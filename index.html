@@ -1,17 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>PeerPrep</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-  </head>
-  <body>
-    <main>
-        <h1>Welcome to PeerPrep</h1>  
-    </main>
-	<script src="index.js"></script>
-  </body>
+    <link rel="stylesheet" href="css/styles.css">
+     <!-- For icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Questions</title>
+</head>
+<body>
+    <h1>Questions</h1>
+
+    <!-- Create a container to hold the two columns -->
+    <div class="container">
+        <!-- Left column for question list -->
+        <div class="column" id="left-column">
+            
+            <!-- Form for adding a new question -->
+            <form id="add-question-form">
+                <!-- Add input fields for question attributes here -->
+                <div class="form-group">
+                    <label for="question-title">Title*:</label>
+                    <input type="text" id="question-title" placeholder="Question Title" required>
+                </div>
+                <div class="form-group">
+                    <label for="question-complexity">Complexity:</label>
+                    <!-- Add a select dropdown for question complexity -->
+                    <select id="question-complexity">
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                    
+                    <label for="question-category">Category:</label>
+                    <input type="text" id="question-category" placeholder="Question Category">
+                </div>
+                <div class="form-group">
+                    <label for="question-description"class="top-label">Description*:</label>
+                    <textarea id="question-description" placeholder="Question Description" required></textarea>
+                </div>
+                <button type="submit">Add Question</button>
+            </form>
+            
+            <div class="column" id="question-list">
+                <!-- Questions will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Right column for question display and form -->
+        <div class="column" id="right-column">
+        
+            <!-- Display question details here -->
+            <div id="question-details">
+                <!-- Question details will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript includes -->
+    <script src="src/index.js"></script>
+</body>
 </html>
