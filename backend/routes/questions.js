@@ -1,5 +1,5 @@
-const express  = require('express')
-const { 
+const express = require('express')
+const {
     getQuestions,
     getQuestion,
     createQuestion,
@@ -22,6 +22,6 @@ router.post('/', createQuestion)
 router.delete('/:id', deleteQuestion)
 
 // UPDATE a new question
-router.patch('/:id',updateQuestion)
+router.patch('/:id', updateQuestion)
 
 module.exports = router
