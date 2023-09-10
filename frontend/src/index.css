@@ -131,14 +131,58 @@ input.error {
 select.error {
   border: 1px solid var(--error);
 }
-
-/* Multiselect container */
-.Multiselect .search-box {
-	border: none;
-	font-size: 10px;
-	min-height: 50px;
+.custom-arrow {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-left: 5px;
 }
 
-.Multiselect .chips {
-  background: red;
+/* question details table */
+/* Add borders to the table */
+.table-container {
+  width: 100%;
+}
+
+/* Style table headers */
+.table-header {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Style table headers */
+.table-header th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  background-color: #f2f2f2;
+}
+
+/* Style table rows */
+.table-row td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Style the delete button cell */
+.delete-button {
+  cursor: pointer;
+}
+
+/* Style the delete button cell on hover */
+.delete-button:hover {
+  background-color: red;
+  color: white;
+}
+
+/* Style the title cell */
+/* Style clickable <td> elements */
+.clickable-cell {
+  cursor: pointer; /* Change cursor to pointer on hover */
+  color: #007bff; /* Set the default text color */
+}
+
+/* Change text color on hover */
+.clickable-cell:hover {
+  color: #0056b3; /* Set the hover text color */
 }

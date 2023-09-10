@@ -17,15 +17,14 @@ const QuestionDetails = ({ question,  onClick }) => {
         }
     }
     return (
-        <div className="question-details">
-            <h4 onClick={() => onClick(question)}>{question.title}</h4>
-            <p>Complexity: {question.complexity}</p>
-            <p>Category: {question.category}</p>
-            <p>Description: {question.description}</p>
-            <p>{formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</p>
-            <span className="material-symbols-outlined" onClick={handleClick}>delete</span>
-    </div>    
-    )
+        <tr className="table-row"> {/* Use table row element */}
+          <td className="clickable-cell" onClick={() => onClick(question)}>{question.title}</td>
+          <td>{question.complexity}</td>
+          <td>{question.category.join(', ')}</td>
+          <td>{formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</td>
+          <td className="delete-button material-symbols-outlined" onClick={handleClick}>delete</td>
+        </tr>
+      )      
 }
 
 export default QuestionDetails

@@ -24,27 +24,39 @@ const Home = () => {
 
         fetchQuestions()
     }, [dispatch])
-
     return (
-        <div className="home">
-      <QuestionForm />
-      <div className="questions">
-        {questions &&
-          questions.map((question) => (
-            <QuestionDetails
-              key={question._id}
-              question={question}
-              onClick={(question) => {
-                setSelectedQuestion(question)
-              }} // Pass the click event handler
-            />
-          ))}
+      <div className="home">
+        <QuestionForm />
+        <div className="table-container">
+          <table className="table-header">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Complexity</th>
+                <th>Category</th>
+                <th>Created</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {questions &&
+                questions.map((question) => (
+                  <QuestionDetails
+                    key={question._id}
+                    question={question}
+                    onClick={(question) => {
+                      setSelectedQuestion(question);
+                    }}
+                  />
+                ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="QuestionInfo">
+          <QuestionInfo selectedQuestion={selectedQuestion} />
+        </div>
       </div>
-      <div className="QuestionInfo">
-        <QuestionInfo selectedQuestion={selectedQuestion} />
-      </div>
-    </div>
-    )
+    )    
 }
 
 export default Home

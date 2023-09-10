@@ -23,36 +23,48 @@ const QuestionForm = () => {
             backgroundColor: 'white',
         },
         searchBox: {
-            borderColor: 'grey',
-            padding: '10px',
+            borderColor: '#ddd',
+            padding: '0px',
+            paddingTop: '5px',
             marginTop: '10px',
-            marginBottom: '20px',
+            marginBottom: '10px',
             width: '100%',
             border: '1px solid #ddd',
             borderRadius: '4px',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            backgroundColor: '#e6f2f1',
         },
         inputField: {
+            backgroundColor: 'white',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            margin: '0px',
         },
         chips: {
             backgroundColor: '#1aac83',
+            marginLeft: '5px',
             color: 'white',
         },
         optionContainer: {
-            border: '1px solid #ccc'
+            border: '1px solid #ccc',
+            alignItems: 'center',
         },
         option: {
             color: 'black',
-            backgroundColor: 'white',
-            display: 'flex',
+            display: 'inline-block',
+            borderRadius: '4px',
             alignItems: 'center',
-        }
+            padding: '5px',
+            margin: '0px',
+        },
+        
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault() //prevent page refresh
 
         const category = selectedCategories;
+        console.log(category)
 
         const question = { title, complexity, category, description }
 
@@ -84,14 +96,16 @@ const QuestionForm = () => {
 
     const handleCategoryChange = (e) => {
         const selectedCategory = e;
-        if (selectedCategories.includes(selectedCategory)) {
-            // If the category is already selected, remove it from the selectedCategories array
-            setSelectedCategories(selectedCategories.filter((category) => category !== selectedCategory));
-        } else {
-            // If the category is not selected, add it to the selectedCategories array
-            setSelectedCategories([...selectedCategories, selectedCategory]);
-        }
+        // if (selectedCategories.includes(selectedCategory)) {
+        //     // If the category is already selected, remove it from the selectedCategories array
+        //     setSelectedCategories(selectedCategories.filter((category) => category !== selectedCategory));
+        // } else {
+        //     // If the category is not selected, add it to the selectedCategories array
+        //     setSelectedCategories([...selectedCategories, selectedCategory]);
+        // }
+        setSelectedCategories(e)
         console.log(e)
+        console.log(selectedCategories)
     }
 
     return (
@@ -126,6 +140,7 @@ const QuestionForm = () => {
                 options={categoryOptions}
                 onRemove={handleCategoryChange}
                 onSelect={handleCategoryChange}
+                selectedValues={selectedCategories}
                 placeholder='Select Category'
                 showCheckbox
                 showArrow
