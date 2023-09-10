@@ -2,10 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { QuestionsContextProvider } from './context/QuestionContext'
 
 ReactDOM.render(
   <React.StrictMode>
+    <QuestionsContextProvider>
     <App />
+    </QuestionsContextProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
