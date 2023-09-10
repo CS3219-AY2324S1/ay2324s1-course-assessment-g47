@@ -1,6 +1,9 @@
 // QuestionInfo.js
 import React from 'react';
 
+//date
+import { format } from 'date-fns';
+
 // Function to parse the description and replace Base64-encoded images
 const parseDescription = (description) => {
   const imageRegex = /<img[^>]+src=['"]data:image\/[^'"]+['"][^>]*>/g;
@@ -38,12 +41,13 @@ const QuestionInfo = ({ selectedQuestion }) => {
   return (
     <div className="question-info">
     <h4>{selectedQuestion.title}</h4>
-    <p>Complexity: {selectedQuestion.complexity}</p>
-    <p>Category: {selectedQuestion.category.join(', ')}</p>
+    <p><strong>Complexity:</strong>  {selectedQuestion.complexity}</p>
+    <p><strong>Category:</strong> {selectedQuestion.category.join(', ')}</p>
+    <p><strong>Description:</strong></p>
     <div className="card-description">
       {parseDescription(selectedQuestion.description)}
     </div>
-    <p>Created at: {selectedQuestion.createdAt}</p>
+    <p className='question-btm-subtext'>Created at: {format(new Date(selectedQuestion.createdAt), 'dd MMM yyyy HH:mm:ss')}</p>
   </div>
   );
 };

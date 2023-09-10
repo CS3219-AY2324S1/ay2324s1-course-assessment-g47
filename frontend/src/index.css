@@ -145,19 +145,25 @@ select.error {
   margin-left: 5px;
 }
 
+.editor-container{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .editor-container .ql-editor {
   min-height: 200px;
   padding: 10px;
-  margin: 10px;
-  box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
+  box-shadow: 0 0 5px 0 rgba(0,0,0,0.1);
   background-color: white;
 }
 
 
-/* question details table */
+//* question details table */
 /* Add borders to the table */
 .table-container {
   width: 100%;
+  max-width: 500px; /* Set a maximum width for the table */
+  overflow: hidden; /* Hide content that overflows the container */
 }
 
 /* Style table headers */
@@ -172,6 +178,10 @@ select.error {
   padding: 8px;
   text-align: left;
   background-color: #f2f2f2;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide content that overflows the cell */
+  text-overflow: ellipsis; /* Add ellipsis (...) for overflowed text */
+  max-width: 150px; /* Set a maximum width for the header cells */
 }
 
 /* Style table rows */
@@ -179,6 +189,10 @@ select.error {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide content that overflows the cell */
+  text-overflow: ellipsis; /* Add ellipsis (...) for overflowed text */
+  max-width: 150px; /* Set a maximum width for the data cells */
 }
 
 /* Style the delete button cell */
@@ -230,11 +244,23 @@ select.error {
 .question-info p {
   font-size: 16px; /* Adjust the font size as needed */
   margin-bottom: 8px; /* Spacing between text elements */
+  line-height: 0.5; /* Adjust the line height as needed */
+}
+
+.question-info .question-btm-subtext {
+  font-size: x-small;
+  color: #777;
+  text-align: center;
 }
 
 /* CSS for the description */
 .card-description {
   margin-top: 8px; /* Spacing above the description */
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  width: 100%;
+  box-sizing: border-box; /* Include padding and border within width */
 }
 
 /* CSS for the image */

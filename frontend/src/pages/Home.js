@@ -9,6 +9,7 @@ import QuestionInfo from '../components/QuestionInfo'; // Import the QuestionInf
 const Home = () => {
     const {questions, dispatch} = useQuestionsContext()
     const [selectedQuestion, setSelectedQuestion] = useState(null); // State to store the selected question
+    let rowCount = 1;
 
     // fetch questions from the backend
     useEffect(() => {
@@ -23,6 +24,8 @@ const Home = () => {
 
         fetchQuestions()
     }, [dispatch])
+
+
     return (
       <div className="home">
         <QuestionForm />
@@ -30,6 +33,7 @@ const Home = () => {
           <table className="table-header">
             <thead>
               <tr>
+                <th>#</th>
                 <th>Title</th>
                 <th>Complexity</th>
                 <th>Category</th>
@@ -41,10 +45,17 @@ const Home = () => {
               {questions &&
                 questions.map((question) => (
                   <QuestionDetails
+                  id = {rowCount++}
                     key={question._id}
                     question={question}
                     onClick={(question) => {
                       setSelectedQuestion(question);
+                    }}
+                    onDelete={(questionId) => {
+                      if (selectedQuestion._id === questionId) {
+                        setSelectedQuestion(null);
+                      }
+                
                     }}
                   />
                 ))}

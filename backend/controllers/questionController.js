@@ -42,7 +42,7 @@ const createQuestion = async (req, res) => {
     if(!complexity){
         emptyFields.push('complexity')
     }
-    if(!category){
+    if(!category || category.length === 0){
         emptyFields.push('category')
     }
     if(!description){

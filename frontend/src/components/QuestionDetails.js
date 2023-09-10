@@ -3,7 +3,7 @@ import { useQuestionsContext } from "../hooks/useQuestionsContext"
 //date
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 
-const QuestionDetails = ({ question,  onClick }) => {
+const QuestionDetails = ({ id, question,  onClick, onDelete }) => {
     const {dispatch} = useQuestionsContext()
 
     const handleClick = async() => {
@@ -14,10 +14,12 @@ const QuestionDetails = ({ question,  onClick }) => {
         
         if(response.ok){
             dispatch({type: 'DELETE_QUESTION', payload: json})
+            onDelete(question._id);
         }
     }
     return (
         <tr className="table-row"> {/* Use table row element */}
+        <td>{id}</td>
           <td className="clickable-cell" onClick={() => onClick(question)}>{question.title}</td>
           <td>{question.complexity}</td>
           <td>{question.category.join(', ')}</td>
