@@ -6,7 +6,6 @@ import QuestionDetails from '../components/QuestionDetails'
 import QuestionForm from '../components/QuestionForm'
 import QuestionInfo from '../components/QuestionInfo'; // Import the QuestionInfo component
 
-
 const Home = () => {
     const {questions, dispatch} = useQuestionsContext()
     const [selectedQuestion, setSelectedQuestion] = useState(null); // State to store the selected question
@@ -55,6 +54,7 @@ const Home = () => {
         <div className="QuestionInfo">
           <QuestionInfo selectedQuestion={selectedQuestion} />
         </div>
+        
       </div>
     )    
 }

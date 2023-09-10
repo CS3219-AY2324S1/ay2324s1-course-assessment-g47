@@ -87,6 +87,14 @@ header a {
 
 
 /* new question form */
+.create {
+  background-color: #f5f5f5; /* Light grey background color */
+  border-radius: 10px; /* Rounded corners */
+  padding: 20px;
+  margin: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle lift */
+}
+
 label, input {
   display: block;
 }
@@ -137,6 +145,15 @@ select.error {
   margin-left: 5px;
 }
 
+.editor-container .ql-editor {
+  min-height: 200px;
+  padding: 10px;
+  margin: 10px;
+  box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
+  background-color: white;
+}
+
+
 /* question details table */
 /* Add borders to the table */
 .table-container {
@@ -185,4 +202,63 @@ select.error {
 /* Change text color on hover */
 .clickable-cell:hover {
   color: #0056b3; /* Set the hover text color */
+}
+
+/* Quesiton info */
+/* CSS for the card container */
+.question-info {
+  background-color: #f5f5f5; /* Light grey background color */
+  border-radius: 10px; /* Rounded corners */
+  padding: 20px;
+  margin: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle lift */
+  text-align: left; /* Left-align children */
+  display: flex; /* Enable flexbox layout */
+  flex-direction: column; /* Stack children vertically */
+  align-items: left; /* Center children horizontally */
+  justify-content: center; /* Center children vertically */
+}
+
+/* CSS for the title */
+.question-info h4 {
+  font-size: 24px; /* Adjust the font size as needed */
+  font-weight: bold;
+  margin-bottom: 10px; /* Spacing below the title */
+}
+
+/* CSS for other text elements (complexity, category, description) */
+.question-info p {
+  font-size: 16px; /* Adjust the font size as needed */
+  margin-bottom: 8px; /* Spacing between text elements */
+}
+
+/* CSS for the description */
+.card-description {
+  margin-top: 8px; /* Spacing above the description */
+}
+
+/* CSS for the image */
+.card-description img {
+  max-width: 100%; /* Ensure images fit within their container */
+  margin-top: 8px; /* Add spacing above images if needed */
+}
+
+/* Apply the styles to the card container */
+.card-container {
+  /* Add any additional styles here if needed */
+}
+
+/* Apply the styles to the card title */
+.card-title {
+  /* Add any additional styles here if needed */
+}
+
+/* Apply the styles to other text elements (complexity, category) */
+.card-text {
+  /* Add any additional styles here if needed */
+}
+
+/* Apply the styles to the description */
+.card-description {
+  /* Add any additional styles here if needed */
 }

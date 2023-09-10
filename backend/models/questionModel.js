@@ -17,7 +17,7 @@ const questionSchema = new Schema({
         required: true
     },
     description: {
-        type: String,
+        type: Object,
         required: true
     },
 }, {timestamps: true})
