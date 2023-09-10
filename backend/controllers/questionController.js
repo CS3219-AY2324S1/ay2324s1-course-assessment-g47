@@ -38,27 +38,44 @@ const createQuestion = async (req, res) => {
 
     if(!title){
         emptyFields.push('title')
-        console.log('title empty')
     }
     if(!complexity){
         emptyFields.push('complexity')
-        console.log('complexity empty')
     }
     if(!category){
         emptyFields.push('category')
-        console.log('category empty')
     }
     if(!description){
         emptyFields.push('description')
-        console.log('description empty')
     }
     if(emptyFields.length > 0){
         console.log(emptyFields)
-        return res.status(400).json({ error: 'Please fill in all the fieldss', emptyFields })
+        return res.status(400).json({ error: 'Please fill in all the fields', emptyFields })
     }
 
     //add doc to db
     try {
+        const existingQuestion = await Question.findOne({ $or: [{ title}, {description}] })
+        if (existingQuestion) {
+
+            let errorMessage = '';
+
+            // Check if the title and/or description is a duplicate
+            if (existingQuestion.title === title) {
+                errorMessage = 'A question with the same title already exists.';
+                emptyFields.push('title')
+                if (existingQuestion.description === description) {
+                    errorMessage = 'A question with the same title and description already exists.';
+                    emptyFields.push('description')
+                }
+
+            } else {
+                errorMessage = 'A question with the same description already exists.';
+                emptyFields.push('description')
+            }
+
+            return res.status(400).json({ error: errorMessage, emptyFields });
+        }
         const question = await Question.create({ title, complexity, category, description })
         res.status(200).json(question)
     } catch (error) {
