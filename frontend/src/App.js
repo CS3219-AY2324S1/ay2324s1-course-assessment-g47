@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './App.css';
 
-import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 // pages & components
 import Home from './pages/Home'
@@ -11,15 +11,15 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-      <Navbar />
-      <div className="pages">
-        <Routes>
-          <Route
-           path="/"
-           element={<Home />} 
-          />
-        </Routes>
-      </div>
+        <Navbar />
+        <div className="pages">
+          <Routes>
+            <Route
+              path="/"
+              element={<Home />}
+            />
+          </Routes>
+        </div>
       </BrowserRouter>
     </div>
   );

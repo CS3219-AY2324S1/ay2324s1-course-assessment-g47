@@ -4,7 +4,7 @@ import { useContext } from "react";
 export const useQuestionsContext = () => {
     const context = useContext(QuestionContext)
 
-    if(!context){
+    if (!context) {
         throw new Error('useQuestionsContext must be used within a QuestionsContextProvider')
     }
 

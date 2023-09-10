@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
-    return(
+    return (
         <header>
             <div className="container">
-                <Link to ="/">
+                <Link to="/">
                     <h1>Question</h1>
                 </Link>
             </div>

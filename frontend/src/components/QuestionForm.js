@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { useQuestionsContext } from '../hooks/useQuestionsContext'
 import MultiSelect from "multiselect-react-dropdown";
 import Quill from 'quill'
@@ -7,14 +7,14 @@ import 'quill/dist/quill.snow.css'
 const complexityOptions = ["Easy", "Medium", "Hard"];
 const categoryOptions = ["String", "Algorithms", "Data Structures", "Bit Manipulation", "Recursion", "Databases", "Arrays", "Brainteaser"];; // Define your category options here
 
-const TOOLBAR_OPTIONS= [
+const TOOLBAR_OPTIONS = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
-    [{ font: []}],
+    [{ font: [] }],
     [{ list: "ordered" }, { list: "bullet" }],
     ["bold", "italic", "underline"],
-    [{ color: []}, { background: []}],
+    [{ color: [] }, { background: [] }],
     [{ script: "sub" }, { script: "super" }],
-    [{align: []}],
+    [{ align: [] }],
     ["image", "blockquote", "code-block"],
     ["clean"],
 ]
@@ -68,7 +68,7 @@ const QuestionForm = () => {
             padding: '5px',
             margin: '0px',
         },
-        
+
     }
 
     const multiselectErrorStyle = {
@@ -109,7 +109,7 @@ const QuestionForm = () => {
             padding: '5px',
             margin: '0px',
         },
-        
+
     }
 
     const handleSubmit = async (e) => {
@@ -120,7 +120,7 @@ const QuestionForm = () => {
 
         const isQuillEmpty = (quill.getText().trim()) === '';
         if (!isQuillEmpty) {
-        description = quill.root.innerHTML.trim() // Get the HTML content from Quill
+            description = quill.root.innerHTML.trim() // Get the HTML content from Quill
         }
 
         const question = { title, complexity, category, description }
@@ -153,52 +153,51 @@ const QuestionForm = () => {
 
     const handlePaste = (e) => {
         if (quill) {
-        const clipboardData = e.clipboardData || window.clipboardData;
-        const items = clipboardData.items;
-      
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          if (item.type.indexOf("image") !== -1) {
-            const blob = item.getAsFile();
-            const reader = new FileReader();
-      
-            reader.onload = () => {
-              const base64Image = reader.result;
+            const clipboardData = e.clipboardData || window.clipboardData;
+            const items = clipboardData.items;
 
-              const range = quill.getSelection();
-              if (range) {
-                quill.insertEmbed(range.index, 'image', base64Image);
-              }
-            };
-      
-            reader.readAsDataURL(blob);
-          }
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf("image") !== -1) {
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+
+                    reader.onload = () => {
+                        const base64Image = reader.result;
+
+                        const range = quill.getSelection();
+                        if (range) {
+                            quill.insertEmbed(range.index, 'image', base64Image);
+                        }
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
         }
-    }
-      };
-      
+    };
+
     const wrapperRef = useCallback((wrapper) => {
         if (wrapper == null) return;
-      
+
         wrapper.innerHTML = "";
         const editor = document.createElement("div");
         wrapper.append(editor);
         const q = new Quill(editor, {
-          theme: "snow",
-          modules: { toolbar: TOOLBAR_OPTIONS },
-          trimWhitespace: true,
+            theme: "snow",
+            modules: { toolbar: TOOLBAR_OPTIONS },
+            trimWhitespace: true,
         });
 
         q.root.addEventListener('paste', handlePaste);
-      
+
         q.on('text-change', (delta, oldDelta, source) => {
-          if (source === 'user') {
-            setQuill(q);
-          }
+            if (source === 'user') {
+                setQuill(q);
+            }
         });
 
         setQuill(q);
-      }, []);
+    }, []);
 
     return (
         <form className="create" onSubmit={handleSubmit}>
@@ -230,12 +229,8 @@ const QuestionForm = () => {
             <MultiSelect
                 isObject={false}
                 options={categoryOptions}
-                onRemove={(e) => {
-                    setSelectedCategories(e)
-                }}
-                onSelect={(e) => {
-                    setSelectedCategories(e)
-                }}
+                onRemove={(e) => { setSelectedCategories(e) }}
+                onSelect={(e) => { setSelectedCategories(e) }}
                 selectedValues={selectedCategories}
                 placeholder='Select Category'
                 showCheckbox
