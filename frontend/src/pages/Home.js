@@ -7,6 +7,7 @@ import "./Home.css";
 import QuestionList from "../components/QuestionList";
 import QuestionForm from "../components/QuestionForm";
 import QuestionDetails from "../components/QuestionDetails";
+import LoginPage from "../components/Login";
 
 const Home = ({ user, handleLogin, handleLogout }) => {
 	const { questions, dispatch } = useQuestionsContext();
@@ -93,3 +94,5 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 		<LoginPage onSuccessLogin={handleLogin} />
 	);
 };
+
+export default Home;
