@@ -4,7 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const questionRoutes = require("./routes/questions");
 
-const app = express(); //Start up express app
+const app = express();
 
 //middleware
 app.use(express.json()); //Allows us to use json in the body of the request
@@ -14,10 +14,9 @@ app.use((req, res, next) => {
 });
 
 //routes
-app.use("/api/questions", questionRoutes); //Grabs all the routes from the questions.js file
-//The routes will only be used if the path starts with /api/questions
+app.use("/api/questions", questionRoutes);
 
-// connect to mongodb
+// Connect to mongodb
 mongoose
 	.connect(process.env.MONGO_URI)
 	.then(() => {

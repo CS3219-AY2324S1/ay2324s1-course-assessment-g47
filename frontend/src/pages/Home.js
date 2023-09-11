@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 import "./Home.css";
 
 // components
-import QuestionDetails from "../components/QuestionDetails";
+import QuestionList from "../components/QuestionList";
 import QuestionForm from "../components/QuestionForm";
-import QuestionInfo from "../components/QuestionInfo"; // Import the QuestionInfo component
-import LoginPage from "../components/Login";
+import QuestionDetails from "../components/QuestionDetails";
 
 const Home = ({ user, handleLogin, handleLogout }) => {
 	const { questions, dispatch } = useQuestionsContext();
 	const [selectedQuestion, setSelectedQuestion] = useState(null); // State to store the selected question
+	let rowCount = 1;
 
 	// fetch questions from the backend
 	useEffect(() => {
@@ -51,6 +51,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 					<table className="table-header">
 						<thead>
 							<tr>
+								<th>#</th>
 								<th>Title</th>
 								<th>Complexity</th>
 								<th>Category</th>
@@ -61,19 +62,30 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 						<tbody>
 							{questions &&
 								questions.map((question) => (
-									<QuestionDetails
+									<QuestionList
+										id={rowCount++}
 										key={question._id}
 										question={question}
 										onClick={(question) => {
 											setSelectedQuestion(question);
+										}}
+										onDelete={(questionId) => {
+											if (selectedQuestion !== null) {
+												if (
+													selectedQuestion._id ===
+													questionId
+												) {
+													setSelectedQuestion(null);
+												}
+											}
 										}}
 									/>
 								))}
 						</tbody>
 					</table>
 				</div>
-				<div className="QuestionInfo">
-					<QuestionInfo selectedQuestion={selectedQuestion} />
+				<div className="QuestionDetails">
+					<QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>
 			</div>
 		</>
@@ -81,5 +93,3 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 		<LoginPage onSuccessLogin={handleLogin} />
 	);
 };
-
-export default Home;

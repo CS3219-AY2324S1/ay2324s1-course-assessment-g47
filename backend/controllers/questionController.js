@@ -36,26 +36,26 @@ const createQuestion = async (req, res) => {
     console.log(req.body)
     let emptyFields = []
 
-    if(!title){
+    if (!title) {
         emptyFields.push('title')
     }
-    if(!complexity){
+    if (!complexity) {
         emptyFields.push('complexity')
     }
-    if(!category){
+    if (!category || category.length === 0) {
         emptyFields.push('category')
     }
-    if(!description){
+    if (!description) {
         emptyFields.push('description')
     }
-    if(emptyFields.length > 0){
+    if (emptyFields.length > 0) {
         console.log(emptyFields)
         return res.status(400).json({ error: 'Please fill in all the fields', emptyFields })
     }
 
     //add doc to db
     try {
-        const existingQuestion = await Question.findOne({ $or: [{ title}, {description}] })
+        const existingQuestion = await Question.findOne({ $or: [{ title }, { description }] })
         if (existingQuestion) {
 
             let errorMessage = '';
