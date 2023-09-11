@@ -23,6 +23,16 @@ function Register() {
 		e.preventDefault();
 		const { username, email, password } = formData;
 
+		if (password.length < 6) {
+			// Display an error message when the password is too short
+			setFormData({
+				...formData,
+				createSuccess: "",
+				createError: "Password must be at least 6 characters long",
+			});
+			return;
+		}
+
 		try {
 			const response = await fetch(
 				`http://localhost:${postgresqlPort}/users/register`,
@@ -95,6 +105,9 @@ function Register() {
 				</div>
 				{formData.createSuccess && (
 					<p className="success">{formData.createSuccess}</p>
+				)}
+				{formData.createError && (
+					<p className="success">{formData.createError}</p>
 				)}
 				<button className="login-button" type="submit">
 					Create Account
