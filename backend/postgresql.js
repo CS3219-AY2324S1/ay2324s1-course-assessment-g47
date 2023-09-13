@@ -79,14 +79,16 @@ app.post("/users/update/:id", async (req, res) => {
 	const id = req.params.id; // Get the user's ID from the URL parameter
 	const username = req.body.username;
 	const email = req.body.email;
+	const password = req.body.password;
 
 	console.log("User ID: " + id);
 	console.log("Username: " + username);
 	console.log("Email: " + email);
+	console.log("Password: " + password);
 
 	// Construct the UPDATE query with the ID in the WHERE clause
 	const updateSTMT = `UPDATE accounts SET username = '${username}', 
-                       email = '${email}' WHERE user_id = ${id}`;
+                       email = '${email}', password = '${password}' WHERE user_id = ${id}`;
 
 	try {
 		const response = await pool.query(updateSTMT);

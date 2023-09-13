@@ -9,6 +9,7 @@ function Profile({ user, handleUserChange, handleLogout }) {
 	const [localUser, setLocalUser] = useState({
 		username: user ? user.username : "",
 		email: user ? user.email : "",
+		password: user ? user.password : "",
 	});
 
 	const handleEditClick = () => {
@@ -131,6 +132,25 @@ function Profile({ user, handleUserChange, handleLogout }) {
 					/>
 				) : (
 					<span>{user.email}</span>
+				)}
+			</div>
+			<div className="password-wrapper">
+				<label className="login-label">Password:</label>
+				{isEditing ? (
+					<input
+						className="login-input"
+						type="text" // Change input type to text
+						onChange={(e) => {
+							setLocalUser({
+								...localUser,
+								password: e.target.value,
+							});
+						}}
+						value={localUser.password}
+						name="password"
+					/>
+				) : (
+					<span>{"*".repeat(localUser.password.length)}</span> // Display asterisks or a masked value
 				)}
 			</div>
 			<div className="buttons">
