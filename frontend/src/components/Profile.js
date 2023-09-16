@@ -35,7 +35,6 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 			if (response.status === 200) {
 				//successful update
-				const data = await response.json();
 				console.log("Update successful");
 			} else {
 				// Handle other error cases
@@ -69,7 +68,6 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 				if (response.status === 200) {
 					//successful delete
-					const data = await response.json();
 					console.log("Delete successful");
 
 					handleLogout();

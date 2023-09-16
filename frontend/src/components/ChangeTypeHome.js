@@ -9,7 +9,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin}) {
     const postgresqlPort = 4001;
     const [formData, setFormData] = useState({
         email: "",
-        account_type: "",
+        account_type: "user",
         updateSuccess: "",
     });
 
@@ -32,10 +32,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin}) {
 
     const handleSaveClick = async (e) => {
         e.preventDefault();
-        if (user.account_type === "admin" && formData.account_type === "admin") {
-            changeLabelText("Cannot change admin account type");
-            return;
-        }
+        //do not allow admin to change their another admin's account type
         const { email, account_type } = formData;
         
         //get user id from local storage then update user info
@@ -114,7 +111,9 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin}) {
                             >
                                 <option value="user" selected>User</option>
                                 <option value="superuser">SuperUser</option>
-                                <option value="admin">Admin</option>
+                                {user.account_type === "superadmin" ? (
+                                    <option value="admin">Admin</option>
+                                ) : null}
                             </select>
                             </div>
                             <div className="form-group">
