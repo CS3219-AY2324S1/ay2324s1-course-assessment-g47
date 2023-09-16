@@ -35,6 +35,7 @@ import Home from "./pages/Home";
 import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
 import Profile from "./components/Profile";
+import ChangeTypeHome from "./components/ChangeTypeHome";
 
 function App() {
 	const [user, setUser] = useState(null);
@@ -73,6 +74,17 @@ function App() {
 							path="profile"
 							element={
 								<Profile
+									user={user}
+									handleUserChange={onUserchange}
+									handleLogout={handleLogout}
+									handleLogin={handleLogin}
+								/>
+							}
+						/>
+						<Route
+							path="changetype"
+							element={
+								<ChangeTypeHome
 									user={user}
 									handleUserChange={onUserchange}
 									handleLogout={handleLogout}

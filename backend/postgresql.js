@@ -21,11 +21,13 @@ app.post("/users/register", (req, res) => {
 	const email = req.body["email"];
 	const password = req.body["password"];
 
+
 	console.log("Username:" + username);
 	console.log("Email:" + email);
 	console.log("Password:" + password);
+	console.log("Account Type: User");
 
-	const insertSTMT = `INSERT INTO accounts (username, email, password) VALUES ('${username}', '${email}', '${password}');`;
+	const insertSTMT = `INSERT INTO accounts (username, email, password, account_type) VALUES ('${username}', '${email}', '${password}', 'user');`;
 	pool.query(insertSTMT)
 		.then((response) => {
 			console.log("User added");

@@ -35,6 +35,9 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 					<p>
 						<Link to="/profile">Profile</Link>
 					</p>
+					<p>
+						<Link to="/changetype">Change Type</Link>
+					</p>
 				</div>
 				<div className="center">
 					<h1>Welcome, {user.username}</h1>
