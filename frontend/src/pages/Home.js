@@ -33,10 +33,10 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 			<div className="header">
 				<div className="left">
 					<p>
-						<Link to="/profile">Profile</Link>
+						<Link className="button-link" to="/profile">Profile</Link>
 					</p>
 					<p>
-						<Link to="/changetype">Change Type</Link>
+						<Link className="button-link" to="/changetype">Change Account Type</Link>
 					</p>
 				</div>
 				<div className="center">
@@ -44,11 +44,10 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 				</div>
 				<div className="right">
 					<p>
-						<button onClick={() => handleLogout()}>Logout</button>
+						<button className="button-link" onClick={() => handleLogout()}>Logout</button>
 					</p>
 				</div>
 			</div>{" "}
-			(
 			<div className="home">
 				<QuestionForm />
 				<div className="table-container">

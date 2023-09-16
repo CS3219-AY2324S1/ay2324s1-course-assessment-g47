@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import LoginPage from "./Login";
 import "./css/Profile.css";
 
-function Profile({ user, handleUserChange, handleLogout }) {
+function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	const postgresqlPort = 4001;
 	const [isEditing, setIsEditing] = useState(false);
 	const [localUser, setLocalUser] = useState({
@@ -87,14 +87,25 @@ function Profile({ user, handleUserChange, handleLogout }) {
 		}
 	};
 
-	if (!user) {
-		// Return a different component or handle the case when user is not defined
-		return <LoginPage />;
-	}
-
-	return (
+	return user ? (
+		<>
+            <div className="header">
+                <div className="left">
+						{ 	!isEditing ? (
+								<Link className="button-link" to="/">Dashboard</Link>
+							) : null
+						}
+                    </div>
+                    <div className="center">
+                        <h1>Profile Settings</h1>
+                    </div>
+                    <div className="right">
+                        <p>
+                            <button className="button-link" onClick={() => handleLogout()}>Logout</button>
+                        </p>
+                    </div>
+                </div>{" "}
 		<div className="profile-container">
-			<h2 className="profile-heading">Profile</h2>
 			<div className="username-wrapper">
 				<label className="login-label">Username:</label>
 				{isEditing ? (
@@ -158,8 +169,10 @@ function Profile({ user, handleUserChange, handleLogout }) {
 					</>
 				)}
 			</div>
-			{!isEditing ? <Link to="/">Dashboard</Link> : null}
 		</div>
+		</>
+	) : (
+		<LoginPage onSuccessLogin={handleLogin} />
 	);
 }
 
