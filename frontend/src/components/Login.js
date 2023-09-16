@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./css/Login.css";
 
 function LoginPage(props) {
 	const postgresqlPort = 4001;

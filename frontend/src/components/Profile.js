@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import LoginPage from "./Login";
-import "./Login.css";
+import "./css/Profile.css";
 
 function Profile({ user, handleUserChange, handleLogout }) {
 	const postgresqlPort = 4001;

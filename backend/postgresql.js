@@ -21,11 +21,13 @@ app.post("/users/register", (req, res) => {
 	const email = req.body["email"];
 	const password = req.body["password"];
 
+
 	console.log("Username:" + username);
 	console.log("Email:" + email);
 	console.log("Password:" + password);
+	console.log("Account Type: User");
 
-	const insertSTMT = `INSERT INTO accounts (username, email, password) VALUES ('${username}', '${email}', '${password}');`;
+	const insertSTMT = `INSERT INTO accounts (username, email, password, account_type) VALUES ('${username}', '${email}', '${password}', 'user');`;
 	pool.query(insertSTMT)
 		.then((response) => {
 			console.log("User added");
@@ -145,6 +147,29 @@ app.post("/users/delete", async (req, res) => {
 		return res
 			.status(200)
 			.json({ message: "Deleted successful", data: req.body });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+// Update account type using email
+app.post("/users/update/type/:id", async (req, res) => {
+	const email = req.body.email;
+	const account_type = req.body.account_type;
+	
+	console.log("Email:" + email);
+	console.log("Account Type:" + account_type);
+
+	const updateSTMT = `UPDATE accounts SET account_type = '${account_type}' WHERE email = '${email}';`;
+
+	try {
+		const response = await pool.query(updateSTMT);
+		console.log("User updated");
+		console.log(response);
+		return res
+			.status(200)
+			.json({ message: "Update successful", data: req.body });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ error: "Internal server error" });

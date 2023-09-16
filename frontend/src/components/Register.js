@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./css/Login.css";
 
 function Register() {
 	const postgresqlPort = 4001;
@@ -21,7 +21,7 @@ function Register() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const { username, email, password } = formData;
+		const { username, email, password} = formData;
 
 		if (password.length < 6) {
 			// Display an error message when the password is too short
@@ -41,7 +41,7 @@ function Register() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ username, email, password }),
+					body: JSON.stringify({ username, email, password, account_type: "user" }),
 				}
 			);
 
