@@ -26,7 +26,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout}) {
         try {
             console.log(user);
             const response = await fetch(
-                `http://localhost:${postgresqlPort}/users/update/${user.user_id}`,
+                `http://localhost:${postgresqlPort}/users/update/type/${user.user_id}`,
                 {
                     method: "POST",
                     headers: {

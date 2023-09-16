@@ -151,6 +151,29 @@ app.post("/users/delete", async (req, res) => {
 	}
 });
 
+// Update account type using email
+app.post("/users/update/type/:id", async (req, res) => {
+	const email = req.body.email;
+	const account_type = req.body.account_type;
+	
+	console.log("Email:" + email);
+	console.log("Account Type:" + account_type);
+
+	const updateSTMT = `UPDATE accounts SET account_type = '${account_type}' WHERE email = '${email}';`;
+
+	try {
+		const response = await pool.query(updateSTMT);
+		console.log("User updated");
+		console.log(response);
+		return res
+			.status(200)
+			.json({ message: "Update successful", data: req.body });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: "Internal server error" });
+	}
+});
+
 app.listen(port, () =>
 	console.log(`PostgreSQL server running on port ${port}`)
 );
