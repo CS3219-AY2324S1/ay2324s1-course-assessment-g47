@@ -37,7 +37,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 					</p>
 				</div>
 				<div className="center">
-					<h1>Welcome, {user.username}</h1>
+					<h1>Welcome, {user.user.username}</h1>
 				</div>
 				<div className="right">
 					<p>

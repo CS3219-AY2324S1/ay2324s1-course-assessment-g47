@@ -27,7 +27,7 @@
 
 // export default App;
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Layout from "./components/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -35,19 +35,43 @@ import Home from "./pages/Home";
 import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
 import Profile from "./components/Profile";
+import { useAuthContext } from './hooks/useAuthContext';
 
 function App() {
 	const [user, setUser] = useState(null);
+	const { dispatch } = useAuthContext()
+
+	// Load user data from localStorage when the component mounts
+	useEffect(() => {
+		const storedUser = JSON.parse(localStorage.getItem('user'));
+
+		if (storedUser) {
+			setUser(storedUser);
+			dispatch({ type: 'LOGIN', payload: storedUser });
+		}
+	}, [dispatch]);
+
 	const handleLogin = (user) => {
+		// save the user to local storage
+		localStorage.setItem('user', JSON.stringify(user))
+
+		// update the auth context
+		dispatch({type: 'LOGIN', payload: user})
 		setUser(user);
 	};
 
 	const handleLogout = () => {
+		// remove user from storage
+		localStorage.removeItem('user')
+
+		// dispatch logout action
+		dispatch({ type: 'LOGOUT' })
 		setUser(null);
 	};
 
 	const onUserchange = (newUser) => {
 		setUser({ ...user, ...newUser });
+		localStorage.setItem('user', JSON.stringify({ ...user, ...newUser }));
 	};
 	return (
 		<>

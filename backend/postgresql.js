@@ -28,18 +28,33 @@ app.post("/users/register", async (req, res) => {
 	console.log("Email:" + email);
 	console.log("Password:" + password);
 
-	const insertSTMT = `INSERT INTO accounts (username, email, password) VALUES ('${username}', '${email}', '${hashedPassword}');`;
-	pool.query(insertSTMT)
-		.then((response) => {
-			console.log("User added");
-			console.log(response);
-		})
-		.catch((err) => {
-			console.log(err);
-		});
+	try {
+		// Check if the user with the same email or username already exists
+		const userExistsQuery = `SELECT * FROM accounts WHERE email = $1;`;
+		const userExistsResult = await pool.query(userExistsQuery, [email]);
 
-	console.log(req.body);
-	res.json({ message: "Account Created!", data: req.body });
+		if (userExistsResult.rowCount > 0) {
+			// User with the same email or username already exists
+			console.log("User already exists");
+			return res.status(401).json({ message: "Email already exists" });
+		}
+
+		const insertSTMT = `INSERT INTO accounts (username, email, password) VALUES ('${username}', '${email}', '${hashedPassword}');`;
+		pool.query(insertSTMT)
+			.then((response) => {
+				console.log("User added");
+				console.log(response);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+
+		console.log(req.body);
+		res.json({ message: "Account Created!", data: req.body });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err.message });
+	}
 });
 
 // Login User
