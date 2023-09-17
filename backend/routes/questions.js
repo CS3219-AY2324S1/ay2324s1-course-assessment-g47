@@ -8,10 +8,10 @@ const {
 } = require('../controllers/questionController')
 
 const router = express.Router()
-//const authenticateToken = require('../middleware/authorization'); // Import the middleware
+const authenticateToken = require('../middleware/authorization'); // Import the middleware
 
 // Apply the authenticateToken middleware to all routes below
-//router.use(authenticateToken);
+router.use(authenticateToken);
 
 // GET all questions
 router.get('/', getQuestions)

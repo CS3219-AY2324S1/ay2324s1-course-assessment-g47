@@ -17,7 +17,8 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 	// fetch questions from the backend
 	useEffect(() => {
 		const fetchQuestions = async () => {
-			const response = await fetch("/api/questions");
+			const response = await fetch("/api/questions", { 
+				headers: { Authorization: `Bearer ${user.tokens.accessToken}` } });
 			const json = await response.json();
 
 			if (response.ok) {
@@ -25,8 +26,10 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 			}
 		};
 
-		fetchQuestions();
-	}, [dispatch]);
+		if (user) {
+			fetchQuestions();
+		}
+	}, [dispatch,user]);
 
 	return user ? (
 		<>
