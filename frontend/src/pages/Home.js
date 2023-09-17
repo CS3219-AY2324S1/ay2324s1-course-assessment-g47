@@ -45,7 +45,6 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 					</p>
 				</div>
 			</div>{" "}
-			(
 			<div className="home">
 				<QuestionForm />
 				<div className="table-container">

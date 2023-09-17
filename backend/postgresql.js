@@ -5,6 +5,8 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./database");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { jwtTokens } = require("./utils/jwt-helpers");
 const port = process.env.POSTGRESQLPORT;
 
 const app = express(); //Start up express app
@@ -14,18 +16,19 @@ app.use(express.json()); // Body parser middleware
 app.use(cors()); // CORS middleware (allows requests from other domains)
 
 // Register User
-app.post("/users/register", (req, res) => {
+app.post("/users/register", async (req, res) => {
 	res.setHeader("Content-Type", "application/json");
 
 	const username = req.body["username"];
 	const email = req.body["email"];
 	const password = req.body["password"];
+	const hashedPassword = await bcrypt.hash(password, 10);
 
 	console.log("Username:" + username);
 	console.log("Email:" + email);
 	console.log("Password:" + password);
 
-	const insertSTMT = `INSERT INTO accounts (username, email, password) VALUES ('${username}', '${email}', '${password}');`;
+	const insertSTMT = `INSERT INTO accounts (username, email, password) VALUES ('${username}', '${email}', '${hashedPassword}');`;
 	pool.query(insertSTMT)
 		.then((response) => {
 			console.log("User added");
@@ -43,31 +46,27 @@ app.post("/users/register", (req, res) => {
 app.post("/users/login", async (req, res) => {
 	res.setHeader("Content-Type", "application/json");
 
-	const email = req.body["email"];
-	const password = req.body["password"];
-
-	console.log("Email:" + email);
-	console.log("Password:" + password);
-
-	const selectSTMT = `SELECT * FROM accounts WHERE 
-        email = '${email}' AND password = '${password}';`;
+	const { email, password } = req.body;
 
 	try {
-		const response = await pool.query(selectSTMT);
+		const response = await pool.query('SELECT * FROM accounts WHERE email = $1', [email]);
 
 		if (response.rows.length === 0)
-			return res.status(401).json({ error: "Invalid email or password" });
+			return res.status(401).json({ error: "Email is incorrect" });
 
-		const user = response.rows[0];
-		console.log(user);
+		user = response.rows[0];
 
-		if (user.password !== password) {
-			// Password does not match
-			return res.status(401).json({ error: "Invalid email or password" });
-		}
+		//PASSWORD CHECK
+		const validPassword = await bcrypt.compare(password, user.password);
+		if (!validPassword) return res.status(401).json({error: "Incorrect password"});
+
+		// Create a JWT token
+		let tokens = jwtTokens(user);//Gets access and refresh tokens
+		res.cookie('refresh_token', tokens.refreshToken, {...(process.env.COOKIE_DOMAIN && {domain: process.env.COOKIE_DOMAIN}) , httpOnly: true,sameSite: 'none', secure: true});
+	
 
 		// Successful login
-		return res.status(200).json({ message: "Login successful", user });
+		return res.status(200).json({ message: "Login successful", user, tokens});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ error: "Internal server error" });
