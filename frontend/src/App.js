@@ -36,6 +36,8 @@ import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
 import Profile from "./components/Profile";
 import ChangeTypeHome from "./components/ChangeTypeHome";
+import VerifyOTP from "./components/VerifyOTP";
+import ResendOTP from "./components/ResendOTP";
 
 function App() {
 	const [user, setUser] = useState(null);
@@ -93,6 +95,8 @@ function App() {
 							}
 						/>
 					</Route>
+					<Route path="/verifyOTP" element={<VerifyOTP />}> </Route>
+					<Route path="/resendOTPVerificationCode" element={<ResendOTP />}> </Route>
 				</Routes>
 			</BrowserRouter>
 		</>

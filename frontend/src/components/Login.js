@@ -104,6 +104,9 @@ function LoginPage(props) {
 			</form>
 			<div>
 				<Link to="/register">Not a user? Sign up now</Link>
+				<br />
+				<br />
+				<Link to="/verifyOTP">Click here to verify your account now!</Link>
 			</div>
 			{/* <div>
 				<Link to="/forgetPassword">Forgot password? Reset here</Link>

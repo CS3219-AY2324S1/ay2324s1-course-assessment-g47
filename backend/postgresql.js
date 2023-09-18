@@ -90,6 +90,12 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 		const hashedOTP = await bcrypt.hash(otp, saltRounds);
 
 		try {
+			const UserOTPVerificationRecords = await UserOTPVerification.find({ email: email.toString(), });
+			if (UserOTPVerificationRecords.length > 0) {
+				throw new Error (
+					"An existing account with this email address has already been created! Please try with a new email address!"
+				);
+			}
 			const newOTPVerification = new UserOTPVerification({
 			  user_Id: _id,
 			  email: email,
@@ -103,7 +109,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 
 			await transporter.sendMail(mailOptions);
 
-		  } catch (error) {
+		} catch (error) {
 			console.error("Error while inserting into MongoDB:", error);
 			if (res) {
 			  res.status(500).json({
@@ -111,7 +117,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 				message: "Internal server error",
 			  });
 			}
-		  }
+		}
 	} catch (error) {
 		console.log(error);
 		if (res) {
@@ -265,14 +271,14 @@ app.listen(port, () =>
 // Verify OTP email
 app.post("/verifyOTP", async (req, res) => {
 	try {
-		let { userId, otp } = req.body;
-		console.log(userId);
+		let { email, otp } = req.body;
+		console.log(email);
 		console.log(otp);
-		if (!userId || !otp) {
+		if (!email || !otp) {
 			throw Error("Empty OTP details are not allowed");
 		} else {
 			const UserOTPVerificationRecords = await UserOTPVerification.find({
-				_id: userId.toString(),
+				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length <= 0) {
 				throw new Error (
@@ -281,11 +287,11 @@ app.post("/verifyOTP", async (req, res) => {
 			} else {
 				const { expiresAt } = UserOTPVerificationRecords[0];
 				const hashedOTP = UserOTPVerificationRecords[0].otp;
-				const storedEmail = UserOTPVerificationRecords[0].email;
+				// const storedEmail = UserOTPVerificationRecords[0].email;
 
 				if (expiresAt < Date.now()) {
 					// User OTP record has expired
-					await UserOTPVerification.deleteMany({ _id: userId.toString() });
+					await UserOTPVerification.deleteMany({ email: email.toString() });
 					throw new Error("Code has expired. Please request again.");
 				} else {
 					const validOTP = await bcrypt.compare(otp, hashedOTP);
@@ -293,10 +299,11 @@ app.post("/verifyOTP", async (req, res) => {
 						// OTP given is wrong / invalid
 						throw new Error("Invalid verification code given. Check your inbox and submit again.");
 					} else {
-						const updateAuthentication = `UPDATE accounts SET authentication_stats = 'true' WHERE email = '${storedEmail}';`;
+						const updateAuthentication = `UPDATE accounts SET authentication_stats = 'true' WHERE email = '${email}';`;
 						const response = await pool.query(updateAuthentication);
 						console.log("User updated");
 						console.log(response);
+						await UserOTPVerification.deleteMany({ email: email.toString() });
 						return res
 							.status(200)
 							.json({ status: "VERIFIED", message: "You are now verified!", data: req.body });
@@ -313,30 +320,38 @@ app.post("/verifyOTP", async (req, res) => {
 // Resending OTP
 app.post("/resendOTPVerificationCode", async (req, res) => {
 	try {
-		let { userId, email } = req.body;
+		let { email } = req.body;
 
-		if (!userId || !email) {
+		if (!email) {
 			throw Error("Empty user details are not allowed");
 		} else {
+			// check if there's even an entry for this email
+			const UserOTPVerificationRecords = await UserOTPVerification.find({ email: email.toString(), });
+			if (UserOTPVerificationRecords.length <= 0) {
+				throw new Error (
+					"An existing account with this email address has already been created! Please try with a new email address!"
+				);
+			}
 			// delete existing records and resend
-			await UserOTPVerification.deleteMany({ _id: userId.toString() });
+			await UserOTPVerification.deleteMany({ email: email.toString() });
 			const selectUserIdQuery = `SELECT user_id FROM accounts WHERE email = '${email}';`;
 			const response = await pool.query(selectUserIdQuery);
+			const userID = response.rows[0].user_id;
 			console.log(response);
 
 			if (response.rowCount === 0) {
 				throw Error("Invalid email given. Please check the email you keyed in and resubmit.");
 			}
 
-			sendOTPVerificationEmail({ _id: userId, email }, res);
+			sendOTPVerificationEmail({ _id: userID, email }, res);
 			return res
 			.status(200)
 			.json({ status: "RESENT", message: "New verification code has been sent to you.", data: req.body });
 		}
 	} catch (error) {
-		res.json({
-			status: "FAILED",
-			message: error.message,
+		return res
+			.status(500)
+			.json({ status: "FAILED", message: error.message,
 		});
 	}
 });
