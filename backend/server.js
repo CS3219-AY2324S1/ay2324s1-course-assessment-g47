@@ -3,7 +3,6 @@ require("dotenv").config(); //Load env variables
 const express = require("express");
 const mongoose = require("mongoose");
 const questionRoutes = require("./routes/questions");
-const routes = require("./routes/routes");
 
 const app = express();
 
@@ -16,7 +15,6 @@ app.use((req, res, next) => {
 
 //routes
 app.use("/api/questions", questionRoutes);
-app.use("/api/v1", routes);
 
 // Connect to mongodb
 mongoose
