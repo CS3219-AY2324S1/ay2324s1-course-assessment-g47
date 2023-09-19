@@ -3,7 +3,7 @@ import { useAuthContext } from '../hooks/useAuthContext'
 
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 
-const QuestionList = ({ id, question, onClick, onDelete, user }) => {
+const QuestionList = ({ id, question, onClick, onDelete }) => {
     const { dispatch } = useQuestionsContext()
     const { user } = useAuthContext()
 

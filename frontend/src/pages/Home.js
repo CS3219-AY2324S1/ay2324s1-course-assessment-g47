@@ -39,7 +39,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 						<Link className="button-link" to="/profile">Profile</Link>
 					</p>
 					<p>
-						{user.account_type === "superadmin" || user.account_type === "admin" ? (
+						{user.user.account_type === "superadmin" || user.user.account_type === "admin" ? (
 							<Link className="button-link" to="/changetype">Change Account Type</Link>
 						) : null}
 					</p>
@@ -54,7 +54,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 				</div>
 			</div>{" "}
 			<div className="home">
-			{user.account_type !== "user" ? (
+			{user.user.account_type !== "user" ? (
 				<QuestionForm />
 			) : null}
 				<div className="table-container">
@@ -91,7 +91,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 												}
 											}
 										}}
-										user={user}
+										user={user.user}
 									/>
 								))}
 						</tbody>

@@ -9,9 +9,9 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	const postgresqlPort = 4001;
 	const [isEditing, setIsEditing] = useState(false);
 	const [localUser, setLocalUser] = useState({
-		username: user ? user.username : "",
-		email: user ? user.email : "",
-		password: user ? user.password : "",
+		username: user ? user.user.username : "",
+		email: user ? user.user.email : "",
+		password: user ? user.user.password : "",
 	});
 
 	const handleEditClick = () => {
@@ -34,7 +34,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		try {
 			console.log(user);
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/update/${user.user_id}`,
+				`http://localhost:${postgresqlPort}/users/update/${user.user.user_id}`,
 				{
 					method: "POST",
 					headers: {

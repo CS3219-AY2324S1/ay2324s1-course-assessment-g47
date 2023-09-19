@@ -76,7 +76,7 @@ app.post("/users/register", async (req, res) => {
 
 		// console.log("Hashed password:" + hashedPassword);
 
-		const insertSTMT = `INSERT INTO accounts (username, email, password, account_type) VALUES ('${username}', '${email}', '${password}', 'user') RETURNING user_id;`;
+		const insertSTMT = `INSERT INTO accounts (username, email, password, account_type) VALUES ('${username}', '${email}', '${hashedPassword}', 'user') RETURNING user_id;`;
 		pool.query(insertSTMT)
 			.then((response) => {
 				id_counter = response.rows[0].user_id;
@@ -169,6 +169,11 @@ app.post("/users/login", async (req, res) => {
 		//PASSWORD CHECK
 		const validPassword = await bcrypt.compare(password, user.password);
 		if (!validPassword) return res.status(401).json({error: "Incorrect password"});
+
+		const authentication_stats = user.authentication_stats;
+		if (!authentication_stats) {
+			return res.status(401).json({ error: "Please verify your account first!" });
+		}
 
 		// Create a JWT token
 		let tokens = jwtTokens(user);//Gets access and refresh tokens
