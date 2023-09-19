@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./css/Login.css";
+import "./Login.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Register() {
 	const postgresqlPort = 4001;
@@ -44,10 +46,9 @@ function Register() {
 					body: JSON.stringify({ username, email, password, account_type: "user" }),
 				}
 			);
-
+			const data = await response.json();
 			if (response.status === 200) {
 				// Successful registration
-				const data = await response.json();
 				setFormData({
 					...formData,
 					createSuccess: data.message,
@@ -57,9 +58,15 @@ function Register() {
 			} else {
 				// Handle other error cases
 				console.log("Server error");
+				// Show an error toast message
+				toast.error(data.message);
 			}
 		} catch (error) {
 			console.error("Error:", error);
+			// Show an error toast message for network errors
+			toast.error(
+				"Network error. Please check your internet connection."
+			);
 		}
 	};
 
@@ -116,6 +123,7 @@ function Register() {
 			<div>
 				<Link to="/">Already a user? Login now</Link>
 			</div>
+			<ToastContainer />
 		</div>
 	);
 }

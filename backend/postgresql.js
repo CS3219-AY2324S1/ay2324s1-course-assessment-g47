@@ -44,7 +44,7 @@ app.use(cors()); // CORS middleware (allows requests from other domains)
 // Register User
 let id_counter;
 
-app.post("/users/register", (req, res) => {
+app.post("/users/register", async (req, res) => {
 	res.setHeader("Content-Type", "application/json");
 
 	const username = req.body["username"];
@@ -57,21 +57,41 @@ app.post("/users/register", (req, res) => {
 	console.log("Password:" + password);
 	console.log("Account Type: User");
 
-	const insertSTMT = `INSERT INTO accounts (username, email, password, account_type) VALUES ('${username}', '${email}', '${password}', 'user') RETURNING user_id;`;
-	pool.query(insertSTMT)
-		.then((response) => {
-			id_counter = response.rows[0].user_id;
-			console.log("User added");
-			console.log(response);
-			console.log("Last Inserted ID:", id_counter);
-		})
-		.catch((err) => {
-			console.log(err);
-		});
+	try {
+		// Check if the user with the same email or username already exists
+		const userExistsQuery = `SELECT * FROM accounts WHERE email = $1;`;
+		const userExistsResult = await pool.query(userExistsQuery, [email]);
 
-	console.log(req.body);
-	res.json({ message: "Account Created!", data: req.body });
-	sendOTPVerificationEmail({ _id: id_counter, email, res });
+		if (userExistsResult.rowCount > 0) {
+			// User with the same email or username already exists
+			console.log("User already exists");
+			return res.status(401).json({ message: "Email already exists" });
+		}
+		// Hash the password
+		// const saltRounds = 10; // Number of salt rounds
+		// const hashedPassword = bcrypt.hashSync(password, saltRounds);
+
+		// console.log("Hashed password:" + hashedPassword);
+
+		const insertSTMT = `INSERT INTO accounts (username, email, password, account_type) VALUES ('${username}', '${email}', '${password}', 'user') RETURNING user_id;`;
+		pool.query(insertSTMT)
+			.then((response) => {
+				id_counter = response.rows[0].user_id;
+				console.log("User added");
+				console.log(response);
+				console.log("Last Inserted ID:", id_counter);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	
+		console.log(req.body);
+		res.json({ message: "Account Created!", data: req.body });
+		sendOTPVerificationEmail({ _id: id_counter, email, res });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err.message });
+	}
 });
 
 // Send OTP verification email

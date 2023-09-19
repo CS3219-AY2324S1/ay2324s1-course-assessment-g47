@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import LoginPage from "./Login";
-import "./css/Profile.css";
+import "./Login.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Profile({ user, handleUserChange, handleLogout }) {
 	const postgresqlPort = 4001;
@@ -17,8 +19,16 @@ function Profile({ user, handleUserChange, handleLogout }) {
 	};
 
 	const handleSaveClick = async (e) => {
+		// Check if the username and email are not empty
+		if (!localUser.username || !localUser.email || !localUser.password) {
+			console.log("Username, email and password cannot be empty");
+			toast.error("Username, email and password cannot be empty");
+			return;
+		}
+
 		e.preventDefault();
 		setIsEditing(false);
+
 		handleUserChange(localUser);
 		//get user id from local storage then update user info
 		try {
@@ -179,6 +189,7 @@ function Profile({ user, handleUserChange, handleLogout }) {
 				)}
 			</div>
 			{!isEditing ? <Link to="/">Dashboard</Link> : null}
+			<ToastContainer />
 		</div>
 	);
 }
