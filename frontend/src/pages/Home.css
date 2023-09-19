@@ -19,21 +19,4 @@
     font-weight: bold;
   }
   
-  .left a {
-    color: #333;
-    text-decoration: none;
-    font-size: 18px;
-  }
-  
-  .right button {
-    background-color: transparent;
-    color: #333;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .right button:hover {
-    text-decoration: underline;
-  }
   

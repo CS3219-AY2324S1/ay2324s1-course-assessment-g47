@@ -5,7 +5,7 @@ import "./css/Login.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function Profile({ user, handleUserChange, handleLogout }) {
+function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	const postgresqlPort = 4001;
 	const [isEditing, setIsEditing] = useState(false);
 	const [localUser, setLocalUser] = useState({
@@ -46,7 +46,6 @@ function Profile({ user, handleUserChange, handleLogout }) {
 
 			if (response.status === 200) {
 				//successful update
-				const data = await response.json();
 				console.log("Update successful");
 			} else {
 				// Handle other error cases
@@ -80,7 +79,6 @@ function Profile({ user, handleUserChange, handleLogout }) {
 
 				if (response.status === 200) {
 					//successful delete
-					const data = await response.json();
 					console.log("Delete successful");
 
 					handleLogout();
@@ -98,14 +96,25 @@ function Profile({ user, handleUserChange, handleLogout }) {
 		}
 	};
 
-	if (!user) {
-		// Return a different component or handle the case when user is not defined
-		return <LoginPage />;
-	}
-
-	return (
+	return user ? (
+		<>
+            <div className="header">
+                <div className="left">
+						{ 	!isEditing ? (
+								<Link className="button-link" to="/">Dashboard</Link>
+							) : null
+						}
+                    </div>
+                    <div className="center">
+                        <h1>Profile Settings</h1>
+                    </div>
+                    <div className="right">
+                        <p>
+                            <button className="button-link" onClick={() => handleLogout()}>Logout</button>
+                        </p>
+                    </div>
+                </div>{" "}
 		<div className="profile-container">
-			<h2 className="profile-heading">Profile</h2>
 			<div className="username-wrapper">
 				<label className="login-label">Username:</label>
 				{isEditing ? (
@@ -191,6 +200,9 @@ function Profile({ user, handleUserChange, handleLogout }) {
 			{!isEditing ? <Link to="/">Dashboard</Link> : null}
 			<ToastContainer />
 		</div>
+		</>
+	) : (
+		<LoginPage onSuccessLogin={handleLogin} />
 	);
 }
 

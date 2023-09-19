@@ -269,9 +269,19 @@ app.post("/users/update/type/:id", async (req, res) => {
 	console.log("Email:" + email);
 	console.log("Account Type:" + account_type);
 
+	//check if email is non empty
+	if (email === "") {
+		return res.status(401).json({ error: " Email cannot be empty." });
+	}
+
+	//Only update the account type for the email and keep the rest the same
 	const updateSTMT = `UPDATE accounts SET account_type = '${account_type}' WHERE email = '${email}';`;
 
 	try {
+		const check = await pool.query(`SELECT * FROM accounts WHERE email = '${email}';`);
+		if (check.rows.length === 0) {
+			return res.status(401).json({ error: " Email not found." });
+		}
 		const response = await pool.query(updateSTMT);
 		console.log("User updated");
 		console.log(response);

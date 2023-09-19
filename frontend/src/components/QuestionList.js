@@ -2,7 +2,7 @@ import { useQuestionsContext } from "../hooks/useQuestionsContext"
 
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 
-const QuestionList = ({ id, question, onClick, onDelete }) => {
+const QuestionList = ({ id, question, onClick, onDelete, user }) => {
     const { dispatch } = useQuestionsContext()
 
     const handleClick = async () => {
@@ -25,7 +25,9 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
             <td>{question.complexity}</td>
             <td>{question.category.join(', ')}</td>
             <td>{formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</td>
-            <td className="delete-button material-symbols-outlined" onClick={handleClick}>delete</td>
+            {   user.account_type !== "user" ? (
+                <td className="delete-button material-symbols-outlined" onClick={handleClick}>delete</td>
+            ) : null}
         </tr>
     )
 }

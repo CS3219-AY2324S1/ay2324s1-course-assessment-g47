@@ -33,10 +33,12 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 			<div className="header">
 				<div className="left">
 					<p>
-						<Link to="/profile">Profile</Link>
+						<Link className="button-link" to="/profile">Profile</Link>
 					</p>
 					<p>
-						<Link to="/changetype">Change Type</Link>
+						{user.account_type === "superadmin" || user.account_type === "admin" ? (
+							<Link className="button-link" to="/changetype">Change Account Type</Link>
+						) : null}
 					</p>
 				</div>
 				<div className="center">
@@ -44,13 +46,14 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 				</div>
 				<div className="right">
 					<p>
-						<button onClick={() => handleLogout()}>Logout</button>
+						<button className="button-link" onClick={() => handleLogout()}>Logout</button>
 					</p>
 				</div>
 			</div>{" "}
-			(
 			<div className="home">
+			{user.account_type !== "user" ? (
 				<QuestionForm />
+			) : null}
 				<div className="table-container">
 					<table className="table-header">
 						<thead>
@@ -60,7 +63,9 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 								<th>Complexity</th>
 								<th>Category</th>
 								<th>Created</th>
-								<th>Action</th>
+								{user.account_type !== "user" ? (
+									<th>Action</th>
+								) : null}
 							</tr>
 						</thead>
 						<tbody>
@@ -83,6 +88,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 												}
 											}
 										}}
+										user={user}
 									/>
 								))}
 						</tbody>
