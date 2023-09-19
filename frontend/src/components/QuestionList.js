@@ -1,15 +1,24 @@
 import { useQuestionsContext } from "../hooks/useQuestionsContext"
+import { useAuthContext } from '../hooks/useAuthContext'
 
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 
 const QuestionList = ({ id, question, onClick, onDelete, user }) => {
     const { dispatch } = useQuestionsContext()
+    const { user } = useAuthContext()
 
     const handleClick = async () => {
 
+        if (!user) {
+            return
+        }
+        
         let questionId = question._id
         const response = await fetch(`/api/questions/` + question._id, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${user.tokens.accessToken}`
+            }
         })
         const json = await response.json()
 

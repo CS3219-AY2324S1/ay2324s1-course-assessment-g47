@@ -131,7 +131,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 						name="username"
 					/>
 				) : (
-					<span>{user.username}</span>
+					<span>{user.user.username}</span>
 				)}
 			</div>
 			<div className="email-wrapper">
@@ -150,7 +150,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 						name="email"
 					/>
 				) : (
-					<span>{user.email}</span>
+					<span>{user.user.email}</span>
 				)}
 			</div>
 			<div className="password-wrapper">

@@ -37,12 +37,12 @@ function LoginPage(props) {
 
 			if (response.status === 200) {
 				// Successful login
-				const data = await response.json();
+				const json = await response.json();
 				// Set isSignIn to true
-				props.onSuccessLogin(data.user);
+				props.onSuccessLogin(json);
 				setFormData({
 					...formData,
-					loginSuccess: data.message,
+					loginSuccess: json.message,
 					loginError: "",
 				});
 				console.log("Login successful");

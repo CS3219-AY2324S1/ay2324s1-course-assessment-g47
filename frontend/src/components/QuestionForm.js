@@ -3,6 +3,7 @@ import { useQuestionsContext } from '../hooks/useQuestionsContext'
 import MultiSelect from "multiselect-react-dropdown";
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
+import { useAuthContext } from '../hooks/useAuthContext'
 
 const complexityOptions = ["Easy", "Medium", "Hard"];
 const categoryOptions = ["String", "Algorithms", "Data Structures", "Bit Manipulation", "Recursion", "Databases", "Arrays", "Brainteaser"];; // Define your category options here
@@ -22,7 +23,7 @@ const TOOLBAR_OPTIONS = [
 const QuestionForm = () => {
 
     const { dispatch } = useQuestionsContext()
-
+    const { user } = useAuthContext()
     const [title, setTitle] = useState('')
     const [complexity, setComplexity] = useState('')
     const [selectedCategories, setSelectedCategories] = useState([])
@@ -115,6 +116,11 @@ const QuestionForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault() //prevent page refresh
 
+        if(!user) {
+            setError('Please login to add a question')
+            return
+        }
+
         const category = selectedCategories;
         let description = ''
 
@@ -131,7 +137,8 @@ const QuestionForm = () => {
             method: 'POST',
             body: JSON.stringify(question), //converts to JSON string
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.tokens.accessToken}`
             }
         })
         const json = await response.json()
