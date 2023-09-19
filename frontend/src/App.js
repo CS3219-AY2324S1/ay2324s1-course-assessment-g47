@@ -111,7 +111,7 @@ function App() {
 							path="changetype"
 							element={
 								<ChangeTypeHome
-									user={user.user}
+									user={user?.user}
 									handleUserChange={onUserchange}
 									handleLogout={handleLogout}
 									handleLogin={handleLogin}
