@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 
 // For OTP Verification model
 const UserOTPVerification = require("./models/UserOTPVerification");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Connecting to MongoDB and verifying its connection
 mongoose.connect(process.env.MONGO_URI, {
@@ -15,8 +15,8 @@ mongoose.connect(process.env.MONGO_URI, {
 
 const db = mongoose.connection;
 
-db.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
+db.on("error", (err) => {
+	console.error("MongoDB connection error:", err);
 });
 
 // For postgresql
@@ -30,11 +30,11 @@ const port = process.env.POSTGRESQLPORT;
 // Nodemailer stuff
 const { AUTH_EMAIL, AUTH_PASS } = process.env;
 let transporter = nodemailer.createTransport({
-    host: "smtp-mail.outlook.com",
-    auth: {
-        user: AUTH_EMAIL,
-        pass: AUTH_PASS,
-    },
+	host: "smtp-mail.outlook.com",
+	auth: {
+		user: AUTH_EMAIL,
+		pass: AUTH_PASS,
+	},
 });
 
 const app = express(); //Start up express app
@@ -53,7 +53,6 @@ app.post("/users/register", async (req, res) => {
 	const email = req.body["email"];
 	const password = req.body["password"];
 	const hashedPassword = await bcrypt.hash(password, 10);
-
 
 	console.log("Username:" + username);
 	console.log("Email:" + email);
@@ -87,7 +86,7 @@ app.post("/users/register", async (req, res) => {
 			.catch((err) => {
 				console.log(err);
 			});
-	
+
 		console.log(req.body);
 		res.json({ message: "Account Created!", data: req.body });
 		sendOTPVerificationEmail({ _id: id_counter, email, res });
@@ -113,32 +112,33 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 		const hashedOTP = await bcrypt.hash(otp, saltRounds);
 
 		try {
-			const UserOTPVerificationRecords = await UserOTPVerification.find({ email: email.toString(), });
+			const UserOTPVerificationRecords = await UserOTPVerification.find({
+				email: email.toString(),
+			});
 			if (UserOTPVerificationRecords.length > 0) {
-				throw new Error (
+				throw new Error(
 					"An existing account with this email address has already been created! Please try with a new email address!"
 				);
 			}
 			const newOTPVerification = new UserOTPVerification({
-			  user_Id: _id,
-			  email: email,
-			  otp: hashedOTP,
-			  createdAt: Date.now(),
-			  expiresAt: Date.now() + 3600000,
+				user_Id: _id,
+				email: email,
+				otp: hashedOTP,
+				createdAt: Date.now(),
+				expiresAt: Date.now() + 3600000,
 			});
-		  
+
 			// Save OTP Record
 			await newOTPVerification.save();
 
 			await transporter.sendMail(mailOptions);
-
 		} catch (error) {
 			console.error("Error while inserting into MongoDB:", error);
 			if (res) {
-			  res.status(500).json({
-				status: "FAILED",
-				message: "Internal server error",
-			  });
+				res.status(500).json({
+					status: "FAILED",
+					message: "Internal server error",
+				});
 			}
 		}
 	} catch (error) {
@@ -159,7 +159,10 @@ app.post("/users/login", async (req, res) => {
 	const { email, password } = req.body;
 
 	try {
-		const response = await pool.query('SELECT * FROM accounts WHERE email = $1', [email]);
+		const response = await pool.query(
+			"SELECT * FROM accounts WHERE email = $1",
+			[email]
+		);
 
 		if (response.rows.length === 0)
 			return res.status(401).json({ error: "Email is incorrect" });
@@ -168,20 +171,31 @@ app.post("/users/login", async (req, res) => {
 
 		//PASSWORD CHECK
 		const validPassword = await bcrypt.compare(password, user.password);
-		if (!validPassword) return res.status(401).json({error: "Incorrect password"});
+		if (!validPassword)
+			return res.status(401).json({ error: "Incorrect password" });
 
 		const authentication_stats = user.authentication_stats;
 		if (!authentication_stats) {
-			return res.status(401).json({ error: "Please verify your account first!" });
+			return res
+				.status(401)
+				.json({ error: "Please verify your account first!" });
 		}
 
 		// Create a JWT token
-		let tokens = jwtTokens(user);//Gets access and refresh tokens
-		res.cookie('refresh_token', tokens.refreshToken, {...(process.env.COOKIE_DOMAIN && {domain: process.env.COOKIE_DOMAIN}) , httpOnly: true,sameSite: 'none', secure: true});
-	
+		let tokens = jwtTokens(user); //Gets access and refresh tokens
+		res.cookie("refresh_token", tokens.refreshToken, {
+			...(process.env.COOKIE_DOMAIN && {
+				domain: process.env.COOKIE_DOMAIN,
+			}),
+			httpOnly: true,
+			sameSite: "none",
+			secure: true,
+		});
 
 		// Successful login
-		return res.status(200).json({ message: "Login successful", user, tokens});
+		return res
+			.status(200)
+			.json({ message: "Login successful", user, tokens });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ error: "Internal server error" });
@@ -193,16 +207,16 @@ app.post("/users/update/:id", async (req, res) => {
 	const id = req.params.id; // Get the user's ID from the URL parameter
 	const username = req.body.username;
 	const email = req.body.email;
-	const password = req.body.password;
+	// const password = req.body.password;
 
 	console.log("User ID: " + id);
 	console.log("Username: " + username);
 	console.log("Email: " + email);
-	console.log("Password: " + password);
+	// console.log("Password: " + password);
 
 	// Construct the UPDATE query with the ID in the WHERE clause
 	const updateSTMT = `UPDATE accounts SET username = '${username}', 
-                       email = '${email}', password = '${password}' WHERE user_id = ${id}`;
+                       email = '${email}' WHERE user_id = ${id}`; //, password = '${password}'
 
 	try {
 		const response = await pool.query(updateSTMT);
@@ -210,7 +224,7 @@ app.post("/users/update/:id", async (req, res) => {
 		console.log(response);
 		return res
 			.status(200)
-			.json({ message: "Login successful", data: req.body });
+			.json({ message: "User updated successful", data: req.body });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ error: "Internal server error" });
@@ -218,13 +232,11 @@ app.post("/users/update/:id", async (req, res) => {
 });
 
 // Update password using email (forgot password)
-app.post("/users/update/password", async (req, res) => {
+app.post("/users/update_password", async (req, res) => {
+	console.log("Update password");
 	const email = req.body.email;
 	const password = req.body.password;
-
-	// Hash the password
-	const saltRounds = 10; // Number of salt rounds
-	const hashedPassword = await bcrypt.hash(password, saltRounds);
+	const hashedPassword = await bcrypt.hash(password, 10);
 
 	console.log("Password:" + hashedPassword);
 	console.log("Email:" + email);
@@ -237,7 +249,7 @@ app.post("/users/update/password", async (req, res) => {
 		console.log(response);
 		return res
 			.status(200)
-			.json({ message: "Login successful", data: req.body });
+			.json({ message: "Update password successful", data: req.body });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ error: "Internal server error" });
@@ -269,7 +281,7 @@ app.post("/users/delete", async (req, res) => {
 app.post("/users/update/type/:id", async (req, res) => {
 	const email = req.body.email;
 	const account_type = req.body.account_type;
-	
+
 	console.log("Email:" + email);
 	console.log("Account Type:" + account_type);
 
@@ -282,7 +294,9 @@ app.post("/users/update/type/:id", async (req, res) => {
 	const updateSTMT = `UPDATE accounts SET account_type = '${account_type}' WHERE email = '${email}';`;
 
 	try {
-		const check = await pool.query(`SELECT * FROM accounts WHERE email = '${email}';`);
+		const check = await pool.query(
+			`SELECT * FROM accounts WHERE email = '${email}';`
+		);
 		if (check.rows.length === 0) {
 			return res.status(401).json({ error: " Email not found." });
 		}
@@ -315,7 +329,7 @@ app.post("/verifyOTP", async (req, res) => {
 				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length <= 0) {
-				throw new Error (
+				throw new Error(
 					"Account record doesn't exist or has been verified already. Please sign up or log in."
 				);
 			} else {
@@ -325,29 +339,39 @@ app.post("/verifyOTP", async (req, res) => {
 
 				if (expiresAt < Date.now()) {
 					// User OTP record has expired
-					await UserOTPVerification.deleteMany({ email: email.toString() });
+					await UserOTPVerification.deleteMany({
+						email: email.toString(),
+					});
 					throw new Error("Code has expired. Please request again.");
 				} else {
 					const validOTP = await bcrypt.compare(otp, hashedOTP);
 					if (!validOTP) {
 						// OTP given is wrong / invalid
-						throw new Error("Invalid verification code given. Check your inbox and submit again.");
+						throw new Error(
+							"Invalid verification code given. Check your inbox and submit again."
+						);
 					} else {
 						const updateAuthentication = `UPDATE accounts SET authentication_stats = 'true' WHERE email = '${email}';`;
 						const response = await pool.query(updateAuthentication);
 						console.log("User updated");
 						console.log(response);
-						await UserOTPVerification.deleteMany({ email: email.toString() });
-						return res
-							.status(200)
-							.json({ status: "VERIFIED", message: "You are now verified!", data: req.body });
+						await UserOTPVerification.deleteMany({
+							email: email.toString(),
+						});
+						return res.status(200).json({
+							status: "VERIFIED",
+							message: "You are now verified!",
+							data: req.body,
+						});
 					}
 				}
 			}
 		}
 	} catch (error) {
 		console.error(error);
-		return res.status(500).json({ status: "FAILED", message: error.message });
+		return res
+			.status(500)
+			.json({ status: "FAILED", message: error.message });
 	}
 });
 
@@ -360,9 +384,11 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 			throw Error("Empty user details are not allowed");
 		} else {
 			// check if there's even an entry for this email
-			const UserOTPVerificationRecords = await UserOTPVerification.find({ email: email.toString(), });
+			const UserOTPVerificationRecords = await UserOTPVerification.find({
+				email: email.toString(),
+			});
 			if (UserOTPVerificationRecords.length <= 0) {
-				throw new Error (
+				throw new Error(
 					"An existing account with this email address has already been created! Please try with a new email address!"
 				);
 			}
@@ -374,18 +400,21 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 			console.log(response);
 
 			if (response.rowCount === 0) {
-				throw Error("Invalid email given. Please check the email you keyed in and resubmit.");
+				throw Error(
+					"Invalid email given. Please check the email you keyed in and resubmit."
+				);
 			}
 
 			sendOTPVerificationEmail({ _id: userID, email }, res);
-			return res
-			.status(200)
-			.json({ status: "RESENT", message: "New verification code has been sent to you.", data: req.body });
+			return res.status(200).json({
+				status: "RESENT",
+				message: "New verification code has been sent to you.",
+				data: req.body,
+			});
 		}
 	} catch (error) {
 		return res
 			.status(500)
-			.json({ status: "FAILED", message: error.message,
-		});
+			.json({ status: "FAILED", message: error.message });
 	}
 });

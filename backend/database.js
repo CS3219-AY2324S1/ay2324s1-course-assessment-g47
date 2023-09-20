@@ -25,7 +25,7 @@ module.exports = pool;
 // 		// pool.end();
 // 	});
 
-// // CREATE TABLE
+// CREATE TABLE
 // const createTblQry = `CREATE TABLE accounts (
 //     user_id serial PRIMARY KEY,
 //     username VARCHAR ( 255 ) NOT NULL,
