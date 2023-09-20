@@ -29,6 +29,10 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		setIsEditingPassword(true);
 	};
 
+	const handleBackButtonClick = () => {
+		setIsEditingPassword(false);
+	};
+
 	// When user click on save user details button
 	const handleSaveUserDetailsClick = async (e) => {
 		// Check if the username and email are not empty
@@ -327,6 +331,12 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 								onClick={(e) => handleSavePasswordClick(e)}
 							>
 								Save Password
+							</button>
+							<button
+								className="login-button"
+								onClick={(e) => handleBackButtonClick(e)}
+							>
+								Back
 							</button>
 						</>
 					) : (
