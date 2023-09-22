@@ -418,3 +418,25 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 			.json({ status: "FAILED", message: error.message });
 	}
 });
+
+//Fetch user info
+app.post('/users/fetch/:id', async (req, res) => {
+	const user_id = req.params.id; // Use req.params.id to get the user_id from the route parameter
+	try {
+	  const query = `SELECT * FROM accounts WHERE user_id = '${user_id}'`;
+	  const result = await pool.query(query);
+	  if (result.rows.length === 1) {
+		res.json({
+		  message: "User found",
+		  user: result.rows[0],
+		  tokens: req.body.tokens,
+		});
+	  } else {
+		res.status(404).json({ error: 'Account not found' });
+	  }
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).json({ error: 'Internal server error' });
+	}
+  });
+  
