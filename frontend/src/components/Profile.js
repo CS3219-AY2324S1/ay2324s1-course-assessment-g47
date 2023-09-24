@@ -4,9 +4,9 @@ import LoginPage from "./Login";
 import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as Constants from "../constants/constants.js";
 
 function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
-	const postgresqlPort = 4001;
 	const [isEditingUserDetails, setIsEditingUserDetails] = useState(false);
 	const [isEditingPassword, setIsEditingPassword] = useState(false);
 	const [localUser, setLocalUser] = useState({
@@ -50,7 +50,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		try {
 			console.log(user);
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/update/${user.user.user_id}`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/${user.user.user_id}`,
 				{
 					method: "POST",
 					headers: {
@@ -102,7 +102,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		// Check if the current password is correct
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/login`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/login`,
 				{
 					method: "POST",
 					headers: {
@@ -135,7 +135,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		// Update the password
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/update_password`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update_password`,
 				{
 					method: "POST",
 					headers: {
@@ -175,7 +175,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		if (confirmed) {
 			try {
 				const response = await fetch(
-					`http://localhost:${postgresqlPort}/users/delete`,
+					`http://localhost:${Constants.POSTGRESQL_PORT}/users/delete`,
 					{
 						method: "POST",
 						headers: {

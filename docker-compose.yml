@@ -1,0 +1,73 @@
+version: '3.8'
+services:
+  # PostgreSQL Database
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: always # postgres up and running no matter what happens
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1309
+      POSTGRES_DB: cs3219_g47
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+    volumes: # bind data inside server to outside container
+      - ./postgres_data:/var/lib/postgresql/data
+
+  # MongoDB Database
+  mongodb:
+    container_name: mongodb
+    restart: always
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: shaniceng
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./mongo-data:/data/db
+    networks:
+      - app-network
+
+  # Backend Server with PostgreSQL and MongoDB
+  backend:
+    container_name: backend
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: shaniceng
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
+      ME_CONFIG_MONGODB_URL: mongodb://shaniceng:1234@mongodb:27017
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+      - postgres
+
+  # Frontend React App
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge

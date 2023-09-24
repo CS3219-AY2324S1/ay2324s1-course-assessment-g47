@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import * as Constants from "../constants/constants.js";
 
 function ForgotPassword() {
-	const postgresqlPort = 4001;
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -24,7 +24,7 @@ function ForgotPassword() {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/update/password`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/password`,
 				{
 					method: "POST",
 					headers: {

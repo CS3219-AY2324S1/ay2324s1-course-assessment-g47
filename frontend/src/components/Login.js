@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./css/Login.css";
+import * as Constants from "../constants/constants.js";
 
 function LoginPage(props) {
-	const postgresqlPort = 4001;
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -25,7 +25,7 @@ function LoginPage(props) {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/login`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/login`,
 				{
 					method: "POST",
 					headers: {
@@ -106,7 +106,9 @@ function LoginPage(props) {
 				<Link to="/register">Not a user? Sign up now</Link>
 				<br />
 				<br />
-				<Link to="/verifyOTP">Click here to verify your account now!</Link>
+				<Link to="/verifyOTP">
+					Click here to verify your account now!
+				</Link>
 			</div>
 			{/* <div>
 				<Link to="/forgetPassword">Forgot password? Reset here</Link>

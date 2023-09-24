@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import "./css/Login.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as Constants from "../constants/constants.js";
 
 function Register() {
-	const postgresqlPort = 4001;
 	const [formData, setFormData] = useState({
 		username: "",
 		email: "",
@@ -23,7 +23,7 @@ function Register() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const { username, email, password} = formData;
+		const { username, email, password } = formData;
 
 		if (password.length < 6) {
 			// Display an error message when the password is too short
@@ -37,13 +37,18 @@ function Register() {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/register`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/register`,
 				{
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ username, email, password, account_type: "user" }),
+					body: JSON.stringify({
+						username,
+						email,
+						password,
+						account_type: "user",
+					}),
 				}
 			);
 			const data = await response.json();

@@ -18,7 +18,8 @@ app.use("/api/questions", questionRoutes);
 
 // Connect to mongodb
 mongoose
-	.connect(process.env.MONGO_URI)
+	.connect("mongodb://mongodb:27017/test")
+	// .connect(process.env.MONGO_URI)
 	.then(() => {
 		// only listen for requests when we are connected to the database
 		app.listen(process.env.PORT, (req, res) => {
@@ -26,5 +27,5 @@ mongoose
 		});
 	})
 	.catch((error) => {
-		console.log(error);
+		console.log("MongoDB connection error:", error);
 	});
