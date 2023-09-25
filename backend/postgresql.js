@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const nodemailer = require("nodemailer");
+const authenticateToken = require("./middleware/authorization"); // Import the middleware
 
 // For OTP Verification model
 const UserOTPVerification = require("./models/UserOTPVerification");
@@ -203,7 +204,7 @@ app.post("/users/login", async (req, res) => {
 });
 
 // Update User using ID
-app.post("/users/update/:id", async (req, res) => {
+app.post("/users/update/:id", authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
 	const id = req.params.id; // Get the user's ID from the URL parameter
 	const username = req.body.username;
 	const email = req.body.email;
@@ -232,7 +233,7 @@ app.post("/users/update/:id", async (req, res) => {
 });
 
 // Update password using email (forgot password)
-app.post("/users/update_password", async (req, res) => {
+app.post("/users/update_password", authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
 	console.log("Update password");
 	const email = req.body.email;
 	const password = req.body.password;
@@ -257,7 +258,7 @@ app.post("/users/update_password", async (req, res) => {
 });
 
 // Delete User using email
-app.post("/users/delete", async (req, res) => {
+app.post("/users/delete", authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
 	const email = req.body.email;
 
 	console.log("Email:" + email);
@@ -278,7 +279,7 @@ app.post("/users/delete", async (req, res) => {
 });
 
 // Update account type using email
-app.post("/users/update/type/:id", async (req, res) => {
+app.post("/users/update/type/:id", authenticateToken(['admin', 'superadmin']), async (req, res) => {
 	const email = req.body.email;
 	const account_type = req.body.account_type;
 
@@ -420,7 +421,7 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 });
 
 //Fetch user info
-app.post('/users/fetch/:id', async (req, res) => {
+app.post('/users/fetch/:id', authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
 	const user_id = req.params.id; // Use req.params.id to get the user_id from the route parameter
 	try {
 	  const query = `SELECT * FROM accounts WHERE user_id = '${user_id}'`;
