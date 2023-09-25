@@ -43,6 +43,7 @@ import { useAuthContext } from './hooks/useAuthContext';
 function App() {
 	const [user, setUser] = useState(null);
 	const { dispatch } = useAuthContext()
+	const postgresqlPort = 4001;
 
 	// Load user data from localStorage when the component mounts
 	useEffect(() => {
@@ -73,9 +74,36 @@ function App() {
 	};
 
 	const onUserchange = (newUser) => {
-		setUser({ ...user, ...newUser });
-		localStorage.setItem('user', JSON.stringify({ ...user, ...newUser }));
-	};
+		const fetchDataFromAPI = async () => {
+		  try {
+			const response = await fetch(
+			  `http://localhost:${postgresqlPort}/users/fetch/${newUser.user.user_id}`,
+			  {
+				method: "POST",
+				headers: {
+				  "Content-Type": "application/json",
+				},
+				body: JSON.stringify(newUser), // Send user data directly
+			  }
+			);
+			if (response.ok) {
+			  const user = await response.json();
+	  
+			  // Update the 'user' state with the API data
+			  setUser(user);
+	  
+			  // Update 'user' in localStorage with the API data
+			  localStorage.setItem('user', JSON.stringify(user));
+
+			} else {
+			  console.error('API request failed');
+			}
+		  } catch (error) {
+			console.error('Error:', error);
+		  }
+		};
+		fetchDataFromAPI();
+	  };  
 	return (
 		<>
 			<BrowserRouter>
@@ -111,7 +139,7 @@ function App() {
 							path="changetype"
 							element={
 								<ChangeTypeHome
-									user={user?.user}
+									user={user}
 									handleUserChange={onUserchange}
 									handleLogout={handleLogout}
 									handleLogin={handleLogin}
