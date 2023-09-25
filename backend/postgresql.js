@@ -275,12 +275,10 @@ app.post(
 			const response = await pool.query(updateSTMT);
 			console.log("User updated");
 			console.log(response);
-			return_res = res
-				.status(200)
-				.json({
-					message: "Update password successful",
-					data: req.body,
-				});
+			return_res = res.status(200).json({
+				message: "Update password successful",
+				data: req.body,
+			});
 
 			res.end();
 

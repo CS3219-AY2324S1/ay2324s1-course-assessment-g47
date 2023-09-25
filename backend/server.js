@@ -17,19 +17,6 @@ app.use((req, res, next) => {
 app.use("/api/questions", questionRoutes);
 
 // Connect to mongodb
-// mongoose
-// 	// .connect("mongodb://mongodb:27017/test")
-// 	.connect(process.env.MONGO_URL)
-// 	.then(() => {
-// 		// only listen for requests when we are connected to the database
-// 		app.listen(process.env.PORT, (req, res) => {
-// 			console.log("Listining on port", process.env.PORT);
-// 		});
-// 	})
-// 	.catch((error) => {
-// 		console.log("MongoDB connection error:", error);
-// 	});
-
 const connectWithRetry = () => {
 	mongoose
 		.connect(process.env.MONGO_URL, {
