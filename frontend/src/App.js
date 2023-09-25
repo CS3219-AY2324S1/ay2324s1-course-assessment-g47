@@ -82,12 +82,19 @@ function App() {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
+							Authorization: `Bearer ${newUser.tokens.accessToken}`,
 						},
 						body: JSON.stringify(newUser), // Send user data directly
 					}
 				);
 				if (response.ok) {
 					const user = await response.json();
+
+					// Update the 'user' state with the API data
+					setUser(user);
+
+					// Update 'user' in localStorage with the API data
+					localStorage.setItem("user", JSON.stringify(user));
 
 					// Update the 'user' state with the API data
 					setUser(user);
