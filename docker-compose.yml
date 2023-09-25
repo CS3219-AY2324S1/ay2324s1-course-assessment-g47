@@ -6,9 +6,9 @@ services:
     image: postgres:latest
     restart: always # postgres up and running no matter what happens
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: '1309'
-      POSTGRES_DB: 'cs3219_g47'
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
     ports:
       - '5432:5432'
     networks:
@@ -22,8 +22,8 @@ services:
     restart: always
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: shaniceng
-      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - '27017:27017'
     volumes:
@@ -41,9 +41,9 @@ services:
     ports:
       - '8080:8080'
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: shaniceng
-      ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
-      ME_CONFIG_MONGODB_URL: mongodb://shaniceng:1234@mongodb:27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: ${MONGO_URL}
     networks:
       - app-network
     depends_on:
