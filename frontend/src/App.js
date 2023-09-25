@@ -82,6 +82,7 @@ function App() {
 				method: "POST",
 				headers: {
 				  "Content-Type": "application/json",
+				  'Authorization': `Bearer ${newUser.tokens.accessToken}`
 				},
 				body: JSON.stringify(newUser), // Send user data directly
 			  }

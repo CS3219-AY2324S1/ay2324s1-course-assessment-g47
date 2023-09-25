@@ -53,6 +53,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						'Authorization': `Bearer ${user.tokens.accessToken}`
 					},
 					body: JSON.stringify(localUser),
 				}
@@ -140,6 +141,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						'Authorization': `Bearer ${user.tokens.accessToken}`
 					},
 					body: JSON.stringify({
 						email: user.user.email,
@@ -180,6 +182,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
+							'Authorization': `Bearer ${user.tokens.accessToken}`
 						},
 						body: JSON.stringify(user.user),
 					}
