@@ -9,6 +9,7 @@ COPY package*.json ./
 # ==== BUILD =====
 # install dependencies
 RUN npm install
+# RUN npm install -g nodemon
 
 # for production
 # RUN npm ci --omit=dev
@@ -16,7 +17,7 @@ RUN npm install
 # copy the rest of the files to /app
 COPY . .
 
-EXPOSE 8080
+EXPOSE 8080 27017 5432
 
 # ==== RUN =======
 CMD [ "npm", "run", "dev" ]

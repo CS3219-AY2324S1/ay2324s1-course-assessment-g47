@@ -6,9 +6,9 @@ services:
     image: postgres:latest
     restart: always # postgres up and running no matter what happens
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1309
-      POSTGRES_DB: cs3219_g47
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '1309'
+      POSTGRES_DB: 'cs3219_g47'
     ports:
       - '5432:5432'
     networks:
