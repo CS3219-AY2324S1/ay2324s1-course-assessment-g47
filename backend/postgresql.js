@@ -1,5 +1,7 @@
 require("dotenv").config();
 const express = require("express");
+const amqp = require("amqplib");
+const { setupMatchmakingQueues } = require("./controllers/amqp");
 const nodemailer = require("nodemailer");
 const authenticateToken = require("./middleware/authorization"); // Import the middleware
 
@@ -440,4 +442,68 @@ app.post('/users/fetch/:id', authenticateToken(['user', 'superuser', 'admin', 's
 	  res.status(500).json({ error: 'Internal server error' });
 	}
   });
+
+// Create a global variable to store connected channels
+let matchmakingChannel;
+
+// Define the matchmaking channel setup function
+const createMatchingChannel = async () => {
+	try {
+    	matchmakingChannel = await setupMatchmakingQueues();
+    	console.log('Matchmaking channel set up successfully');
+  	} catch (error) {
+    	console.error('Error setting up matchmaking channel:', error);
+  	}
+};
+
+// Set up matchmaking queues on server start
+createMatchingChannel();
+
+app.use(express.json());
+
+app.post('/matchmake', async (req, res) => {
+	const user = req.body.user; // Replace with actual user data
+	const { name, questionType } = user; // Assuming user has 'name' and 'questionType' properties
+
+	try {
+	    if (!matchmakingChannel) {
+    		return res.status(500).json({ error: 'Matchmaking channel is not set up' });
+    	}
+
+    	// Publish the user to the 'waiting_users' queue
+    	matchmakingChannel.sendToQueue('waiting_users', Buffer.from(JSON.stringify(user)));
+    
+    	// Try to match the user with another user with the same question type
+   		await matchUsersWithSameQuestionType(questionType);
+
+    	res.status(200).json({ message: 'Matchmaking in progress' });
+ 	} catch (error) {
+    	console.error('Error publishing user to matchmaking queue:', error);
+    	res.status(500).json({ error: 'Internal server error' });
+  	}
+});
+
+// Function to match users with the same question type
+const matchUsersWithSameQuestionType = async (questionType) => {
+  	try {
+    	const channel = await amqp.connect(process.env.AMQP_URL).then((conn) => conn.createChannel());
+    
+    	// Consume messages from the 'waiting_users' queue
+    	channel.consume('waiting_users', (message) => {
+      		const user = JSON.parse(message.content.toString());
+      		const { name: userName, questionType: userQuestionType } = user;
+
+      		if (userQuestionType === questionType) {
+        		// Users have the same question type, create a match
+        		const matchedPair = { user1: { name, questionType }, user2: { userName, userQuestionType } };
+        		channel.sendToQueue('matched_pairs', Buffer.from(JSON.stringify(matchedPair)));
+
+        		// Acknowledge the consumed message
+        		channel.ack(message);
+      		}
+    	});
+  	} catch (error) {
+    	console.error('Error matching users:', error);
+  	}
+};
   
