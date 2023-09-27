@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const amqp = require("amqplib");
-const { setupMatchmakingQueues} = require("./controllers/amqp");
+const { setupMatchmakingQueues } = require("./controllers/amqp");
 const nodemailer = require("nodemailer");
 const authenticateToken = require("./middleware/authorization"); // Import the middleware
 
@@ -476,15 +476,15 @@ app.post('/matchmake', async (req, res) => {
 		// Try to match the user with another user with the same question type
 		await matchUsersWithSameDifficulty(email, questionType);
 
-		res.status(200).json({ message: 'Matchmaking in progress' });
+		return res.status(200).json({ message: 'Matchmaking in progress' });
 	} catch (error) {
 		console.error('Error publishing user to matchmaking queue:', error);
-		res.status(500).json({ error: 'Internal server error' });
+		return res.status(500).json({ error: 'Internal server error' });
 	}
 });
 
 // Keep track of user in the queue to ACK them when match found for them
-const queuedUsers = new Map();
+const queueMap = new Map();
 
 // Function to match users with the same difficulty level for the questions
 const matchUsersWithSameDifficulty = async (email, questionType) => {
@@ -496,36 +496,38 @@ const matchUsersWithSameDifficulty = async (email, questionType) => {
 			channel.consume('waiting_users', async (message) => {
 
 				const user = JSON.parse(message.content.toString());
-				const { email: matchEmail, questionType: matchQuestionType } = user;
-				const matchedUserMessage = queuedUsers.get(email);
-				queuedUsers.delete(email);
+				const { email: matchEmail, questionType: matchQuestionType } = user; // Extract email and questionType out from user in the queue and storing into matchEmail and matchQuestionType
 
 				// Checks the waiting queue to locate an user which is NOT current user and has the same question difficulty level selected
-				if ((matchQuestionType === questionType && matchEmail !== email) && (matchedUserMessage !== undefined && matchedUserMessage !== null)) {
-
-					// Acknowledge the messages when a match is found
+				if (matchQuestionType === questionType && matchEmail !== email) {
+					// Acknowledge and cancel the user in the waiting_users when a match is found
 					channel.ack(message);
-					channel.ack(matchedUserMessage);
-					
-                    // Remove and acknowledge the matched user from the waiting queue
+					//console.log(email);
+					//console.log(matchEmail);
+					//console.log(message);
+					queueMap.delete(email);
+					channel.cancel(message.fields.consumerTag);
+
+					// Remove and acknowledge the matched user from the waiting queue
 					console.log(`${email} has been dequeued from the waiting list successfully`);
 					console.log(`${matchEmail} has been dequeued from the waiting list successfully`);
 
-					// Users have the same question type, create a match
+					// Create a matched binding the two users and add into matched_pairs queue
 					const matchedPair = { Player1: { email, questionType }, Player2: { email: matchEmail, questionType: matchQuestionType } };
 					matched_message = JSON.stringify(matchedPair)
 					channel.sendToQueue('matched_pairs', Buffer.from(matched_message));
 					console.log(matched_message);
+					return;
 				} else {
-					queuedUsers.set(email, message);
-					console.log("here");
+					console.log(email);
+					queueMap.set(email, message); // Add a key-value pair into the queueMap to take note of the message for the user that was added into the waiting_users queue
 				}
 			});
 		};
 
 		// Start the matching session
 		continuousMatching();
-
+		return;
 	} catch (error) {
 		console.error('Error matching users:', error);
 	}
