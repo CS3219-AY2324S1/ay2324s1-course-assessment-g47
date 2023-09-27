@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const amqp = require("amqplib");
-const { setupMatchmakingQueues } = require("./controllers/amqp");
+const { setupMatchmakingQueues} = require("./controllers/amqp");
 const nodemailer = require("nodemailer");
 const authenticateToken = require("./middleware/authorization"); // Import the middleware
 
@@ -426,84 +426,107 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 app.post('/users/fetch/:id', authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
 	const user_id = req.params.id; // Use req.params.id to get the user_id from the route parameter
 	try {
-	  const query = `SELECT * FROM accounts WHERE user_id = '${user_id}'`;
-	  const result = await pool.query(query);
-	  if (result.rows.length === 1) {
-		res.json({
-		  message: "User found",
-		  user: result.rows[0],
-		  tokens: req.body.tokens,
-		});
-	  } else {
-		res.status(404).json({ error: 'Account not found' });
-	  }
+		const query = `SELECT * FROM accounts WHERE user_id = '${user_id}'`;
+		const result = await pool.query(query);
+		if (result.rows.length === 1) {
+			res.json({
+				message: "User found",
+				user: result.rows[0],
+				tokens: req.body.tokens,
+			});
+		} else {
+			res.status(404).json({ error: 'Account not found' });
+		}
 	} catch (error) {
-	  console.error('Error:', error);
-	  res.status(500).json({ error: 'Internal server error' });
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Internal server error' });
 	}
-  });
+});
 
 // Create a global variable to store connected channels
 let matchmakingChannel;
 
-// Define the matchmaking channel setup function
+// Function to create the matching channel with the waiting and matched queues
 const createMatchingChannel = async () => {
 	try {
-    	matchmakingChannel = await setupMatchmakingQueues();
-    	console.log('Matchmaking channel set up successfully');
-  	} catch (error) {
-    	console.error('Error setting up matchmaking channel:', error);
-  	}
+		matchmakingChannel = await setupMatchmakingQueues();
+		console.log('Matchmaking channel set up successfully');
+	} catch (error) {
+		console.error('Error setting up matchmaking channel:', error);
+	}
 };
 
-// Set up matchmaking queues on server start
+// Set up waiting and matched queues on initialization
 createMatchingChannel();
-
-app.use(express.json());
 
 app.post('/matchmake', async (req, res) => {
 	const user = req.body.user; // Replace with actual user data
-	const { name, questionType } = user; // Assuming user has 'name' and 'questionType' properties
+	const { email, questionType } = user; // Assuming user has 'email' and 'questionType' properties
 
 	try {
-	    if (!matchmakingChannel) {
-    		return res.status(500).json({ error: 'Matchmaking channel is not set up' });
-    	}
+		if (!matchmakingChannel) {
+			return res.status(500).json({ error: 'Matchmaking channel is not set up' });
+		}
 
-    	// Publish the user to the 'waiting_users' queue
-    	matchmakingChannel.sendToQueue('waiting_users', Buffer.from(JSON.stringify(user)));
-    
-    	// Try to match the user with another user with the same question type
-   		await matchUsersWithSameQuestionType(questionType);
+		// Publish the user to the 'waiting_users' queue
+		message = JSON.stringify(user);
+		matchmakingChannel.sendToQueue('waiting_users', Buffer.from(message));
+		console.log(message);
 
-    	res.status(200).json({ message: 'Matchmaking in progress' });
- 	} catch (error) {
-    	console.error('Error publishing user to matchmaking queue:', error);
-    	res.status(500).json({ error: 'Internal server error' });
-  	}
+		// Try to match the user with another user with the same question type
+		await matchUsersWithSameDifficulty(email, questionType);
+
+		res.status(200).json({ message: 'Matchmaking in progress' });
+	} catch (error) {
+		console.error('Error publishing user to matchmaking queue:', error);
+		res.status(500).json({ error: 'Internal server error' });
+	}
 });
 
-// Function to match users with the same question type
-const matchUsersWithSameQuestionType = async (questionType) => {
-  	try {
-    	const channel = await amqp.connect(process.env.AMQP_URL).then((conn) => conn.createChannel());
-    
-    	// Consume messages from the 'waiting_users' queue
-    	channel.consume('waiting_users', (message) => {
-      		const user = JSON.parse(message.content.toString());
-      		const { name: userName, questionType: userQuestionType } = user;
+// Keep track of user in the queue to ACK them when match found for them
+const queuedUsers = new Map();
 
-      		if (userQuestionType === questionType) {
-        		// Users have the same question type, create a match
-        		const matchedPair = { user1: { name, questionType }, user2: { userName, userQuestionType } };
-        		channel.sendToQueue('matched_pairs', Buffer.from(JSON.stringify(matchedPair)));
+// Function to match users with the same difficulty level for the questions
+const matchUsersWithSameDifficulty = async (email, questionType) => {
+	try {
+		const channel = await amqp.connect(process.env.AMQP_URL).then((conn) => conn.createChannel());
 
-        		// Acknowledge the consumed message
-        		channel.ack(message);
-      		}
-    	});
-  	} catch (error) {
-    	console.error('Error matching users:', error);
-  	}
+		const continuousMatching = async () => {
+			// Consume messages from the 'waiting_users' queue
+			channel.consume('waiting_users', async (message) => {
+
+				const user = JSON.parse(message.content.toString());
+				const { email: matchEmail, questionType: matchQuestionType } = user;
+				const matchedUserMessage = queuedUsers.get(email);
+				queuedUsers.delete(email);
+
+				// Checks the waiting queue to locate an user which is NOT current user and has the same question difficulty level selected
+				if ((matchQuestionType === questionType && matchEmail !== email) && (matchedUserMessage !== undefined && matchedUserMessage !== null)) {
+
+					// Acknowledge the messages when a match is found
+					channel.ack(message);
+					channel.ack(matchedUserMessage);
+					
+                    // Remove and acknowledge the matched user from the waiting queue
+					console.log(`${email} has been dequeued from the waiting list successfully`);
+					console.log(`${matchEmail} has been dequeued from the waiting list successfully`);
+
+					// Users have the same question type, create a match
+					const matchedPair = { Player1: { email, questionType }, Player2: { email: matchEmail, questionType: matchQuestionType } };
+					matched_message = JSON.stringify(matchedPair)
+					channel.sendToQueue('matched_pairs', Buffer.from(matched_message));
+					console.log(matched_message);
+				} else {
+					queuedUsers.set(email, message);
+					console.log("here");
+				}
+			});
+		};
+
+		// Start the matching session
+		continuousMatching();
+
+	} catch (error) {
+		console.error('Error matching users:', error);
+	}
 };
-  
