@@ -39,6 +39,7 @@ import ChangeTypeHome from "./components/ChangeTypeHome";
 import VerifyOTP from "./components/VerifyOTP";
 import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from './hooks/useAuthContext';
+import Room from "./components/Room";
 
 function App() {
 	const [user, setUser] = useState(null);
@@ -150,6 +151,7 @@ function App() {
 					</Route>
 					<Route path="/verifyOTP" element={<VerifyOTP />}> </Route>
 					<Route path="/resendOTPVerificationCode" element={<ResendOTP />}> </Route>
+					<Route path="/room" element={<Room />}> </Route>
 				</Routes>
 			</BrowserRouter>
 		</>
