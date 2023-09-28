@@ -29,4 +29,4 @@ io.on("connection", (socket) => {
 
 })
 
-server.listen(IO_PORT, () => console.log(`server is running on port ${IO_PORT}`))
+server.listen(IO_PORT, () => console.log(`socket-io is running on port ${IO_PORT}`))
