@@ -31,6 +31,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 	const handleBackButtonClick = () => {
 		setIsEditingPassword(false);
+		setIsEditingUserDetails(false);
 	};
 
 	// When user click on save user details button
@@ -207,17 +208,15 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	return user ? (
 		<>
 			<div className="header">
-				<div className="left">
+				{/* <div className="left">
 					{!isEditingUserDetails ? (
 						<Link className="button-link" to="/">
 							Dashboard
 						</Link>
 					) : null}
-				</div>
-				<div className="center">
-					<h1>Profile Settings</h1>
-				</div>
-				<div className="right">
+				</div> */}
+
+				{/* <div className="right">
 					<p>
 						<button
 							className="button-link"
@@ -226,14 +225,26 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 							Logout
 						</button>
 					</p>
-				</div>
+				</div> */}
 			</div>{" "}
 			<div className="profile-container">
+				<p>
+					{user.user.account_type === "superadmin" ||
+					user.user.account_type === "admin" ? (
+						<Link
+							className="button-link-change-account"
+							to="/changetype"
+						>
+							Change Account Type
+						</Link>
+					) : null}
+				</p>
+				<h1 className="profile-label">Profile Settings</h1>
 				<div className="username-wrapper">
-					<label className="login-label">Username:</label>
+					<label className="profile-label">Username:</label>
 					{isEditingUserDetails ? (
 						<input
-							className="login-input"
+							className="profile-input"
 							type="text"
 							onChange={(e) => {
 								setLocalUser({
@@ -245,14 +256,16 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 							name="username"
 						/>
 					) : (
-						<span>{user.user.username}</span>
+						<span className="profile-display">
+							{user.user.username}
+						</span>
 					)}
 				</div>
 				<div className="email-wrapper">
-					<label className="login-label">Email:</label>
+					<label className="profile-label">Email:</label>
 					{isEditingUserDetails ? (
 						<input
-							className="login-input"
+							className="profile-input"
 							type="email"
 							onChange={(e) => {
 								setLocalUser({
@@ -264,26 +277,36 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 							name="email"
 						/>
 					) : (
-						<span>{user.user.email}</span>
+						<span className="profile-display">
+							{user.user.email}
+						</span>
 					)}
 				</div>
 
 				<div className="buttons">
 					{isEditingUserDetails ? (
-						<button
-							className="login-button"
-							onClick={(e) => handleSaveUserDetailsClick(e)}
-						>
-							Save User Details
-						</button>
+						<div className="edit-user-button">
+							<button
+								className="profile-button"
+								onClick={(e) => handleSaveUserDetailsClick(e)}
+							>
+								Save User Details
+							</button>
+							<button
+								className="profile-button"
+								onClick={(e) => handleBackButtonClick(e)}
+							>
+								Back
+							</button>
+						</div>
 					) : isEditingPassword ? (
 						<>
 							<div className="password-wrapper">
-								<label className="login-label">
+								<label className="profile-label">
 									Current Password:
 								</label>
 								<input
-									className="login-input"
+									className="profile-input"
 									type="password"
 									value={passwordData.currentPassword}
 									onChange={(e) => {
@@ -295,11 +318,11 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 								/>
 							</div>
 							<div className="password-wrapper">
-								<label className="login-label">
+								<label className="profile-label">
 									New Password:
 								</label>
 								<input
-									className="login-input"
+									className="profile-input"
 									type="password"
 									value={passwordData.newPassword}
 									onChange={(e) => {
@@ -311,11 +334,11 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 								/>
 							</div>
 							<div className="password-wrapper">
-								<label className="login-label">
+								<label className="profile-label">
 									Repeat Password:
 								</label>
 								<input
-									className="login-input"
+									className="profile-input"
 									type="password"
 									value={passwordData.repeatNewPassword}
 									onChange={(e) => {
@@ -326,40 +349,42 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 									}}
 								/>
 							</div>
-							<button
-								className="login-button"
-								onClick={(e) => handleSavePasswordClick(e)}
-							>
-								Save Password
-							</button>
-							<button
-								className="login-button"
-								onClick={(e) => handleBackButtonClick(e)}
-							>
-								Back
-							</button>
+							<div className="edit-password-button">
+								<button
+									className="profile-button"
+									onClick={(e) => handleSavePasswordClick(e)}
+								>
+									Save Password
+								</button>
+								<button
+									className="profile-button"
+									onClick={(e) => handleBackButtonClick(e)}
+								>
+									Back
+								</button>
+							</div>
 						</>
 					) : (
-						<>
+						<div className="edit-profile-button">
 							<button
-								className="login-button"
+								className="profile-button"
 								onClick={handleEditUserDetailsClick}
 							>
 								Edit User Details
 							</button>
 							<button
-								className="login-button"
+								className="profile-button"
 								onClick={handleEditPasswordClick}
 							>
 								Edit Password
 							</button>
 							<button
-								className="login-button"
+								className="profile-button"
 								onClick={handleDeleteClick}
 							>
 								Delete account
 							</button>
-						</>
+						</div>
 					)}
 				</div>
 				<ToastContainer />
