@@ -13,7 +13,7 @@ let connection;
 let matchmakingChannel;
 
 // For OTP Verification model
-const UserOTPVerification = require("./models/UserOTPVerification");
+const otpModel = require("./models/otpModel");
 const mongoose = require("mongoose");
 
 // Connecting to MongoDB and verifying its connection
@@ -122,7 +122,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 		const hashedOTP = await bcrypt.hash(otp, saltRounds);
 
 		try {
-			const UserOTPVerificationRecords = await UserOTPVerification.find({
+			const UserOTPVerificationRecords = await otpModel.find({
 				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length > 0) {
@@ -130,7 +130,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 					"An existing account with this email address has already been created! Please try with a new email address!"
 				);
 			}
-			const newOTPVerification = new UserOTPVerification({
+			const newOTPVerification = new otpModel({
 				user_Id: _id,
 				email: email,
 				otp: hashedOTP,
@@ -331,7 +331,7 @@ app.post("/verifyOTP", async (req, res) => {
 		if (!email || !otp) {
 			throw Error("Empty OTP details are not allowed");
 		} else {
-			const UserOTPVerificationRecords = await UserOTPVerification.find({
+			const UserOTPVerificationRecords = await otpModel.find({
 				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length <= 0) {
@@ -345,7 +345,7 @@ app.post("/verifyOTP", async (req, res) => {
 
 				if (expiresAt < Date.now()) {
 					// User OTP record has expired
-					await UserOTPVerification.deleteMany({
+					await otpModel.deleteMany({
 						email: email.toString(),
 					});
 					throw new Error("Code has expired. Please request again.");
@@ -361,7 +361,7 @@ app.post("/verifyOTP", async (req, res) => {
 						const response = await pool.query(updateAuthentication);
 						console.log("User updated");
 						console.log(response);
-						await UserOTPVerification.deleteMany({
+						await otpModel.deleteMany({
 							email: email.toString(),
 						});
 						return res.status(200).json({
@@ -390,7 +390,7 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 			throw Error("Empty user details are not allowed");
 		} else {
 			// check if there's even an entry for this email
-			const UserOTPVerificationRecords = await UserOTPVerification.find({
+			const UserOTPVerificationRecords = await otpModel.find({
 				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length <= 0) {
@@ -399,7 +399,7 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 				);
 			}
 			// delete existing records and resend
-			await UserOTPVerification.deleteMany({ email: email.toString() });
+			await otpModel.deleteMany({ email: email.toString() });
 			const selectUserIdQuery = `SELECT user_id FROM accounts WHERE email = '${email}';`;
 			const response = await pool.query(selectUserIdQuery);
 			const userID = response.rows[0].user_id;
