@@ -77,7 +77,7 @@ function Register() {
 
 	return (
 		<div className="login-container">
-			<h1>Create Account</h1>
+			<h1 className="login-label">Create Account</h1>
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label htmlFor="username">Username:</label>

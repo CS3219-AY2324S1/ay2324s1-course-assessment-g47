@@ -39,7 +39,7 @@ import ChangeTypeHome from "./components/ChangeTypeHome";
 import VerifyOTP from "./components/VerifyOTP";
 import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from "./hooks/useAuthContext";
-import * as Constants from "./constants/constants.js";
+import Navbar from "./components/Navbar";
 
 function App() {
 	const [user, setUser] = useState(null);
@@ -74,61 +74,30 @@ function App() {
 	};
 
 	const onUserchange = (newUser) => {
-		const fetchDataFromAPI = async () => {
-			try {
-				const response = await fetch(
-					`http://localhost:${Constants.POSTGRESQL_PORT}/users/fetch/${newUser.user.user_id}`,
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${newUser.tokens.accessToken}`,
-						},
-						body: JSON.stringify(newUser), // Send user data directly
-					}
-				);
-				if (response.ok) {
-					const user = await response.json();
-
-					// Update the 'user' state with the API data
-					setUser(user);
-
-					// Update 'user' in localStorage with the API data
-					localStorage.setItem("user", JSON.stringify(user));
-
-					// Update the 'user' state with the API data
-					setUser(user);
-
-					// Update 'user' in localStorage with the API data
-					localStorage.setItem("user", JSON.stringify(user));
-				} else {
-					console.error("API request failed");
-				}
-			} catch (error) {
-				console.error("Error:", error);
-			}
-		};
-		fetchDataFromAPI();
+		setUser({ ...user, ...newUser });
+		localStorage.setItem("user", JSON.stringify({ ...user, ...newUser }));
 	};
 	return (
 		<>
 			<BrowserRouter>
+				<Navbar user={user} handleLogout={handleLogout} />
 				<Routes>
 					<Route path="/" element={<Layout />}>
 						<Route
 							index
 							element={
-								<Home
-									user={user}
-									handleLogin={handleLogin}
-									handleLogout={handleLogout}
-								/>
+								<Home user={user} handleLogin={handleLogin} />
 							}
 						/>
 						<Route path="register" element={<Register />} />
 						<Route
 							path="forgetPassword"
 							element={<ForgotPassword />}
+						/>
+						<Route path="verifyOTP" element={<VerifyOTP />} />
+						<Route
+							path="resendOTPVerificationCode"
+							element={<ResendOTP />}
 						/>
 						<Route
 							path="profile"
@@ -152,15 +121,6 @@ function App() {
 								/>
 							}
 						/>
-					</Route>
-					<Route path="/verifyOTP" element={<VerifyOTP />}>
-						{" "}
-					</Route>
-					<Route
-						path="/resendOTPVerificationCode"
-						element={<ResendOTP />}
-					>
-						{" "}
 					</Route>
 				</Routes>
 			</BrowserRouter>

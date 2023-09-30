@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./css/ResendOTP.css";
+import "./css/Login.css";
 import * as Constants from "../constants/constants.js";
 
 function ResendOTP() {
@@ -42,12 +42,13 @@ function ResendOTP() {
 	};
 
 	return (
-		<div className="resend-otp-container">
-			<h2>Generate a new OTP</h2>
+		<div className="login-container">
+			<h1 className="login-label">Generate New OTP</h1>
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label htmlFor="email">Email:</label>
 					<input
+						className="login-input"
 						type="email"
 						id="email"
 						name="email"
@@ -56,15 +57,12 @@ function ResendOTP() {
 						required
 					/>
 				</div>
-				<button type="submit">Generate a new OTP</button>
+				<button type="submit">Generate New OTP</button>
 			</form>
 			{/* Conditionally render the error message */}
-			{createError && <p className="error-message">{createError}</p>}
-			<br />
+			{createError && <p className="error">{createError}</p>}
 			{/* Conditionally render the success message */}
-			{createSuccess && (
-				<p className="success-message">{createSuccess}</p>
-			)}
+			{createSuccess && <p className="success">{createSuccess}</p>}
 			<br />
 			<div className="links">
 				<Link to="/">Click here to login now</Link>

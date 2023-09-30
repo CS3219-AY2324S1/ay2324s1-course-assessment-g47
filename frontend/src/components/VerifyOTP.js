@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./css/VerifyOTP.css";
+import "./css/Login.css";
 import * as Constants from "../constants/constants.js";
 
 function VerifyOTP() {
@@ -58,12 +58,13 @@ function VerifyOTP() {
 	};
 
 	return (
-		<div className="verify-otp-container">
-			<h2>Verify OTP</h2>
+		<div className="login-container">
+			<h1 className="login-label">Verify OTP</h1>
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label>Email:</label>
 					<input
+						className="login-input"
 						type="email"
 						name="email"
 						value={formData.email}
@@ -74,6 +75,7 @@ function VerifyOTP() {
 				<div className="form-group">
 					<label>OTP:</label>
 					<input
+						className="login-input"
 						type="text"
 						name="otp"
 						value={formData.otp}
@@ -85,17 +87,15 @@ function VerifyOTP() {
 			</form>
 			{/* Conditionally render the error message */}
 			{formData.createError && (
-				<p className="error-message">{formData.createError}</p>
+				<p className="error">{formData.createError}</p>
 			)}
-			<br />
 			{/* Conditionally render the success message */}
 			{formData.createSuccess && (
-				<p className="success-message">{formData.createSuccess}</p>
+				<p className="success">{formData.createSuccess}</p>
 			)}
 			<br />
 			<div className="links">
 				<Link to="/">Click here to login now</Link>
-				<br />
 				<br />
 				<Link to="/resendOTPVerificationCode">
 					Forgot your OTP? Get a new one here!

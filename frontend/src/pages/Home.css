@@ -5,6 +5,8 @@
     color: #333;
     padding: 10px 20px;
   }
+
+
   
   .left,
   .right {
@@ -18,5 +20,11 @@
     font-size: 24px;
     font-weight: bold;
   }
+
+
+.table-container {
+  margin-bottom: 50px;
+}
+
   
   
