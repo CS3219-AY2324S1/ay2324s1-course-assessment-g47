@@ -110,6 +110,7 @@ function Dashboard() {
 			<h1>Questions</h1>
 			<div className="container">
 				<div className="column" id="left-column">
+					
 					<form id="add-question-form" onSubmit={addQuestion}>
 						<div className="form-group">
 							<label htmlFor="question-title">Title*:</label>

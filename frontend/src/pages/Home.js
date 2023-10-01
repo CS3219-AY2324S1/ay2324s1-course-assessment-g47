@@ -8,6 +8,7 @@ import QuestionList from "../components/QuestionList";
 import QuestionForm from "../components/QuestionForm";
 import QuestionDetails from "../components/QuestionDetails";
 import LoginPage from "../components/Login";
+import QuestionQueue from "../components/QuestionQueue";
 
 const Home = ({ user, handleLogin, handleLogout }) => {
 	const { questions, dispatch } = useQuestionsContext();
@@ -17,8 +18,9 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 	// fetch questions from the backend
 	useEffect(() => {
 		const fetchQuestions = async () => {
-			const response = await fetch("/api/questions", { 
-				headers: { Authorization: `Bearer ${user.tokens.accessToken}` } });
+			const response = await fetch("/api/questions", {
+				headers: { Authorization: `Bearer ${user.tokens.accessToken}` }
+			});
 			const json = await response.json();
 
 			if (response.ok) {
@@ -29,7 +31,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 		if (user) {
 			fetchQuestions();
 		}
-	}, [dispatch,user]);
+	}, [dispatch, user]);
 
 	return user ? (
 		<>
@@ -54,9 +56,13 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 				</div>
 			</div>{" "}
 			<div className="home">
-			{user.user.account_type !== "user" ? (
-				<QuestionForm />
-			) : null}
+				{user.user.account_type !== "user" ? (
+					<div>
+						
+						<QuestionForm />
+					</div>
+				) : null}
+				<QuestionQueue user={user.user}/>
 				<div className="table-container">
 					<table className="table-header">
 						<thead>

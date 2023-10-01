@@ -3,6 +3,9 @@ const express = require("express");
 const amqp = require("amqplib");
 const nodemailer = require("nodemailer");
 const authenticateToken = require("./middleware/authorization"); // Import the middleware
+const socketIO = require('./socket-io');
+const { v4: uuidv4 } = require('uuid');
+
 
 const amqpUrl = process.env.AMQP_URL;
 
@@ -488,6 +491,8 @@ const enqueueUser = async (email, difficultyLevel, socketId) => {
 	}
 }
 
+const rooms = {}; // Store rooms and their participants
+
 // Matching service to match users of the same difficulty, upon match add them into the matched queue as a pair and remove them from waiting queue
 const matchUsers = async () => {
 	try {
@@ -515,6 +520,14 @@ const matchUsers = async () => {
 						channel.sendToQueue('matched_pairs', Buffer.from(matched_message));
 						console.log(matched_message);
 						console.log(`Matched user ${email} with user ${matchingUser.email} for difficulty level: ${difficultyLevel}`);
+
+						const roomId = uuidv4(); // Implement a function to generate a unique roomId
+      					rooms[roomId] = [email, matchingUser.email]; // Store the matched users in the room
+
+						// Notify the matched users with the roomId
+						socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId});
+						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId});
+
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
 					} else {
@@ -537,6 +550,8 @@ const matchUsers = async () => {
 
 // Queuing feature to match users that chose the same difficulty level
 app.post('/matchmake', async (req, res) => {
+
+	console.log('Matchmake request received');
 	// Upon every matching request, user sends his/her 'email' and 'difficultyLevel' to the waiting queue
 	const { email, difficultyLevel, socketId } = req.body; 
 
