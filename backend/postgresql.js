@@ -1,12 +1,19 @@
 require("dotenv").config();
 const express = require("express");
 const amqp = require("amqplib");
-const { setupMatchmakingQueues } = require("./controllers/amqp");
 const nodemailer = require("nodemailer");
 const authenticateToken = require("./middleware/authorization"); // Import the middleware
 
+const amqpUrl = process.env.AMQP_URL;
+
+// Create a global variable to store the RabbitMQ connection
+let connection;
+
+// Create a global variable to store the RabbitMQ channel
+let matchmakingChannel;
+
 // For OTP Verification model
-const UserOTPVerification = require("./models/UserOTPVerification");
+const otpModel = require("./models/otpModel");
 const mongoose = require("mongoose");
 
 // Connecting to MongoDB and verifying its connection
@@ -115,7 +122,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 		const hashedOTP = await bcrypt.hash(otp, saltRounds);
 
 		try {
-			const UserOTPVerificationRecords = await UserOTPVerification.find({
+			const UserOTPVerificationRecords = await otpModel.find({
 				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length > 0) {
@@ -123,7 +130,7 @@ const sendOTPVerificationEmail = async ({ _id, email }, res) => {
 					"An existing account with this email address has already been created! Please try with a new email address!"
 				);
 			}
-			const newOTPVerification = new UserOTPVerification({
+			const newOTPVerification = new otpModel({
 				user_Id: _id,
 				email: email,
 				otp: hashedOTP,
@@ -315,10 +322,6 @@ app.post("/users/update/type/:id", authenticateToken(['admin', 'superadmin']), a
 	}
 });
 
-app.listen(port, () =>
-	console.log(`PostgreSQL server running on port ${port}`)
-);
-
 // Verify OTP email
 app.post("/verifyOTP", async (req, res) => {
 	try {
@@ -328,7 +331,7 @@ app.post("/verifyOTP", async (req, res) => {
 		if (!email || !otp) {
 			throw Error("Empty OTP details are not allowed");
 		} else {
-			const UserOTPVerificationRecords = await UserOTPVerification.find({
+			const UserOTPVerificationRecords = await otpModel.find({
 				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length <= 0) {
@@ -342,7 +345,7 @@ app.post("/verifyOTP", async (req, res) => {
 
 				if (expiresAt < Date.now()) {
 					// User OTP record has expired
-					await UserOTPVerification.deleteMany({
+					await otpModel.deleteMany({
 						email: email.toString(),
 					});
 					throw new Error("Code has expired. Please request again.");
@@ -358,7 +361,7 @@ app.post("/verifyOTP", async (req, res) => {
 						const response = await pool.query(updateAuthentication);
 						console.log("User updated");
 						console.log(response);
-						await UserOTPVerification.deleteMany({
+						await otpModel.deleteMany({
 							email: email.toString(),
 						});
 						return res.status(200).json({
@@ -387,7 +390,7 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 			throw Error("Empty user details are not allowed");
 		} else {
 			// check if there's even an entry for this email
-			const UserOTPVerificationRecords = await UserOTPVerification.find({
+			const UserOTPVerificationRecords = await otpModel.find({
 				email: email.toString(),
 			});
 			if (UserOTPVerificationRecords.length <= 0) {
@@ -396,7 +399,7 @@ app.post("/resendOTPVerificationCode", async (req, res) => {
 				);
 			}
 			// delete existing records and resend
-			await UserOTPVerification.deleteMany({ email: email.toString() });
+			await otpModel.deleteMany({ email: email.toString() });
 			const selectUserIdQuery = `SELECT user_id FROM accounts WHERE email = '${email}';`;
 			const response = await pool.query(selectUserIdQuery);
 			const userID = response.rows[0].user_id;
@@ -443,92 +446,118 @@ app.post('/users/fetch/:id', authenticateToken(['user', 'superuser', 'admin', 's
 	}
 });
 
-// Create a global variable to store connected channels
-let matchmakingChannel;
+// Establish a RabbitMQ connection if it is not already
+const createRabbitMQConnection = async () => {
+	try {
+		if (!connection) {
+			connection = await amqp.connect(amqpUrl);
+		}
+		return connection;
+	} catch (error) {
+		console.error('Error connecting to RabbitMQ: ', error);
+		throw error;
+	}
+};
 
-// Function to create the matching channel with the waiting and matched queues
+// Create a channel in RabbitMQ to establish the waiting and matched queues
 const createMatchingChannel = async () => {
 	try {
-		matchmakingChannel = await setupMatchmakingQueues();
-		console.log('Matchmaking channel set up successfully');
+		if (!matchmakingChannel) {
+			const connection = await createRabbitMQConnection();
+			matchmakingChannel = await connection.createChannel();
+			await matchmakingChannel.assertQueue('user_queue', { durable: true });
+			await matchmakingChannel.assertQueue('matched_pairs', { durable: true });
+			console.log('Matchmaking channel set up successfully');
+		}
+		return matchmakingChannel;
 	} catch (error) {
 		console.error('Error setting up matchmaking channel:', error);
 	}
 };
 
-// Set up waiting and matched queues on initialization
-createMatchingChannel();
+// Adds users into the waiting queue
+const enqueueUser = async (email, difficultyLevel, socketId) => {
+	try {
+		const channel = await createMatchingChannel();
+		const message = JSON.stringify({ email, difficultyLevel, socketId });
 
+		channel.sendToQueue("user_queue", Buffer.from(message), { persistent: true });
+		console.log(`User ${email} with socket ID (${socketId}) enqueued with difficulty level ${difficultyLevel}.`);
+	} catch (error) {
+		console.error('Failed to add user into the waiting queue due to unexpected error: ', error);
+	}
+}
+
+// Matching service to match users of the same difficulty, upon match add them into the matched queue as a pair and remove them from waiting queue
+const matchUsers = async () => {
+	try {
+		const channel = await createMatchingChannel();
+		
+		await channel.prefetch(1);
+
+		const difficultyMap = new Map();
+
+		console.log('Waiting for users to match...');
+
+		// Check for users in the waiting queue to match with the same difficulty level
+		channel.consume("user_queue", (message) => {
+			if (message !== null) {
+				const { email, difficultyLevel, socketId } = JSON.parse(message.content.toString());
+				// Checks the map for users waiting to get matched based on their difficulty level
+				if (difficultyMap.has(difficultyLevel)) {
+					const matchingUser = difficultyMap.get(difficultyLevel);
+
+					// Ensures the two users matched are not the same user
+					if (matchingUser.email !== email) {
+						// Send the two users' information into the matched_pairs queue and remove from waiting queue
+						const matchedPair = { Player1: { email: email, difficultyLevel: difficultyLevel, socketId: socketId }, Player2: { email: matchingUser.email, difficultyLevel: matchingUser.difficultyLevel, socketId: matchingUser.socketId } };
+						matched_message = JSON.stringify(matchedPair)
+						channel.sendToQueue('matched_pairs', Buffer.from(matched_message));
+						console.log(matched_message);
+						console.log(`Matched user ${email} with user ${matchingUser.email} for difficulty level: ${difficultyLevel}`);
+						// Remove the matched user from the map
+						difficultyMap.delete(difficultyLevel);
+					} else {
+						// When the user queues himself/herself up twice in a row with the same difficulty level chosen
+						console.log(`User ${email} matched with themselves. Ignoring.`);
+					}
+				} else {
+					// No match found, store the user's info into the difficultyMap based on the difficulty level he/she chose
+					difficultyMap.set(difficultyLevel, { email, difficultyLevel, socketId });
+				}
+
+				// Remove the user from the waiting queue by acknowledging his/her message
+				channel.ack(message);
+			}
+		})
+	} catch (error) {
+		console.error('Failed to match any users due to an internal issue: ', error);
+	}
+}
+
+// Queuing feature to match users that chose the same difficulty level
 app.post('/matchmake', async (req, res) => {
-	const user = req.body.user; // Replace with actual user data
-	const { email, questionType } = user; // Assuming user has 'email' and 'questionType' properties
+	// Upon every matching request, user sends his/her 'email' and 'difficultyLevel' to the waiting queue
+	const { email, difficultyLevel, socketId } = req.body; 
 
 	try {
-		if (!matchmakingChannel) {
-			return res.status(500).json({ error: 'Matchmaking channel is not set up' });
+		// Checks for missing email address or difficulty level of the question
+		if (!email || !difficultyLevel || !socketId) {
+			return res.status(400).json({ error: 'Email, difficultyLevel and socketId are required fields.' });
 		}
 
-		// Publish the user to the 'waiting_users' queue
-		message = JSON.stringify(user);
-		matchmakingChannel.sendToQueue('waiting_users', Buffer.from(message));
-		console.log(message);
+		// Enqueue the user into the waiting queue
+		enqueueUser(email, difficultyLevel, socketId);
 
-		// Try to match the user with another user with the same question type
-		await matchUsersWithSameDifficulty(email, questionType);
-
-		return res.status(200).json({ message: 'Matchmaking in progress' });
+		return res.status(200).json({ message: 'User enqueued successfully.' });
 	} catch (error) {
-		console.error('Error publishing user to matchmaking queue:', error);
+		console.error('Error publishing user to waiting queue:', error);
 		return res.status(500).json({ error: 'Internal server error' });
 	}
 });
 
-// Keep track of user in the queue to ACK them when match found for them
-const queueMap = new Map();
-
-// Function to match users with the same difficulty level for the questions
-const matchUsersWithSameDifficulty = async (email, questionType) => {
-	try {
-		const channel = await amqp.connect(process.env.AMQP_URL).then((conn) => conn.createChannel());
-
-		const continuousMatching = async () => {
-			// Consume messages from the 'waiting_users' queue
-			channel.consume('waiting_users', async (message) => {
-
-				const user = JSON.parse(message.content.toString());
-				const { email: matchEmail, questionType: matchQuestionType } = user; // Extract email and questionType out from user in the queue and storing into matchEmail and matchQuestionType
-
-				// Checks the waiting queue to locate an user which is NOT current user and has the same question difficulty level selected
-				if (matchQuestionType === questionType && matchEmail !== email) {
-					// Acknowledge and cancel the user in the waiting_users when a match is found
-					channel.ack(message);
-					//console.log(email);
-					//console.log(matchEmail);
-					//console.log(message);
-					queueMap.delete(email);
-					channel.cancel(message.fields.consumerTag);
-
-					// Remove and acknowledge the matched user from the waiting queue
-					console.log(`${email} has been dequeued from the waiting list successfully`);
-					console.log(`${matchEmail} has been dequeued from the waiting list successfully`);
-
-					// Create a matched binding the two users and add into matched_pairs queue
-					const matchedPair = { Player1: { email, questionType }, Player2: { email: matchEmail, questionType: matchQuestionType } };
-					matched_message = JSON.stringify(matchedPair)
-					channel.sendToQueue('matched_pairs', Buffer.from(matched_message));
-					console.log(matched_message);
-					return;
-				} else {
-					console.log(email);
-					queueMap.set(email, message); // Add a key-value pair into the queueMap to take note of the message for the user that was added into the waiting_users queue
-				}
-			});
-		};
-
-		// Start the matching session
-		continuousMatching();
-		return;
-	} catch (error) {
-		console.error('Error matching users:', error);
-	}
-};
+app.listen(port, () => {
+	console.log(`PostgreSQL server running on port ${port}`)
+	createMatchingChannel(); // Creates a connection to the Cloud AMQP server (RabbitMQ)
+	matchUsers(); // Starts the matching service
+});
