@@ -1,0 +1,21 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    min-height: 50vh;
+    margin: 8% auto;
+    border: 2px solid #333;
+    padding: 20px 40px;
+    border-radius: 10px;
+}
+
+.profile-heading {
+    text-align: center;
+}
+
+.username-wrapper, .email-wrapper {
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+}
