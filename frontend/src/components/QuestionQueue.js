@@ -16,7 +16,7 @@ function QuestionQueue({ user }) {
     socket.on("me", (id) => {
         console.log("Calling socket function `me` to get socketID, socketID:", id);
         setSocketID(id);
-      });
+    });
       
     const handleMatchedSuccessfully = (roomId) => {
         console.log(`User: ${user.username}}Matched successfully: ${roomId}`);
@@ -42,7 +42,7 @@ function QuestionQueue({ user }) {
   const handleJoinQueue = async () => {
 
     console.log(`User: ${user}, SocketId: ${socketID}`);
-
+    
     try {
         console.log(`SocketId: ${socketID}`);
       const response = await fetch('http://localhost:4001/matchmake', {

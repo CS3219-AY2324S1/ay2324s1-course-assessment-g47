@@ -19,17 +19,15 @@ io.on("connection", (socket) => {
 
   socket.emit("me", (socket.id))
 
-  // socket.on("toggleMic", () => {
-  // 	// Handle toggling of microphone on the server
-  // 	// Broadcast the toggleMic event to other users in the same room
-  // 	io.to(socket.id).emit("otherUserToggledMic");
-  //   });
-
-  //   socket.on("toggleCamera", () => {
-  // 	// Handle toggling of camera on the server
-  // 	// Broadcast the toggleCamera event to other users in the same room
-  // 	io.to(socket.id).emit("otherUserToggledCamera");
-  //   });
+  socket.on("toggleMic", (newMicState) => {
+		  io.emit("otherUserToggledMic", socket.id, newMicState);
+      console.log("Mic toggled")
+	});
+	
+	socket.on("toggleCamera", (newCameraState) => {
+		  io.emit("otherUserToggledCamera", socket.id, newCameraState);
+      console.log("Camera toggled")
+	});
 
   socket.on("matchUser", (data) => {
     //socket.join(data.roomName)
@@ -81,9 +79,8 @@ io.on("connection", (socket) => {
   });
 
   // Handle user disconnection
-  socket.on("disconnect", (data) => {
+  socket.on("disconnected", (data) => {
     console.log("A user disconnected: " + socket.id);
-
     // Notify other users in the room that a user has disconnected
     socket.to(data.roomId).emit("user-disconnected", socket.id);
   });

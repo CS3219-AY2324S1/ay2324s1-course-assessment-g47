@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import Peer from "simple-peer";
 import io from "socket.io-client";
+import { ca } from "date-fns/locale";
+import { connect } from "mongoose";
+import { set } from "date-fns";
 
 const IO_PORT = 4002;
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
@@ -18,6 +21,12 @@ function Room() {
     const [callerSignal, setCallerSignal] = useState();
     const [peerSocketId, setPeerSocketId] = useState(null);
     const [editorText, setEditorText] = useState("");
+    const [micOn, setMicOn] = useState(true);
+    const [cameraOn, setCameraOn] = useState(true);
+    const [otherStream, setOtherStream] = useState(null);
+    const [otherMicOn, setOtherMicOn] = useState(true);
+    const [otherCameraOn, setOtherCameraOn] = useState(true);
+    const [inCallRoom, setInCallRoom] = useState(false);
 
     const myVideo = useRef();
     const userVideo = useRef();
@@ -27,14 +36,14 @@ function Room() {
 
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
-          });
-          
-        const getUserMediaWithStatus = async () => {
+        });
+
+        const getFirstUserMediaWithStatus = async () => {
 
             try {
                 const userStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: false,
+                    video: cameraOn,
+                    audio: micOn,
                 });
                 setStream(userStream);
                 myVideo.current.srcObject = userStream;
@@ -72,6 +81,7 @@ function Room() {
                     socket.on("signal-recievedd", (signal) => {
                         console.log("Signal received24:", signal);
                         peer.signal(signal.signal);
+                        setInCallRoom(true);
                     });
 
                     connectionRef.current = peer;
@@ -97,15 +107,9 @@ function Room() {
 
                     console.log("Signal received2:", callerSignal);
                     console.log("Signal received23:", data.signal);
-                     peer.signal(data.signal);
-                     connectionRef.current = peer;
-                });
-
-                socket.on("user-disconnected", (userId) => {
-                    // A user has disconnected from the room
-                    setConnectedUsers((prevUsers) =>
-                        prevUsers.filter((user) => user !== userId)
-                    );
+                    peer.signal(data.signal);
+                    connectionRef.current = peer;
+                    setInCallRoom(true);
                 });
 
                 socket.on("initial-editor-content", (initialContent) => {
@@ -120,6 +124,9 @@ function Room() {
                 });
             } catch (err) {
                 console.error("Error accessing user media:", err);
+                const userStream = null;
+                setStream(userStream);
+                myVideo.current.srcObject = userStream;
             }
         };
 
@@ -127,9 +134,105 @@ function Room() {
             setMe(id);
         });
 
-        // Call the getUserMedia function
-        getUserMediaWithStatus();
+        // Call the getUserMedia function only once when the component mounts
+        getFirstUserMediaWithStatus();
+
+        return () => {
+            // Clean up the event listener when the component unmounts
+            socket.off("user-connected");
+            socket.off("user-disconnected");
+            socket.off("signal-received");
+            socket.off("signal-recievedd");
+            socket.off("initial-editor-content");
+            socket.off("editor-changed");
+            socket.off("me");
+        };
     }, []);
+
+    useEffect(() => {
+        const getUserMediaWithStatus = async () => {
+            try {
+              const userStream = await navigator.mediaDevices.getUserMedia({
+                video: cameraOn,
+                audio: micOn,
+              });
+              setStream(userStream);
+              myVideo.current.srcObject = userStream;
+            } catch (err) {
+              const userStream = null;
+              setStream(userStream);
+              myVideo.current.srcObject = userStream;
+            }
+        };
+
+        getUserMediaWithStatus();
+    }, [micOn, cameraOn]);
+
+    // pause peer video when other user toggled video
+    useEffect(() => {
+        if (otherCameraOn) {
+            userVideo.current.srcObject = stream;
+        } else {
+            userVideo.current.srcObject = null;
+        }
+    }, [otherCameraOn]);
+
+    // pause peer audio when other user toggled mic
+    useEffect(() => {
+        if (otherMicOn) {
+            userVideo.current.srcObject = stream;
+        } else {
+            userVideo.current.srcObject = null;
+        }
+    }, [otherMicOn]);
+
+    // Ignore for now
+    // const getOtherMediaWithStatus = async () => {
+    //     try {
+    //       const otherStream = await navigator.mediaDevices.getUserMedia({
+    //         video: otherCameraOn,
+    //         audio: otherMicOn,
+    //       });
+    //       setOtherStream(otherStream);
+    //       if (userVideo.current) {
+    //         console.log("otherStream:", otherStream);
+    //         userVideo.current.srcObject = otherStream;
+    //       }
+    //     } catch (err) {
+    //       const otherStream = null;
+    //       setOtherStream(otherStream);
+    //       userVideo.current.srcObject = otherStream;
+    //     }
+    // };
+      
+    socket.on("editor-changed", (text) => {
+        if (editorText !== text) {
+            setEditorText(text);
+        }
+    });
+
+    socket.on("user-disconnected", (userId) => {
+        // A user has disconnected from the room
+        console.log("User disconnected:", userId);
+        setConnectedUsers((prevUsers) => prevUsers.filter((id) => id !== userId));
+        if (connectionRef.current) {
+            connectionRef.current.destroy();
+        }
+    });
+
+    socket.on("otherUserToggledMic", (userId, toggleMicState) => {
+        if (userId !== socket.id) {
+            setOtherMicOn(toggleMicState);
+            console.log("other user toggled mic:", userId, toggleMicState);
+        }
+    });
+
+    socket.on("otherUserToggledCamera", (userId, toggleCameraState) => {
+        if (userId !== socket.id) {
+            setOtherCameraOn(toggleCameraState);
+            console.log("other user toggled camera:", userId, toggleCameraState);
+        }
+    });
 
     const handleEditorChange = (newValue) => {
         setEditorText(newValue);
@@ -137,8 +240,20 @@ function Room() {
     };
 
     const leaveCall = () => {
-        connectionRef.current.destroy();
-        socket.disconnect({roomId: roomId});
+        // Disconnect from the room
+        console.log("Leaving call");
+        socket.emit("disconnected");
+    };
+
+    const toggleMic = () => {
+        setMicOn((prevMicOn) => !prevMicOn);
+        socket.emit("toggleMic", !micOn);
+        console.log("User toggled mic:", socket.id, !micOn);
+    };
+    
+    const toggleCamera = () => {
+        setCameraOn((prevCameraOn) => !prevCameraOn);
+        socket.emit("toggleCamera", !cameraOn);
     };
 
     return (
@@ -153,8 +268,18 @@ function Room() {
                     <Link to="/">
                         <button onClick={() => leaveCall()}>Home</button>
                     </Link>
+                    <button
+                        onClick={() => toggleCamera()}
+                    >
+                        Camera
+                    </button>
+
+                    <button
+                        onClick={() => toggleMic()}
+                    >
+                        Microphone
+                    </button>
                 </div>
-                
             </div>
             <div className="right-panel">
                 <Editor
@@ -173,6 +298,8 @@ export default Room;
 
 
 //TODO: Only allow 2 people to enter room. (Bug: a third user can copy and paste same link and join the room)
-// TODO: add toggle mic and camera button
+//TODO: add toggle mic and camera button.
+//TODO: Queuing system require refresh to work.
+//TODO: Once disconnected, cannot reconnect.
 // Add "currently in queue" UI in home page, because user cant see if he/she is in queue or not (only can see in console for now)
 // extra: Add "waitting for other user to join" UI in room page 
