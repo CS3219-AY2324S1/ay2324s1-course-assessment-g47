@@ -39,13 +39,14 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 
 		//get user id from local storage then update user info
 		try {
-			console.log(user);
+			console.log(user.user);
 			const response = await fetch(
 				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/type/${user.user_id}`,
 				{
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						Authorization: `Bearer ${user.tokens.accessToken}`,
 					},
 					body: JSON.stringify({ email, account_type }),
 				}
@@ -57,6 +58,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 				const data = await response.json();
 				changeLabelText(data.message);
 				console.log("Update successful", "");
+				handleUserChange(user);
 			} else if (response.status === 401) {
 				// Invalid email or password
 				const errorData = await response.json();

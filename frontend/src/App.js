@@ -42,6 +42,7 @@ import { useAuthContext } from "./hooks/useAuthContext";
 import Navbar from "./components/Navbar";
 
 function App() {
+	const postgresqlPort = 4001;
 	const [user, setUser] = useState(null);
 	const { dispatch } = useAuthContext();
 
@@ -74,8 +75,35 @@ function App() {
 	};
 
 	const onUserchange = (newUser) => {
-		setUser({ ...user, ...newUser });
-		localStorage.setItem("user", JSON.stringify({ ...user, ...newUser }));
+		const fetchDataFromAPI = async () => {
+			try {
+				const response = await fetch(
+					`http://localhost:${postgresqlPort}/users/fetch/${newUser.user.user_id}`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${newUser.tokens.accessToken}`,
+						},
+						body: JSON.stringify(newUser), // Send user data directly
+					}
+				);
+				if (response.ok) {
+					const user = await response.json();
+
+					// Update the 'user' state with the API data
+					setUser(user);
+
+					// Update 'user' in localStorage with the API data
+					localStorage.setItem("user", JSON.stringify(user));
+				} else {
+					console.error("API request failed");
+				}
+			} catch (error) {
+				console.error("Error:", error);
+			}
+		};
+		fetchDataFromAPI();
 	};
 	return (
 		<>
