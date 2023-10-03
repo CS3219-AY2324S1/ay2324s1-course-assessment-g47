@@ -45,8 +45,6 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 		e.preventDefault();
 		setIsEditingUserDetails(false);
-
-		handleUserChange(localUser);
 		//get user id from local storage then update user info
 		try {
 			console.log(user);
@@ -56,6 +54,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						Authorization: `Bearer ${user.tokens.accessToken}`,
 					},
 					body: JSON.stringify(localUser),
 				}
@@ -64,6 +63,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 			if (response.status === 200) {
 				//successful update
 				console.log("Update successful");
+				handleUserChange(user);
 			} else {
 				// Handle other error cases
 				console.log("Server error");
@@ -119,6 +119,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 			if (response.status === 200) {
 				//successful login
 				console.log("Correct password entered");
+				handleUserChange(user);
 			} else if (response.status === 401) {
 				// Invalid email or password
 				const errorData = await response.json();
@@ -141,6 +142,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						Authorization: `Bearer ${user.tokens.accessToken}`,
 					},
 					body: JSON.stringify({
 						email: user.user.email,
@@ -181,6 +183,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
+							Authorization: `Bearer ${user.tokens.accessToken}`,
 						},
 						body: JSON.stringify(user.user),
 					}

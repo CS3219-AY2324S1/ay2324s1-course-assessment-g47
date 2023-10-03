@@ -1,31 +1,48 @@
-const express = require('express')
+const express = require("express");
 const {
-    getQuestions,
-    getQuestion,
-    createQuestion,
-    deleteQuestion,
-    updateQuestion
-} = require('../controllers/questionController')
+	getQuestions,
+	getQuestion,
+	createQuestion,
+	deleteQuestion,
+	updateQuestion,
+} = require("../controllers/questionController");
 
-const router = express.Router()
-const authenticateToken = require('../middleware/authorization'); // Import the middleware
+const router = express.Router();
+const authenticateToken = require("../middleware/authorization"); // Import the middleware
 
-// Apply the authenticateToken middleware to all routes below
-router.use(authenticateToken);
+// All authenticated users can access this route
+router.get(
+	"/",
+	authenticateToken(["user", "superuser", "admin", "superadmin"]),
+	getQuestions
+);
 
-// GET all questions
-router.get('/', getQuestions)
+// All authenticated can access this route
+router.get(
+	"/:id",
+	authenticateToken(["user", "superuser", "admin", "superadmin"]),
+	getQuestion
+);
 
-// GET a single question
-router.get('/:id', getQuestion)
+// Only superuser, admin and superadmin can access this route
+router.post(
+	"/",
+	authenticateToken(["superuser", "admin", "superadmin"]),
+	createQuestion
+);
 
-// POST a new question
-router.post('/', createQuestion)
+// Only superuser, admin and superadmin can access this route
+router.delete(
+	"/:id",
+	authenticateToken(["superuser", "admin", "superadmin"]),
+	deleteQuestion
+);
 
-// DELETE a new question
-router.delete('/:id', deleteQuestion)
+// Only superuser, admin and superadmin can access this route
+router.patch(
+	"/:id",
+	authenticateToken(["superuser", "admin", "superadmin"]),
+	updateQuestion
+);
 
-// UPDATE a new question
-router.patch('/:id', updateQuestion)
-
-module.exports = router
+module.exports = router;
