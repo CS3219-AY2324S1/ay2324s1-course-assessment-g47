@@ -38,73 +38,72 @@ import Profile from "./components/Profile";
 import ChangeTypeHome from "./components/ChangeTypeHome";
 import VerifyOTP from "./components/VerifyOTP";
 import ResendOTP from "./components/ResendOTP";
-import { useAuthContext } from './hooks/useAuthContext';
+import { useAuthContext } from "./hooks/useAuthContext";
 
 function App() {
 	const [user, setUser] = useState(null);
-	const { dispatch } = useAuthContext()
+	const { dispatch } = useAuthContext();
 	const postgresqlPort = 4001;
 
 	// Load user data from localStorage when the component mounts
 	useEffect(() => {
-		const storedUser = JSON.parse(localStorage.getItem('user'));
+		const storedUser = JSON.parse(localStorage.getItem("user"));
 
 		if (storedUser) {
 			setUser(storedUser);
-			dispatch({ type: 'LOGIN', payload: storedUser });
+			dispatch({ type: "LOGIN", payload: storedUser });
 		}
 	}, [dispatch]);
 
 	const handleLogin = (user) => {
 		// save the user to local storage
-		localStorage.setItem('user', JSON.stringify(user))
+		localStorage.setItem("user", JSON.stringify(user));
 
 		// update the auth context
-		dispatch({type: 'LOGIN', payload: user})
+		dispatch({ type: "LOGIN", payload: user });
 		setUser(user);
 	};
 
 	const handleLogout = () => {
 		// remove user from storage
-		localStorage.removeItem('user')
+		localStorage.removeItem("user");
 
 		// dispatch logout action
-		dispatch({ type: 'LOGOUT' })
+		dispatch({ type: "LOGOUT" });
 		setUser(null);
 	};
 
 	const onUserchange = (newUser) => {
 		const fetchDataFromAPI = async () => {
-		  try {
-			const response = await fetch(
-			  `http://localhost:${postgresqlPort}/users/fetch/${newUser.user.user_id}`,
-			  {
-				method: "POST",
-				headers: {
-				  "Content-Type": "application/json",
-				  'Authorization': `Bearer ${newUser.tokens.accessToken}`
-				},
-				body: JSON.stringify(newUser), // Send user data directly
-			  }
-			);
-			if (response.ok) {
-			  const user = await response.json();
-	  
-			  // Update the 'user' state with the API data
-			  setUser(user);
-	  
-			  // Update 'user' in localStorage with the API data
-			  localStorage.setItem('user', JSON.stringify(user));
+			try {
+				const response = await fetch(
+					`http://localhost:${postgresqlPort}/users/fetch/${newUser.user.user_id}`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${newUser.tokens.accessToken}`,
+						},
+						body: JSON.stringify(newUser), // Send user data directly
+					}
+				);
+				if (response.ok) {
+					const user = await response.json();
 
-			} else {
-			  console.error('API request failed');
+					// Update the 'user' state with the API data
+					setUser(user);
+
+					// Update 'user' in localStorage with the API data
+					localStorage.setItem("user", JSON.stringify(user));
+				} else {
+					console.error("API request failed");
+				}
+			} catch (error) {
+				console.error("Error:", error);
 			}
-		  } catch (error) {
-			console.error('Error:', error);
-		  }
 		};
 		fetchDataFromAPI();
-	  };  
+	};
 	return (
 		<>
 			<BrowserRouter>
@@ -148,8 +147,15 @@ function App() {
 							}
 						/>
 					</Route>
-					<Route path="/verifyOTP" element={<VerifyOTP />}> </Route>
-					<Route path="/resendOTPVerificationCode" element={<ResendOTP />}> </Route>
+					<Route path="/verifyOTP" element={<VerifyOTP />}>
+						{" "}
+					</Route>
+					<Route
+						path="/resendOTPVerificationCode"
+						element={<ResendOTP />}
+					>
+						{" "}
+					</Route>
 				</Routes>
 			</BrowserRouter>
 		</>
