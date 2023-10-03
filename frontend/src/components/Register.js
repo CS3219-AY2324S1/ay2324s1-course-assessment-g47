@@ -23,7 +23,7 @@ function Register() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const { username, email, password } = formData;
+		const { username, email, password} = formData;
 
 		if (password.length < 6) {
 			// Display an error message when the password is too short
@@ -43,12 +43,7 @@ function Register() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({
-						username,
-						email,
-						password,
-						account_type: "user",
-					}),
+					body: JSON.stringify({ username, email, password, account_type: "user" }),
 				}
 			);
 			const data = await response.json();
@@ -77,7 +72,7 @@ function Register() {
 
 	return (
 		<div className="login-container">
-			<h1 className="login-label">Create Account</h1>
+			<h1>Create Account</h1>
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label htmlFor="username">Username:</label>

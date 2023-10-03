@@ -66,11 +66,12 @@ function LoginPage(props) {
 
 	return (
 		<div className="login-container">
-			<h1 className="login-label">Login</h1>
+			<h1>Login</h1>
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label htmlFor="email">Email:</label>
 					<input
+						className="login-input"
 						type="email"
 						id="email"
 						name="email"
@@ -82,6 +83,7 @@ function LoginPage(props) {
 				<div className="form-group">
 					<label htmlFor="password">Password:</label>
 					<input
+						className="login-input"
 						type="password"
 						id="password"
 						name="password"
@@ -96,14 +98,15 @@ function LoginPage(props) {
 				{formData.loginSuccess && (
 					<p className="success">{formData.loginSuccess}</p>
 				)}
-				<button type="submit">Login</button>
+				<button className="login-button" type="submit">
+					Login
+				</button>
 			</form>
 			<div>
 				<Link to="/register">Not a user? Sign up now</Link>
 				<br />
-				<Link to="/verifyOTP">
-					Click here to verify your account now!
-				</Link>
+				<br />
+				<Link to="/verifyOTP">Click here to verify your account now!</Link>
 			</div>
 			{/* <div>
 				<Link to="/forgetPassword">Forgot password? Reset here</Link>

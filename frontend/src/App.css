@@ -1,16 +1,3 @@
-
-:root {
-  --primary-color: #263238;
-  --secondary-color: #37474F;
-  --accent-color: #b0bec5;
-  --dark-accent-color: #455a64;
-  --incorrect-color: #e46578;
-  --correct-color: #81c784;
-  --input-color: #eceff1;
-  --navbar-color: #37474f;
-  --text-color: #b0bec5;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -57,9 +44,7 @@
 
 
 body {
-  background-color: var(--primary-color);
-  margin: 0; /* Remove default margin */
-  font-family: 'Roboto', sans-serif; /* Apply a font family for the entire document */
+  font-family: Arial, sans-serif;
 }
 
 h1 {
@@ -114,54 +99,6 @@ form {
   /* Add margin at the bottom to create space */
 }
 
-/* Style for Add new Question Form */
-.create {
-  height: 720px;
-  background-color: var(--secondary-color);
-  border-radius: 20px;
-}
-
-.question-header {
-  text-align: center;
-  margin-bottom: 10px;
-  color: var(--accent-color);
-}
-
-.editor-container {
-  height: 200px;
-}
-
-/* CSS for the Quill editor toolbar */
-.ql-toolbar {
-  position: sticky;
-  top: 0;
-  background-color: var(--accent-color); 
-  z-index: 1; 
-  border: none;
-  outline: none;
-  border-radius: 10px 10px 0px 0px;
-}
-
-/* CSS for the Quill editor content area */
-.ql-editor {
-  max-height: 100%; 
-  overflow-y: auto;
-  border: none;
-  outline: none;
-}
-
-.add-button {
-  margin-top: 70px;
-  position: absolute;
-  background-color: var(--dark-accent-color);
-}
-
-.add-button:hover {
-  background-color: var(--accent-color);
-  color: var(--primary-color);
-}
-
-/* End of Style for the add new question form */
 
 /* Style for the category multi-select dropdown */
 .custom-select {
@@ -241,7 +178,7 @@ form {
   cursor: pointer;
   padding: 0;
   font-size: 16px;
-  color: var(--incorrect-color);
+  color: red;
   text-align: center;
 }
 
@@ -256,100 +193,4 @@ form {
   border: 1px solid #ccc;
   max-width: 200px;
 
-}
-
-/* Style for table */
-.table-container {
-  margin: 10px 60px;
-  width: 90%;
-}
-
-/* Style for the table header */
-.table-header th {
-  background-color: var(--secondary-color); /* Set the background color */
-  color: var(--accent-color); /* Set the text color */
-  padding: 10px; /* Add padding for spacing */
-}
-
-/* Style for the table rows */
-.table-row {
-  background-color: var(--[--primary-color]-color);
-  color: var(--accent-color);
-}
-
-.clickable-cell {
-  cursor: pointer; /* Change the cursor to a pointer on hover to indicate it's clickable */
-  color: var(--accent-color);
-  transition: color 0.3s; /* Add a smooth transition effect */
-
-  /* Add hover styles */
-  &:hover {
-      background-color: var(--accent-color); /* Set the background color on hover */
-      color: var(--primary-color); /* Change the text color on hover */
-  }
-}
-
-/* Style for the delete button */
-.delete-button {
-  color: #B22222; /* Set the text color to red */
-  cursor: pointer; /* Change the cursor to a pointer on hover to indicate it's clickable */
-  transition: color 0.3s; /* Add a smooth color transition effect */
-  width: 100%;
-
-  /* Add hover styles */
-  &:hover {
-      color: var(--incorrect-color); /* Change the text color to a darker red on hover */
-      background-color: var(--secondary-color);
-  }
-}
-
-
-
-/* Style for question detail page */
-.question-details {
-  height: 720px;
-  background-color: var(--secondary-color);
-  border-radius: 20px;
-  overflow-y: auto;
-  padding: 20px;
-  font-family: 'Roboto', sans-serif;
-}
-
-/* Style the title */
-.question-header {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-/* Style the complexity and category */
-.question-details p {
-  margin: 5px 0px;
-  color: var(--text-color);
-  font-size: 18px;
-  padding: 3px;
-}
-
-/* Style the description */
-.card-description {
-  margin-top: 10px;
-  color: var(--text-color);
-  overflow: auto;
-  white-space: normal;
-}
-
-.card-description p, .card-description ul, .card-description li {
-  line-height: 1.0;
-  margin: 0px 10px;
-}
-
-/* Style the created date */
-.question-btm-subtext {
-  margin-top: 10px;
-  font-style: italic;
-  margin: 5px 0;
-  color: var(--text-color);
-  font-size: 16px;
-  margin: 5px;
-  padding: 3px;
 }
