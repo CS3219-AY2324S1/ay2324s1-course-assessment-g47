@@ -40,9 +40,9 @@ import VerifyOTP from "./components/VerifyOTP";
 import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from "./hooks/useAuthContext";
 import Navbar from "./components/Navbar";
+import * as Constants from "./constants/constants.js";
 
 function App() {
-	const postgresqlPort = 4001;
 	const [user, setUser] = useState(null);
 	const { dispatch } = useAuthContext();
 
@@ -78,7 +78,7 @@ function App() {
 		const fetchDataFromAPI = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:${postgresqlPort}/users/fetch/${newUser.user.user_id}`,
+					`http://localhost:${Constants.POSTGRESQL_PORT}/users/fetch/${newUser.user.user_id}`,
 					{
 						method: "POST",
 						headers: {
