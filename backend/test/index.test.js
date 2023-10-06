@@ -33,11 +33,9 @@ describe('API Test', function () {
         this.timeout(10000);
 
         // Choose the token secret based on the environment
-        const tokenSecret = process.env.NODE_ENV === 'test-ci'
-        ? 'serect.AUTH_TOKEN'
-        : process.env.ACCESS_TOKEN_SECRET;
+        const tokenSecret = process.env.ACCESS_TOKEN_SECRET;
         const token = generateValidToken(user, tokenSecret);
-        
+
         //console.log(token);
         chai.request(app)
         .get('/api/questions/')
