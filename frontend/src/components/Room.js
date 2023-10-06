@@ -9,6 +9,8 @@ import { ca } from "date-fns/locale";
 import { connect } from "mongoose";
 import { set } from "date-fns";
 import { codeLanguages } from "./constants";
+import { FaHome, FaVideo, FaVideoSlash, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
+
 import Select from "react-select";
 
 const IO_PORT = 4002;
@@ -20,7 +22,7 @@ function Room() {
     // Code language settings 
     const [selectedLanguage, setSelectedLanguage] = useState(
         codeLanguages.find((language) => language.value === "python")
-      );
+    );
 
     const { roomId } = useParams();
     const [me, setMe] = useState("");
@@ -35,6 +37,7 @@ function Room() {
     const [otherMicOn, setOtherMicOn] = useState(true);
     const [otherCameraOn, setOtherCameraOn] = useState(true);
     const [inCallRoom, setInCallRoom] = useState(false);
+    const [peer, setPeer] = useState(null);
 
     const myVideo = useRef();
     const userVideo = useRef();
@@ -50,7 +53,10 @@ function Room() {
 
             try {
                 const userStream = await navigator.mediaDevices.getUserMedia({
-                    video: cameraOn,
+                    video: {
+                        width: { ideal: 1280 }, // Preferred width
+                        height: { ideal: 720 },  // Preferred height
+                    },
                     audio: micOn,
                 });
                 setStream(userStream);
@@ -66,9 +72,11 @@ function Room() {
                     // Create a new Peer connection for the new user
                     const peer = new Peer({
                         initiator: true,
-                        trickle: false,
+                        trickle: true,
                         stream: userStream,
                     });
+
+                    setPeer(peer);
 
                     peer.on("signal", (data) => {
                         socket.emit("send-signal", {
@@ -101,7 +109,7 @@ function Room() {
                     setPeerSocketId(data.from)
                     const peer = new Peer({
                         initiator: false,
-                        trickle: false,
+                        trickle: true,
                         stream: userStream,
                     });
 
@@ -129,6 +137,11 @@ function Room() {
                     if (editorText !== text) {
                         setEditorText(text);
                     }
+                });
+                socket.on("language-changed", (language) => {
+                    console.log("language changed:", language);
+                        setSelectedLanguage(language);
+                
                 });
             } catch (err) {
                 console.error("Error accessing user media:", err);
@@ -259,68 +272,99 @@ function Room() {
         console.log("User toggled mic:", socket.id, !micOn);
     };
 
+    // const toggleMic = () => {
+    //     setMicOn((prevMicOn) => !prevMicOn);
+    //     if (stream) {
+    //         console.log("stream:", stream)
+    //         stream.getAudioTracks().forEach((track) => {
+    //             track.enabled = micOn;
+    //         });
+    //     } else {
+    //         console.log("no stream:")
+    //     }
+    //     updatePeerStream();
+    // };
+
     const toggleCamera = () => {
         setCameraOn((prevCameraOn) => !prevCameraOn);
         socket.emit("toggleCamera", !cameraOn);
     };
 
+    // const toggleCamera = () => {
+    //     setCameraOn((prevCameraOn) => !prevCameraOn);
+    //     if (stream) {
+    //         stream.getVideoTracks().forEach((track) => {
+    //             track.enabled = cameraOn;
+    //         });
+    //     }
+    //     updatePeerStream();
+    // };
 
-  // Update the handleLanguageChange function
-  const handleLanguageChange = (selectedOption) => {
-    console.log(`Option selected:`, selectedOption);
-    setSelectedLanguage(selectedOption);
-  };
+    const handleLanguageChange = (selectedOption) => {
+        console.log(`Option selected:`, selectedOption);
+        setSelectedLanguage(selectedOption);
+        socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
+    };
 
-  
+    // const updatePeerStream = () => {
+    //     if (peer) {
+    //         peer.on("stream", (stream) => {
+    //             userVideo.current.srcObject = stream;
+    //         });
+    //     }
+    // };
+
     return (
         <div className="container">
+
             <div className="left-panel">
+
                 <div className="video-container">
                     <video className="video-player" autoPlay playsInline ref={myVideo} />
                     <video className="video-player" playsInline ref={userVideo} autoPlay />
                 </div>
 
-                <div id="controls">
+                <div className="video-controls">
+                    <button onClick={() => toggleCamera()}>
+                        {cameraOn ? <FaVideo /> : <FaVideoSlash className={cameraOn ? "" : "red-icon"} />}
+                    </button>
+                    <button onClick={() => toggleMic()}>
+                        {micOn ? <FaMicrophone /> : <FaMicrophoneSlash className={micOn ? "" : "red-icon"} />}
+                    </button>
                     <Link to="/">
-                        <button onClick={() => leaveCall()}>Home</button>
+                        <button onClick={() => leaveCall()}>
+                            <FaHome /> Home
+                        </button>
                     </Link>
-                    <button
-                        onClick={() => toggleCamera()}
-                    >
-                        Camera
-                    </button>
-
-                    <button
-                        onClick={() => toggleMic()}
-                    >
-                        Microphone
-                    </button>
                 </div>
             </div>
-            <div className="right-panel">
-            <div className="editor-container">
-            <div className="language-dropdown">
-        <label>Select Language:</label>
-        <Select
-          value={selectedLanguage}
-          onChange={handleLanguageChange}
-          options={codeLanguages}
-          isSearchable={true}
-          placeholder="Search for a language..."
-        />
-      </div>
-      <div className="editor">
-        <Editor
-          height="500px"
-          width="100%"
-          theme="vs-dark"
-          language={selectedLanguage.value}
 
-          value={editorText}
-          onChange={handleEditorChange}
-        />
-      </div>
-    </div>
+            <div className="middle-panel">
+                <div className="editor-container">
+                    <div className="language-dropdown">
+                        <label>Select Language:</label>
+                        <Select
+                            value={selectedLanguage}
+                            onChange={handleLanguageChange}
+                            options={codeLanguages}
+                            isSearchable={true}
+                            placeholder="Search for a language..."
+                        />
+                    </div>
+                    <div className="editor">
+                        <Editor
+                            height="100vh"
+                            width="100%"
+                            theme="vs-dark"
+                            language={selectedLanguage.value}
+                            value={editorText}
+                            onChange={handleEditorChange}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="right-panel">
             </div>
         </div>
     );

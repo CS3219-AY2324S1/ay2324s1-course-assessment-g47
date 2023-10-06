@@ -75,33 +75,33 @@ function QuestionQueue({ user }) {
     setQueueStartTime(new Date().getTime()); // Record queue start time
     console.log(`User: ${user}, SocketId: ${socketID}`);
 
-    // try {
-    //     console.log(`SocketId: ${socketID}`);
-    //   const response = await fetch('http://localhost:4001/matchmake', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       email: user.email, // Change this to the user's email
-    //       difficultyLevel: selectedDifficulty,
-    //       socketId: socketID, // Change this to the user's socket ID
-    //     }),
-    //   });
+    try {
+        console.log(`SocketId: ${socketID}`);
+      const response = await fetch('http://localhost:4001/matchmake', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: user.email, // Change this to the user's email
+          difficultyLevel: selectedDifficulty,
+          socketId: socketID, // Change this to the user's socket ID
+        }),
+      });
 
-    //   if (response.status === 200) {
-    //     // User successfully enqueued
-    //     console.log('User enqueued successfully.');
-    //   } else {
-    //     // Handle error cases here
-    //     console.error('Failed to enqueue user.');
-    //     console.error(response);
-    //     setLoading(false); 
-    //   }
-    // } catch (error) {
-    //   console.error('Error enqueueing user:', error);
-    //   setLoading(false); 
-    // }
+      if (response.status === 200) {
+        // User successfully enqueued
+        console.log('User enqueued successfully.');
+      } else {
+        // Handle error cases here
+        console.error('Failed to enqueue user.');
+        console.error(response);
+        setLoading(false); 
+      }
+    } catch (error) {
+      console.error('Error enqueueing user:', error);
+      setLoading(false); 
+    }
   };
 
   return (

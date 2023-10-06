@@ -23,6 +23,7 @@ io.on("connection", (socket) => {
 		  io.emit("otherUserToggledMic", socket.id, newMicState);
       console.log("Mic toggled")
 	});
+  
 	
 	socket.on("toggleCamera", (newCameraState) => {
 		  io.emit("otherUserToggledCamera", socket.id, newCameraState);
@@ -89,6 +90,14 @@ io.on("connection", (socket) => {
     editorContent = data.text;
     io.to(data.roomId).emit("editor-changed", data.text)
   })
+
+  socket.on("language-change", (data) => {
+    const newLanguage = data.language;
+    io.to(data.roomId).emit("language-changed", {label: data.label, value: data.value})
+    // Update the selected language for peers
+    //setSelectedLanguage({ value: newLanguage, label: newLanguage });
+  });
+  
 
 })
 
