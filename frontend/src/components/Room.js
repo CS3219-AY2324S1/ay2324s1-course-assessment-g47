@@ -8,11 +8,19 @@ import io from "socket.io-client";
 import { ca } from "date-fns/locale";
 import { connect } from "mongoose";
 import { set } from "date-fns";
+import { codeLanguages } from "./constants";
+import Select from "react-select";
 
 const IO_PORT = 4002;
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
 
+
 function Room() {
+
+    // Code language settings 
+    const [selectedLanguage, setSelectedLanguage] = useState(
+        codeLanguages.find((language) => language.value === "python")
+      );
 
     const { roomId } = useParams();
     const [me, setMe] = useState("");
@@ -88,7 +96,7 @@ function Room() {
                 });
 
                 socket.on("signal-received", (data) => {
-                    
+
                     console.log("Signal received1:");
                     setPeerSocketId(data.from)
                     const peer = new Peer({
@@ -152,16 +160,16 @@ function Room() {
     useEffect(() => {
         const getUserMediaWithStatus = async () => {
             try {
-              const userStream = await navigator.mediaDevices.getUserMedia({
-                video: cameraOn,
-                audio: micOn,
-              });
-              setStream(userStream);
-              myVideo.current.srcObject = userStream;
+                const userStream = await navigator.mediaDevices.getUserMedia({
+                    video: cameraOn,
+                    audio: micOn,
+                });
+                setStream(userStream);
+                myVideo.current.srcObject = userStream;
             } catch (err) {
-              const userStream = null;
-              setStream(userStream);
-              myVideo.current.srcObject = userStream;
+                const userStream = null;
+                setStream(userStream);
+                myVideo.current.srcObject = userStream;
             }
         };
 
@@ -204,7 +212,7 @@ function Room() {
     //       userVideo.current.srcObject = otherStream;
     //     }
     // };
-      
+
     socket.on("editor-changed", (text) => {
         if (editorText !== text) {
             setEditorText(text);
@@ -236,7 +244,7 @@ function Room() {
 
     const handleEditorChange = (newValue) => {
         setEditorText(newValue);
-        socket.emit("editor-change", {text: newValue, roomId: roomId});
+        socket.emit("editor-change", { text: newValue, roomId: roomId });
     };
 
     const leaveCall = () => {
@@ -250,12 +258,20 @@ function Room() {
         socket.emit("toggleMic", !micOn);
         console.log("User toggled mic:", socket.id, !micOn);
     };
-    
+
     const toggleCamera = () => {
         setCameraOn((prevCameraOn) => !prevCameraOn);
         socket.emit("toggleCamera", !cameraOn);
     };
 
+
+  // Update the handleLanguageChange function
+  const handleLanguageChange = (selectedOption) => {
+    console.log(`Option selected:`, selectedOption);
+    setSelectedLanguage(selectedOption);
+  };
+
+  
     return (
         <div className="container">
             <div className="left-panel">
@@ -282,13 +298,29 @@ function Room() {
                 </div>
             </div>
             <div className="right-panel">
-                <Editor
-                    height="100%"
-                    width="100%"
-                    theme="vs-dark"
-                    value={editorText}
-                    onChange={handleEditorChange}
-                />
+            <div className="editor-container">
+            <div className="language-dropdown">
+        <label>Select Language:</label>
+        <Select
+          value={selectedLanguage}
+          onChange={handleLanguageChange}
+          options={codeLanguages}
+          isSearchable={true}
+          placeholder="Search for a language..."
+        />
+      </div>
+      <div className="editor">
+        <Editor
+          height="500px"
+          width="100%"
+          theme="vs-dark"
+          language={selectedLanguage.value}
+
+          value={editorText}
+          onChange={handleEditorChange}
+        />
+      </div>
+    </div>
             </div>
         </div>
     );
