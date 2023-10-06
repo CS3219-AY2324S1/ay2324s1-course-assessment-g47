@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cross-env NODE_ENV=test mocha --timeout 0 --exit",
+    "test-ci": "cross-env NODE_ENV=ci mocha --timeout 0 --exit",
     "start": "concurrently \"node server.js\" \"node postgresql.js\"",
     "dev": "concurrently \"nodemon server.js\" \"nodemon postgresql.js\""
   },
@@ -21,6 +22,11 @@
     "pg": "^8.11.3"
   },
   "devDependencies": {
-    "concurrently": "^8.2.1"
+    "chai": "^4.3.7",
+    "chai-http": "^4.4.0",
+    "concurrently": "^8.2.1",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.2.0",
+    "mongodb-memory-server": "^8.16.0"
   }
 }
