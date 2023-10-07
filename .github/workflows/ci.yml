@@ -2,6 +2,7 @@ name: CI Pipeline
 on:
   push:
     branches:
+      - master
       - CI
 jobs:
   build:
@@ -15,14 +16,6 @@ jobs:
         with:
           node-version: '18.x'
           cache: 'npm'
-      
-      - name: Start PostgreSQL
-        uses: postgresql/setup-postgres@v2
-        with:
-          postgresql-version: '13'
-          postgresql-database: 'cs3219_g47'
-          postgresql-username: 'postgres'
-          postgresql-password: ${{ secrets.PG_DB_PASSWORD }}
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.9.0
