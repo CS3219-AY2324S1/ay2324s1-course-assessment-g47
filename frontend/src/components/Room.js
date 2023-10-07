@@ -23,7 +23,8 @@ function Room({ user }) {
     console.log("user:", user);
     const location = useLocation();
     const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
-
+    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Get the difficultyLevel from location state
+    console.log("matchedUsername:", matchedUsername);
     console.log("difficultyLevel:", difficultyLevel);
     // Code language settings 
     const [selectedLanguage, setSelectedLanguage] = useState(
@@ -50,7 +51,7 @@ function Room({ user }) {
     const fetchRandomEasyQuestion = async () => {
         if (user) {
             try {
-                const response = await fetch('/api/questions/random-easy', {
+                const response = await fetch(`/api/questions/random-${difficultyLevel}`, {
                     headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
                 });
                 const json = await response.json();
@@ -60,7 +61,7 @@ function Room({ user }) {
                     socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json });
                 }
             } catch (error) {
-                console.error('Error fetching random easy question:', error);
+                console.error(`Error fetching random ${difficultyLevel} question:`, error);
             }
         
   
@@ -362,7 +363,9 @@ function Room({ user }) {
 
                 <div className="video-container">
                     <video className="video-player" autoPlay playsInline ref={myVideo} />
+                    <p>{user ? user.user.username : "me" }</p>
                     <video className="video-player" playsInline ref={userVideo} autoPlay />
+                    <p>{matchedUsername}</p>
                 </div>
 
                 <div className="video-controls">

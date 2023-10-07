@@ -32,7 +32,7 @@ io.on("connection", (socket) => {
 
   socket.on("matchUser", (data) => {
     //socket.join(data.roomName)
-    socket.to(data.socketId).emit("matched-successfully", data.roomName)
+    socket.to(data.socketId).emit("matched-successfully", {roomId: data.roomName,difficultyLevel: data.difficultyLevel, matchedUsername: data.matchedUsername})
   })
 
 

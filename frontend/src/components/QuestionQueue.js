@@ -30,7 +30,7 @@ function QuestionQueue({ user }) {
       console.log("difficultyLevel:", data.difficultyLevel);
       // Redirect to the room page with the roomId when matched successfully
       //navigate(`/room/${data.roomId}`); // Replace `roomId` with the actual room ID
-      navigate(`/room/${data.roomId}`, { state: { difficultyLevel: data.difficultyLevel } });
+      navigate(`/room/${data.roomId}`, { state: { difficultyLevel: data.difficultyLevel, matchedUsername: data.matchedUsername } });
  
     };
     // Attach the event listener for successful matches

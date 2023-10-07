@@ -548,8 +548,8 @@ const matchUsers = async () => {
       					rooms[roomId] = [email, matchingUser.email]; // Store the matched users in the room
 
 						// Notify the matched users with the roomId
-						socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel});
-						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel});
+						socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel, matchedUsername: matchingUser.email});
+						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel, matchedUsername: email});
 
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
