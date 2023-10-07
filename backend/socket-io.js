@@ -79,6 +79,11 @@ io.on("connection", (socket) => {
 
   });
 
+  socket.on('newRandomQuestion', (data) => {
+    // Emit the updated random question to the room
+    socket.to(data.roomId).emit('updateRandomQuestion', data.randomQuestion);
+  });
+
   // Handle user disconnection
   socket.on("disconnected", (data) => {
     console.log("A user disconnected: " + socket.id);

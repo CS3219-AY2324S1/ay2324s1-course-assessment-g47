@@ -13,7 +13,7 @@ function QuestionQueue({ user }) {
   const [loading, setLoading] = useState(false); // Loading state
   const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
   const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
-  
+
 
   const navigate = useNavigate();
   const [socketID, setSocketID] = useState(null);
@@ -25,12 +25,14 @@ function QuestionQueue({ user }) {
       setSocketID(id);
     });
 
-    const handleMatchedSuccessfully = (roomId) => {
-      console.log(`User: ${user.username}}Matched successfully: ${roomId}`);
+    const handleMatchedSuccessfully = (data) => {
+      console.log(`User: ${user.username}}Matched successfully: ${data.roomId}`);
+      console.log("difficultyLevel:", data.difficultyLevel);
       // Redirect to the room page with the roomId when matched successfully
-      navigate(`/room/${roomId}`); // Replace `roomId` with the actual room ID
+      //navigate(`/room/${data.roomId}`); // Replace `roomId` with the actual room ID
+      navigate(`/room/${data.roomId}`, { state: { difficultyLevel: data.difficultyLevel } });
+ 
     };
-
     // Attach the event listener for successful matches
     socket.on('matched-successfully', handleMatchedSuccessfully);
 
@@ -62,21 +64,13 @@ function QuestionQueue({ user }) {
     setSelectedDifficulty(e.target.value);
   };
 
-  const handleExitQueue = () => {
-    setLoading(false); // Stop loading
-    setQueueStartTime(null); // Reset queue start time
-    setElapsedTime(0); // Reset elapsed time
-    // Add logic here to exit the queue (e.g., cancel the request)
-  };
-
-
   const handleJoinQueue = async () => {
     setLoading(true); // Set loading state to true
     setQueueStartTime(new Date().getTime()); // Record queue start time
     console.log(`User: ${user}, SocketId: ${socketID}`);
 
     try {
-        console.log(`SocketId: ${socketID}`);
+      console.log(`SocketId: ${socketID}`);
       const response = await fetch('http://localhost:4001/matchmake', {
         method: 'POST',
         headers: {
@@ -96,11 +90,42 @@ function QuestionQueue({ user }) {
         // Handle error cases here
         console.error('Failed to enqueue user.');
         console.error(response);
-        setLoading(false); 
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error enqueueing user:', error);
-      setLoading(false); 
+      setLoading(false);
+    }
+  };
+
+  // Function to allow the user to exit the queue
+  const handleExitQueue = async () => {
+    setLoading(false); // Stop loading
+    setQueueStartTime(null); // Reset queue start time
+    setElapsedTime(0); // Reset elapsed time
+
+    try {
+      const response = await fetch('http://localhost:4001/exitqueue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: user.email, // Change this to the user's email
+          socketId: socketID, // Change this to the user's socket ID
+        }),
+      });
+
+      if (response.status === 200) {
+        // User successfully exited the queue
+        console.log('User exited the queue successfully.');
+      } else {
+        // Handle error cases here
+        console.error('Failed to exit the queue.');
+        console.error(response);
+      }
+    } catch (error) {
+      console.error('Error exiting the queue:', error);
     }
   };
 
@@ -108,19 +133,21 @@ function QuestionQueue({ user }) {
     <div className="question-queue">
       <h2>Question Queue</h2>
       <div>
-  <label>Select Difficulty:</label>
-  <select
-    value={selectedDifficulty}
-    onChange={handleDifficultyChange}
-    disabled={loading}
-    className="difficulty-select"
-  >
-    <option value="easy">Easy</option>
-    <option value="medium">Medium</option>
-    <option value="hard">Hard</option>
-  </select>
-  <p className="difficulty-prompt">Please exit the queue to change the difficulty.</p>
-</div>
+        <label>Select Difficulty:</label>
+        <select
+          value={selectedDifficulty}
+          onChange={handleDifficultyChange}
+          disabled={loading}
+          className="difficulty-select"
+        >
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        {loading ? (
+    <p className="difficulty-prompt">Please exit the queue to change the difficulty.</p>
+  ) : null}
+      </div>
       <div>
         {loading ? (
           <div>

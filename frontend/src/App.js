@@ -156,7 +156,7 @@ function App() {
 					</Route>
 					<Route path="/verifyOTP" element={<VerifyOTP />}> </Route>
 					<Route path="/resendOTPVerificationCode" element={<ResendOTP />}> </Route>
-					<Route path="/room/:roomId" element={<Room />}> </Route>
+					<Route path="/room/:roomId" element={<Room user={user}/>}> </Route>
 				</Routes>
 			</BrowserRouter>
 		</>

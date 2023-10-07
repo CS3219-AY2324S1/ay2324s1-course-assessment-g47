@@ -491,6 +491,29 @@ const enqueueUser = async (email, difficultyLevel, socketId) => {
 	}
 }
 
+// Function to remove a user from the "user_queue" by email
+const dequeueUserByEmail = async (email) => {
+	console.log(`Removing user ${email} from the waiting queue...`);
+	try {
+	  const channel = await createMatchingChannel();
+  
+	  // Set up a consumer to check and remove the user by email
+	  channel.consume("user_queue", (message) => {
+		console.log('Checking for user in the waiting queue...');
+		if (message !== null) {
+		  const { messageEmail, difficultyLevel, socketId } = JSON.parse(message.content.toString());
+  
+		  if (messageEmail === email) {
+			// Dequeue the user by acknowledging the message
+			channel.ack(message);
+			console.log(`User ${email} has been dequeued from the waiting queue.`);
+		  }
+		}
+	  });
+	} catch (error) {
+	  console.error('Failed to remove user by email due to an internal issue: ', error);
+	}
+  };
 const rooms = {}; // Store rooms and their participants
 
 // Matching service to match users of the same difficulty, upon match add them into the matched queue as a pair and remove them from waiting queue
@@ -525,8 +548,8 @@ const matchUsers = async () => {
       					rooms[roomId] = [email, matchingUser.email]; // Store the matched users in the room
 
 						// Notify the matched users with the roomId
-						socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId});
-						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId});
+						socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel});
+						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel});
 
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
@@ -570,6 +593,28 @@ app.post('/matchmake', async (req, res) => {
 		return res.status(500).json({ error: 'Internal server error' });
 	}
 });
+
+// Endpoint for users to exit the queue
+app.post('/exitqueue', async (req, res) => {
+	console.log('Exit queue request received');
+	const { email, socketId } = req.body;
+  
+	try {
+	  // Checks for missing email or socketId
+	  if (!email || !socketId) {
+		return res.status(400).json({ error: 'Email and socketId are required fields.' });
+	  }
+  
+	  // Remove the user from the queue (you'll need to implement a function to do this)
+	  dequeueUserByEmail(email);
+  
+	  console.log(`User ${email} with socket ID (${socketId}) has exited the queue.`);
+	  return res.status(200).json({ message: 'User exited the queue successfully.' });
+	} catch (error) {
+	  console.error('Error exiting the queue:', error);
+	  return res.status(500).json({ error: 'Internal server error' });
+	}
+  });
 
 app.listen(port, () => {
 	console.log(`PostgreSQL server running on port ${port}`)

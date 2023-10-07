@@ -9,16 +9,22 @@ import { ca } from "date-fns/locale";
 import { connect } from "mongoose";
 import { set } from "date-fns";
 import { codeLanguages } from "./constants";
-import { FaHome, FaVideo, FaVideoSlash, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
+import { FaHome, FaVideo, FaVideoSlash, FaMicrophone, FaMicrophoneSlash, FaCheck } from 'react-icons/fa';
+import { useLocation } from 'react-router-dom'
+import DisplayRandomQuestion from "./DisplayRandomQuestion"
 
-import Select from "react-select";
+import Select, { components } from "react-select";
 
 const IO_PORT = 4002;
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
 
 
-function Room() {
+function Room({ user }) {
+    console.log("user:", user);
+    const location = useLocation();
+    const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
 
+    console.log("difficultyLevel:", difficultyLevel);
     // Code language settings 
     const [selectedLanguage, setSelectedLanguage] = useState(
         codeLanguages.find((language) => language.value === "python")
@@ -39,11 +45,40 @@ function Room() {
     const [inCallRoom, setInCallRoom] = useState(false);
     const [peer, setPeer] = useState(null);
 
+    const [randomQuestion, setRandomQuestion] = useState(null);
+
+    const fetchRandomEasyQuestion = async () => {
+        if (user) {
+            try {
+                const response = await fetch('/api/questions/random-easy', {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
+
+                if (response.ok) {
+                    setRandomQuestion(json);
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json });
+                }
+            } catch (error) {
+                console.error('Error fetching random easy question:', error);
+            }
+        
+  
+        }
+    };
+
     const myVideo = useRef();
     const userVideo = useRef();
     const connectionRef = useRef();
 
     useEffect(() => {
+
+        fetchRandomEasyQuestion();
+        socket.on('updateRandomQuestion', (newRandomQuestion) => {
+            console.log("newRandomQuestion:", newRandomQuestion)
+            setRandomQuestion(newRandomQuestion);
+          });
+      
 
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
@@ -140,8 +175,8 @@ function Room() {
                 });
                 socket.on("language-changed", (language) => {
                     console.log("language changed:", language);
-                        setSelectedLanguage(language);
-                
+                    setSelectedLanguage(language);
+
                 });
             } catch (err) {
                 console.error("Error accessing user media:", err);
@@ -207,6 +242,11 @@ function Room() {
         }
     }, [otherMicOn]);
 
+    const handleRefreshQuestion = () => {
+        // Call fetchRandomEasyQuestion when "Change Question" button is clicked
+        fetchRandomEasyQuestion();
+    };
+
     // Ignore for now
     // const getOtherMediaWithStatus = async () => {
     //     try {
@@ -263,7 +303,7 @@ function Room() {
     const leaveCall = () => {
         // Disconnect from the room
         console.log("Leaving call");
-        socket.emit("disconnected");
+        socket.emit("disconnected", { roomId: roomId });
     };
 
     const toggleMic = () => {
@@ -306,6 +346,7 @@ function Room() {
         socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
     };
 
+    //Doesnt work
     // const updatePeerStream = () => {
     //     if (peer) {
     //         peer.on("stream", (stream) => {
@@ -349,6 +390,11 @@ function Room() {
                             options={codeLanguages}
                             isSearchable={true}
                             placeholder="Search for a language..."
+                            className="select-language"
+                            styles={customSelectStyles}
+                            components={{
+                                Option: CustomSelectOption, // Use the custom component to render options
+                            }}
                         />
                     </div>
                     <div className="editor">
@@ -365,6 +411,11 @@ function Room() {
             </div>
 
             <div className="right-panel">
+                <DisplayRandomQuestion
+                    user={user}
+                    randomQuestion={randomQuestion}
+                    handleRefreshQuestion={handleRefreshQuestion}
+                />
             </div>
         </div>
     );
@@ -379,3 +430,56 @@ export default Room;
 //TODO: Once disconnected, cannot reconnect.
 // Add "currently in queue" UI in home page, because user cant see if he/she is in queue or not (only can see in console for now)
 // extra: Add "waitting for other user to join" UI in room page 
+
+
+const customSelectStyles = {
+    container: (provided) => ({
+        ...provided,
+        width: '100%', // Adjust the width as needed
+        marginBottom: '20px', // Add margin as needed
+    }),
+    control: (provided) => ({
+        ...provided,
+        backgroundColor: '#444', // Darker background color
+        border: '1px solid #666', // Dark border
+        color: '#fff', // White text color
+    }),
+    singleValue: (provided) => ({
+        ...provided,
+        color: '#fff', // White text color
+    }),
+    placeholder: (provided) => ({
+        ...provided,
+        color: '#ccc', // Placeholder text color
+    }),
+    menu: (provided) => ({
+        ...provided,
+        backgroundColor: '#444', // Darker background color
+        border: '1px solid #666', // Dark border
+    }),
+    option: (provided, state) => ({
+        ...provided,
+        color: '#fff', // White text color
+        backgroundColor: state.isFocused ? '#666' : '#444', // Background color for focused/hovered option
+    }),
+    menuList: (provided) => ({
+        ...provided,
+        '&::-webkit-scrollbar': {
+            width: '8px', // Adjust the scrollbar width as needed
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#666', // Color of the scrollbar thumb
+            borderRadius: '4px', // Adjust the scrollbar thumb radius as needed
+        },
+        '&::-webkit-scrollbar-track': {
+            backgroundColor: '#444', // Color of the scrollbar track
+        },
+    }),
+};
+
+const CustomSelectOption = (props) => (
+    <components.Option {...props}>
+        {props.label}
+        <FaCheck style={{ marginLeft: '8px', visibility: props.isSelected ? 'visible' : 'hidden' }} />
+    </components.Option>
+);

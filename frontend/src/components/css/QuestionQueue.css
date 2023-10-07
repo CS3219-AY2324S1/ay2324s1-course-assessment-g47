@@ -62,6 +62,7 @@
   }
 
   .difficulty-select:hover + .difficulty-prompt {
+    background-color: #666; /* Darker background color on hover */
     display: block;
   }
   
@@ -70,7 +71,6 @@
     color: var(--incorrect-color); /* You can style the prompt as needed */
     font-size: 14px;
   }
-  
   
   /* Style the button */
   button {
