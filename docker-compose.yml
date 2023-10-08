@@ -15,6 +15,7 @@ services:
       - app-network
     volumes: # bind data inside server to outside container
       - ./postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
 
   # MongoDB Database
   mongodb:

@@ -22,3 +22,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Ignore the MongoDB data directory
+mongo-data/
+
+# Ignore the PostgreSQL data directory
+postgres_data/
