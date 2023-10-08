@@ -6,15 +6,16 @@ services:
     image: postgres:latest
     restart: always # postgres up and running no matter what happens
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: cs3219_g47
     ports:
       - '5432:5432'
     networks:
       - app-network
     volumes: # bind data inside server to outside container
       - ./postgres_data:/var/lib/postgresql/data
+      - ./backend/init-scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   # MongoDB Database
   mongodb:
