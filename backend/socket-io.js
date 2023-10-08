@@ -19,16 +19,16 @@ io.on("connection", (socket) => {
 
   socket.emit("me", (socket.id))
 
-  socket.on("toggleMic", (newMicState) => {
-		  io.emit("otherUserToggledMic", socket.id, newMicState);
-      console.log("Mic toggled")
-	});
+  // socket.on("toggleMic", (newMicState) => {
+	// 	  io.emit("otherUserToggledMic", socket.id, newMicState);
+  //     console.log("Mic toggled")
+	// });
   
 	
-	socket.on("toggleCamera", (newCameraState) => {
-		  io.emit("otherUserToggledCamera", socket.id, newCameraState);
-      console.log("Camera toggled")
-	});
+	// socket.on("toggleCamera", (newCameraState) => {
+	// 	  io.emit("otherUserToggledCamera", socket.id, newCameraState);
+  //     console.log("Camera toggled")
+	// });
 
   socket.on("matchUser", (data) => {
     //socket.join(data.roomName)

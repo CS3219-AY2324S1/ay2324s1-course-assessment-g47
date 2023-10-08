@@ -38,11 +38,11 @@ function Room({ user }) {
     const [callerSignal, setCallerSignal] = useState();
     const [peerSocketId, setPeerSocketId] = useState(null);
     const [editorText, setEditorText] = useState("");
-    const [micOn, setMicOn] = useState(true);
-    const [cameraOn, setCameraOn] = useState(true);
-    const [otherStream, setOtherStream] = useState(null);
-    const [otherMicOn, setOtherMicOn] = useState(true);
-    const [otherCameraOn, setOtherCameraOn] = useState(true);
+    // const [micOn, setMicOn] = useState(true);
+    // const [cameraOn, setCameraOn] = useState(true);
+    // const [otherStream, setOtherStream] = useState(null);
+    // const [otherMicOn, setOtherMicOn] = useState(true);
+    // const [otherCameraOn, setOtherCameraOn] = useState(true);
     const [inCallRoom, setInCallRoom] = useState(false);
     const [peer, setPeer] = useState(null);
 
@@ -282,19 +282,19 @@ function Room({ user }) {
         }
     });
 
-    socket.on("otherUserToggledMic", (userId, toggleMicState) => {
-        if (userId !== socket.id) {
-            setOtherMicOn(toggleMicState);
-            console.log("other user toggled mic:", userId, toggleMicState);
-        }
-    });
+    // socket.on("otherUserToggledMic", (userId, toggleMicState) => {
+    //     if (userId !== socket.id) {
+    //         setOtherMicOn(toggleMicState);
+    //         console.log("other user toggled mic:", userId, toggleMicState);
+    //     }
+    // });
 
-    socket.on("otherUserToggledCamera", (userId, toggleCameraState) => {
-        if (userId !== socket.id) {
-            setOtherCameraOn(toggleCameraState);
-            console.log("other user toggled camera:", userId, toggleCameraState);
-        }
-    });
+    // socket.on("otherUserToggledCamera", (userId, toggleCameraState) => {
+    //     if (userId !== socket.id) {
+    //         setOtherCameraOn(toggleCameraState);
+    //         console.log("other user toggled camera:", userId, toggleCameraState);
+    //     }
+    // });
 
     const handleEditorChange = (newValue) => {
         setEditorText(newValue);
