@@ -1,52 +1,76 @@
 .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start; /* Align items at the top */
-  }
-  
-  .left-panel {
-    flex: 1; /* Take up all available space */
-    padding: 20px; /* Add some padding for spacing */
-  }
-  
-  
-.right-panel {
-  flex: 1; /* Take up all available space */
-  padding: 20px; /* Add some padding for spacing */
-  display: flex; /* Use flex to make child elements expand */
-  flex-direction: column; /* Stack child elements vertically */
-  height: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
-/* Make the child elements (including .Editor) take up full height */
-.right-panel > * {
-  flex: 1;
+.left-panel {
+  flex: 2;
+  padding: 10px;
 }
-  
-  .video-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Add some spacing between videos */
-  }
-  
-  .video-player {
-    width: 100%;
-    max-width: 100%;
-  }
-  
-  #controls {
-    margin-top: 20px; /* Add margin to separate controls from videos */
-  }
-  
-  button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
+
+.middle-panel {
+  flex: 3;
+  padding: 10px;
+}
+
+.right-panel {
+  flex: 3;
+  padding: 10px;
+}
+
+/* Video and control buttons */
+/* Video */
+.video-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid #ccc;
+  align-items: flex-start;
+}
+
+.video-player {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+  background-color: #000;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+/* control buttons */
+.video-controls {
+  display: flex;
+  align-items: center;
+  padding-top: 10px; 
+  justify-content: center;
+}
+
+.video-controls button {
+  width: 40px; 
+  height: 40px;
+  border-radius: 50%; 
+  background-color: var(--dark-accent-color); 
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.video-controls button:hover {
+  background-color: rgba(0, 0, 0, 0.1); 
+}
+
+.video-controls button .red-icon {
+  color: red; 
+}
+
+.video-controls button:not(:last-child) {
+  margin-right: 10px;
+}
+
+/* Code editor */
+.editor-container{
+  height: 100%;
+}

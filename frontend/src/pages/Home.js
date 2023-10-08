@@ -10,7 +10,7 @@ import QuestionDetails from "../components/QuestionDetails";
 import LoginPage from "../components/Login";
 import QuestionQueue from "../components/QuestionQueue";
 
-const Home = ({ user, handleLogin, handleLogout }) => {
+const Home = ({ user, handleLogin }) => {
 	const { questions, dispatch } = useQuestionsContext();
 	const [selectedQuestion, setSelectedQuestion] = useState(null); // State to store the selected question
 	let rowCount = 1;
@@ -35,26 +35,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 
 	return user ? (
 		<>
-			<div className="header">
-				<div className="left">
-					<p>
-						<Link className="button-link" to="/profile">Profile</Link>
-					</p>
-					<p>
-						{user.user.account_type === "superadmin" || user.user.account_type === "admin" ? (
-							<Link className="button-link" to="/changetype">Change Account Type</Link>
-						) : null}
-					</p>
-				</div>
-				<div className="center">
-					<h1>Welcome, {user.user.username}</h1>
-				</div>
-				<div className="right">
-					<p>
-						<button className="button-link" onClick={() => handleLogout()}>Logout</button>
-					</p>
-				</div>
-			</div>{" "}
+			<div className="header"></div>{" "}
 			<div className="home">
 				{user.user.account_type !== "user" ? (
 					<div>
@@ -106,6 +87,46 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 				<div className="QuestionDetails">
 					<QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>
+			</div>
+			<div className="table-container">
+				<table className="table-header">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Title</th>
+							<th>Complexity</th>
+							<th>Category</th>
+							<th>Created</th>
+							{user.account_type !== "user" ? (
+								<th>Action</th>
+							) : null}
+						</tr>
+					</thead>
+					<tbody>
+						{questions &&
+							questions.map((question) => (
+								<QuestionList
+									id={rowCount++}
+									key={question._id}
+									question={question}
+									onClick={(question) => {
+										setSelectedQuestion(question);
+									}}
+									onDelete={(questionId) => {
+										if (selectedQuestion !== null) {
+											if (
+												selectedQuestion._id ===
+												questionId
+											) {
+												setSelectedQuestion(null);
+											}
+										}
+									}}
+									user={user.user}
+								/>
+							))}
+					</tbody>
+				</table>
 			</div>
 		</>
 	) : (

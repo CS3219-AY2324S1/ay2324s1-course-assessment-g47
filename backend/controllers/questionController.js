@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 
 // get all questions
 const getQuestions = async (req, res) => {
+    console.log("GETQUESTIONS")
     const questions = await Question.find({}).sort({ createdAt: 1 })
 
     res.status(200).json(questions)
@@ -27,6 +28,58 @@ const getQuestion = async (req, res) => {
     }
 
     res.status(200).json(question)
+}
+
+const getRandomEasyQuestion = async (req, res) => {
+    console.log("EASYQUESTION")
+    try {
+        const randomEasyQuestion = await Question.aggregate([
+            { $match: { complexity: "Easy" } }, // Filter by complexity 'easy'
+            { $sample: { size: 1 } }, // Retrieve a random question
+        ]);
+
+        if (!randomEasyQuestion || randomEasyQuestion.length === 0) {
+            return res.status(404).json({ error: 'No random easy question found' });
+        }
+        console.log("EASYQUESTION"+randomEasyQuestion[0])
+        res.status(200).json(randomEasyQuestion[0]); // Send the random easy question
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+const getRandomMediumQuestion = async (req, res) => {
+    try {
+        const randomEasyQuestion = await Question.aggregate([
+            { $match: { complexity: 'Medium' } }, // Filter by complexity 'easy'
+            { $sample: { size: 1 } }, // Retrieve a random question
+        ]);
+
+        if (!randomEasyQuestion || randomEasyQuestion.length === 0) {
+            return res.status(404).json({ error: 'No random Medium question found' });
+        }
+
+        res.status(200).json(randomEasyQuestion[0]); // Send the random easy question
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+const getRandomHardQuestion = async (req, res) => {
+    try {
+        const randomEasyQuestion = await Question.aggregate([
+            { $match: { complexity: 'Hard' } }, // Filter by complexity 'easy'
+            { $sample: { size: 1 } }, // Retrieve a random question
+        ]);
+
+        if (!randomEasyQuestion || randomEasyQuestion.length === 0) {
+            return res.status(404).json({ error: 'No random Hard question found' });
+        }
+
+        res.status(200).json(randomEasyQuestion[0]); // Send the random easy question
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
 }
 
 // create a new question
@@ -124,5 +177,8 @@ module.exports = {
     getQuestion,
     createQuestion,
     deleteQuestion,
-    updateQuestion
+    updateQuestion,
+    getRandomEasyQuestion,
+    getRandomMediumQuestion,
+    getRandomHardQuestion,
 }

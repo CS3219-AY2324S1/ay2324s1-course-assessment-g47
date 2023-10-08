@@ -8,11 +8,28 @@ import io from "socket.io-client";
 import { ca } from "date-fns/locale";
 import { connect } from "mongoose";
 import { set } from "date-fns";
+import { codeLanguages } from "./constants";
+import { FaHome, FaVideo, FaVideoSlash, FaMicrophone, FaMicrophoneSlash, FaCheck } from 'react-icons/fa';
+import { useLocation } from 'react-router-dom'
+import DisplayRandomQuestion from "./DisplayRandomQuestion"
+
+import Select, { components } from "react-select";
 
 const IO_PORT = 4002;
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
 
-function Room() {
+
+function Room({ user }) {
+    console.log("user:", user);
+    const location = useLocation();
+    const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
+    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Get the difficultyLevel from location state
+    console.log("matchedUsername:", matchedUsername);
+    console.log("difficultyLevel:", difficultyLevel);
+    // Code language settings 
+    const [selectedLanguage, setSelectedLanguage] = useState(
+        codeLanguages.find((language) => language.value === "python")
+    );
 
     const { roomId } = useParams();
     const [me, setMe] = useState("");
@@ -27,12 +44,42 @@ function Room() {
     const [otherMicOn, setOtherMicOn] = useState(true);
     const [otherCameraOn, setOtherCameraOn] = useState(true);
     const [inCallRoom, setInCallRoom] = useState(false);
+    const [peer, setPeer] = useState(null);
+
+    const [randomQuestion, setRandomQuestion] = useState(null);
+
+    const fetchRandomEasyQuestion = async () => {
+        if (user) {
+            try {
+                const response = await fetch(`/api/questions/random-${difficultyLevel}`, {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
+
+                if (response.ok) {
+                    setRandomQuestion(json);
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json });
+                }
+            } catch (error) {
+                console.error(`Error fetching random ${difficultyLevel} question:`, error);
+            }
+        
+  
+        }
+    };
 
     const myVideo = useRef();
     const userVideo = useRef();
     const connectionRef = useRef();
 
     useEffect(() => {
+
+        fetchRandomEasyQuestion();
+        socket.on('updateRandomQuestion', (newRandomQuestion) => {
+            console.log("newRandomQuestion:", newRandomQuestion)
+            setRandomQuestion(newRandomQuestion);
+          });
+      
 
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
@@ -42,7 +89,10 @@ function Room() {
 
             try {
                 const userStream = await navigator.mediaDevices.getUserMedia({
-                    video: cameraOn,
+                    video: {
+                        width: { ideal: 1280 }, // Preferred width
+                        height: { ideal: 720 },  // Preferred height
+                    },
                     audio: micOn,
                 });
                 setStream(userStream);
@@ -58,9 +108,11 @@ function Room() {
                     // Create a new Peer connection for the new user
                     const peer = new Peer({
                         initiator: true,
-                        trickle: false,
+                        trickle: true,
                         stream: userStream,
                     });
+
+                    setPeer(peer);
 
                     peer.on("signal", (data) => {
                         socket.emit("send-signal", {
@@ -88,12 +140,12 @@ function Room() {
                 });
 
                 socket.on("signal-received", (data) => {
-                    
+
                     console.log("Signal received1:");
                     setPeerSocketId(data.from)
                     const peer = new Peer({
                         initiator: false,
-                        trickle: false,
+                        trickle: true,
                         stream: userStream,
                     });
 
@@ -121,6 +173,11 @@ function Room() {
                     if (editorText !== text) {
                         setEditorText(text);
                     }
+                });
+                socket.on("language-changed", (language) => {
+                    console.log("language changed:", language);
+                    setSelectedLanguage(language);
+
                 });
             } catch (err) {
                 console.error("Error accessing user media:", err);
@@ -152,16 +209,16 @@ function Room() {
     useEffect(() => {
         const getUserMediaWithStatus = async () => {
             try {
-              const userStream = await navigator.mediaDevices.getUserMedia({
-                video: cameraOn,
-                audio: micOn,
-              });
-              setStream(userStream);
-              myVideo.current.srcObject = userStream;
+                const userStream = await navigator.mediaDevices.getUserMedia({
+                    video: cameraOn,
+                    audio: micOn,
+                });
+                setStream(userStream);
+                myVideo.current.srcObject = userStream;
             } catch (err) {
-              const userStream = null;
-              setStream(userStream);
-              myVideo.current.srcObject = userStream;
+                const userStream = null;
+                setStream(userStream);
+                myVideo.current.srcObject = userStream;
             }
         };
 
@@ -186,6 +243,11 @@ function Room() {
         }
     }, [otherMicOn]);
 
+    const handleRefreshQuestion = () => {
+        // Call fetchRandomEasyQuestion when "Change Question" button is clicked
+        fetchRandomEasyQuestion();
+    };
+
     // Ignore for now
     // const getOtherMediaWithStatus = async () => {
     //     try {
@@ -204,7 +266,7 @@ function Room() {
     //       userVideo.current.srcObject = otherStream;
     //     }
     // };
-      
+
     socket.on("editor-changed", (text) => {
         if (editorText !== text) {
             setEditorText(text);
@@ -236,13 +298,13 @@ function Room() {
 
     const handleEditorChange = (newValue) => {
         setEditorText(newValue);
-        socket.emit("editor-change", {text: newValue, roomId: roomId});
+        socket.emit("editor-change", { text: newValue, roomId: roomId });
     };
 
     const leaveCall = () => {
         // Disconnect from the room
         console.log("Leaving call");
-        socket.emit("disconnected");
+        socket.emit("disconnected", { roomId: roomId });
     };
 
     const toggleMic = () => {
@@ -250,44 +312,112 @@ function Room() {
         socket.emit("toggleMic", !micOn);
         console.log("User toggled mic:", socket.id, !micOn);
     };
-    
+
+    // const toggleMic = () => {
+    //     setMicOn((prevMicOn) => !prevMicOn);
+    //     if (stream) {
+    //         console.log("stream:", stream)
+    //         stream.getAudioTracks().forEach((track) => {
+    //             track.enabled = micOn;
+    //         });
+    //     } else {
+    //         console.log("no stream:")
+    //     }
+    //     updatePeerStream();
+    // };
+
     const toggleCamera = () => {
         setCameraOn((prevCameraOn) => !prevCameraOn);
         socket.emit("toggleCamera", !cameraOn);
     };
 
+    // const toggleCamera = () => {
+    //     setCameraOn((prevCameraOn) => !prevCameraOn);
+    //     if (stream) {
+    //         stream.getVideoTracks().forEach((track) => {
+    //             track.enabled = cameraOn;
+    //         });
+    //     }
+    //     updatePeerStream();
+    // };
+
+    const handleLanguageChange = (selectedOption) => {
+        console.log(`Option selected:`, selectedOption);
+        setSelectedLanguage(selectedOption);
+        socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
+    };
+
+    //Doesnt work
+    // const updatePeerStream = () => {
+    //     if (peer) {
+    //         peer.on("stream", (stream) => {
+    //             userVideo.current.srcObject = stream;
+    //         });
+    //     }
+    // };
+
     return (
         <div className="container">
+
             <div className="left-panel">
+
                 <div className="video-container">
                     <video className="video-player" autoPlay playsInline ref={myVideo} />
+                    <p>{user ? user.user.username : "me" }</p>
                     <video className="video-player" playsInline ref={userVideo} autoPlay />
+                    <p>{matchedUsername}</p>
                 </div>
 
-                <div id="controls">
+                <div className="video-controls">
+                    <button onClick={() => toggleCamera()}>
+                        {cameraOn ? <FaVideo /> : <FaVideoSlash className={cameraOn ? "" : "red-icon"} />}
+                    </button>
+                    <button onClick={() => toggleMic()}>
+                        {micOn ? <FaMicrophone /> : <FaMicrophoneSlash className={micOn ? "" : "red-icon"} />}
+                    </button>
                     <Link to="/">
-                        <button onClick={() => leaveCall()}>Home</button>
+                        <button onClick={() => leaveCall()}>
+                            <FaHome /> Home
+                        </button>
                     </Link>
-                    <button
-                        onClick={() => toggleCamera()}
-                    >
-                        Camera
-                    </button>
-
-                    <button
-                        onClick={() => toggleMic()}
-                    >
-                        Microphone
-                    </button>
                 </div>
             </div>
+
+            <div className="middle-panel">
+                <div className="editor-container">
+                    <div className="language-dropdown">
+                        <label>Select Language:</label>
+                        <Select
+                            value={selectedLanguage}
+                            onChange={handleLanguageChange}
+                            options={codeLanguages}
+                            isSearchable={true}
+                            placeholder="Search for a language..."
+                            className="select-language"
+                            styles={customSelectStyles}
+                            components={{
+                                Option: CustomSelectOption, // Use the custom component to render options
+                            }}
+                        />
+                    </div>
+                    <div className="editor">
+                        <Editor
+                            height="100vh"
+                            width="100%"
+                            theme="vs-dark"
+                            language={selectedLanguage.value}
+                            value={editorText}
+                            onChange={handleEditorChange}
+                        />
+                    </div>
+                </div>
+            </div>
+
             <div className="right-panel">
-                <Editor
-                    height="100%"
-                    width="100%"
-                    theme="vs-dark"
-                    value={editorText}
-                    onChange={handleEditorChange}
+                <DisplayRandomQuestion
+                    user={user}
+                    randomQuestion={randomQuestion}
+                    handleRefreshQuestion={handleRefreshQuestion}
                 />
             </div>
         </div>
@@ -303,3 +433,56 @@ export default Room;
 //TODO: Once disconnected, cannot reconnect.
 // Add "currently in queue" UI in home page, because user cant see if he/she is in queue or not (only can see in console for now)
 // extra: Add "waitting for other user to join" UI in room page 
+
+
+const customSelectStyles = {
+    container: (provided) => ({
+        ...provided,
+        width: '100%', // Adjust the width as needed
+        marginBottom: '20px', // Add margin as needed
+    }),
+    control: (provided) => ({
+        ...provided,
+        backgroundColor: '#444', // Darker background color
+        border: '1px solid #666', // Dark border
+        color: '#fff', // White text color
+    }),
+    singleValue: (provided) => ({
+        ...provided,
+        color: '#fff', // White text color
+    }),
+    placeholder: (provided) => ({
+        ...provided,
+        color: '#ccc', // Placeholder text color
+    }),
+    menu: (provided) => ({
+        ...provided,
+        backgroundColor: '#444', // Darker background color
+        border: '1px solid #666', // Dark border
+    }),
+    option: (provided, state) => ({
+        ...provided,
+        color: '#fff', // White text color
+        backgroundColor: state.isFocused ? '#666' : '#444', // Background color for focused/hovered option
+    }),
+    menuList: (provided) => ({
+        ...provided,
+        '&::-webkit-scrollbar': {
+            width: '8px', // Adjust the scrollbar width as needed
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#666', // Color of the scrollbar thumb
+            borderRadius: '4px', // Adjust the scrollbar thumb radius as needed
+        },
+        '&::-webkit-scrollbar-track': {
+            backgroundColor: '#444', // Color of the scrollbar track
+        },
+    }),
+};
+
+const CustomSelectOption = (props) => (
+    <components.Option {...props}>
+        {props.label}
+        <FaCheck style={{ marginLeft: '8px', visibility: props.isSelected ? 'visible' : 'hidden' }} />
+    </components.Option>
+);
