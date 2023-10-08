@@ -24,7 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Ignore the MongoDB data directory
-/mongo-data/
+mongo-data/
 
 # Ignore the PostgreSQL data directory
-/postgres_data/
+postgres_data/
