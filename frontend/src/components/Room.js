@@ -33,7 +33,7 @@ function Room({ user }) {
 
     const { roomId } = useParams();
     const [me, setMe] = useState("");
-    const [stream, setStream] = useState(null);
+    // const [stream, setStream] = useState(null);
     const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
     const [callerSignal, setCallerSignal] = useState();
     const [peerSocketId, setPeerSocketId] = useState(null);
@@ -88,15 +88,15 @@ function Room({ user }) {
         const getFirstUserMediaWithStatus = async () => {
 
             try {
-                const userStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        width: { ideal: 1280 }, // Preferred width
-                        height: { ideal: 720 },  // Preferred height
-                    },
-                    audio: micOn,
-                });
-                setStream(userStream);
-                myVideo.current.srcObject = userStream;
+                // const userStream = await navigator.mediaDevices.getUserMedia({
+                //     video: {
+                //         width: { ideal: 1280 }, // Preferred width
+                //         height: { ideal: 720 },  // Preferred height
+                //     },
+                //     audio: micOn,
+                // });
+                // setStream(userStream);
+                // myVideo.current.srcObject = userStream;
 
                 socket.emit("join-room", { roomId: roomId }); // Automatically join the socket.io room
 
@@ -109,7 +109,7 @@ function Room({ user }) {
                     const peer = new Peer({
                         initiator: true,
                         trickle: true,
-                        stream: userStream,
+                        // stream: userStream,
                     });
 
                     setPeer(peer);
@@ -126,9 +126,9 @@ function Room({ user }) {
                         setCallerSignal(data);
                         setPeerSocketId(userId)
                     });
-                    peer.on("stream", (stream) => {
-                        userVideo.current.srcObject = stream;
-                    });
+                    // peer.on("stream", (stream) => {
+                    //     userVideo.current.srcObject = stream;
+                    // });
 
                     socket.on("signal-recievedd", (signal) => {
                         console.log("Signal received24:", signal);
@@ -146,16 +146,16 @@ function Room({ user }) {
                     const peer = new Peer({
                         initiator: false,
                         trickle: true,
-                        stream: userStream,
+                        // stream: userStream,
                     });
 
                     peer.on("signal", (signalData) => {
                         socket.emit("return-signal", { signal: signalData, callerId: data.from });
                     });
 
-                    peer.on("stream", (stream) => {
-                        userVideo.current.srcObject = stream;
-                    });
+                    // peer.on("stream", (stream) => {
+                    //     userVideo.current.srcObject = stream;
+                    // });
 
                     console.log("Signal received2:", callerSignal);
                     console.log("Signal received23:", data.signal);
@@ -181,9 +181,9 @@ function Room({ user }) {
                 });
             } catch (err) {
                 console.error("Error accessing user media:", err);
-                const userStream = null;
-                setStream(userStream);
-                myVideo.current.srcObject = userStream;
+                // const userStream = null;
+                // setStream(userStream);
+                // myVideo.current.srcObject = userStream;
             }
         };
 
@@ -206,42 +206,42 @@ function Room({ user }) {
         };
     }, []);
 
-    useEffect(() => {
-        const getUserMediaWithStatus = async () => {
-            try {
-                const userStream = await navigator.mediaDevices.getUserMedia({
-                    video: cameraOn,
-                    audio: micOn,
-                });
-                setStream(userStream);
-                myVideo.current.srcObject = userStream;
-            } catch (err) {
-                const userStream = null;
-                setStream(userStream);
-                myVideo.current.srcObject = userStream;
-            }
-        };
+    // useEffect(() => {
+    //     const getUserMediaWithStatus = async () => {
+    //         try {
+    //             const userStream = await navigator.mediaDevices.getUserMedia({
+    //                 video: cameraOn,
+    //                 audio: micOn,
+    //             });
+    //             setStream(userStream);
+    //             myVideo.current.srcObject = userStream;
+    //         } catch (err) {
+    //             const userStream = null;
+    //             setStream(userStream);
+    //             myVideo.current.srcObject = userStream;
+    //         }
+    //     };
 
-        getUserMediaWithStatus();
-    }, [micOn, cameraOn]);
+    //     getUserMediaWithStatus();
+    // }, [micOn, cameraOn]);
 
     // pause peer video when other user toggled video
-    useEffect(() => {
-        if (otherCameraOn) {
-            userVideo.current.srcObject = stream;
-        } else {
-            userVideo.current.srcObject = null;
-        }
-    }, [otherCameraOn]);
+    // useEffect(() => {
+    //     if (otherCameraOn) {
+    //         userVideo.current.srcObject = stream;
+    //     } else {
+    //         userVideo.current.srcObject = null;
+    //     }
+    // }, [otherCameraOn]);
 
-    // pause peer audio when other user toggled mic
-    useEffect(() => {
-        if (otherMicOn) {
-            userVideo.current.srcObject = stream;
-        } else {
-            userVideo.current.srcObject = null;
-        }
-    }, [otherMicOn]);
+    // // pause peer audio when other user toggled mic
+    // useEffect(() => {
+    //     if (otherMicOn) {
+    //         userVideo.current.srcObject = stream;
+    //     } else {
+    //         userVideo.current.srcObject = null;
+    //     }
+    // }, [otherMicOn]);
 
     const handleRefreshQuestion = () => {
         // Call fetchRandomEasyQuestion when "Change Question" button is clicked
@@ -307,11 +307,11 @@ function Room({ user }) {
         socket.emit("disconnected", { roomId: roomId });
     };
 
-    const toggleMic = () => {
-        setMicOn((prevMicOn) => !prevMicOn);
-        socket.emit("toggleMic", !micOn);
-        console.log("User toggled mic:", socket.id, !micOn);
-    };
+    // const toggleMic = () => {
+    //     setMicOn((prevMicOn) => !prevMicOn);
+    //     socket.emit("toggleMic", !micOn);
+    //     console.log("User toggled mic:", socket.id, !micOn);
+    // };
 
     // const toggleMic = () => {
     //     setMicOn((prevMicOn) => !prevMicOn);
@@ -326,10 +326,10 @@ function Room({ user }) {
     //     updatePeerStream();
     // };
 
-    const toggleCamera = () => {
-        setCameraOn((prevCameraOn) => !prevCameraOn);
-        socket.emit("toggleCamera", !cameraOn);
-    };
+    // const toggleCamera = () => {
+    //     setCameraOn((prevCameraOn) => !prevCameraOn);
+    //     socket.emit("toggleCamera", !cameraOn);
+    // };
 
     // const toggleCamera = () => {
     //     setCameraOn((prevCameraOn) => !prevCameraOn);
@@ -361,13 +361,12 @@ function Room({ user }) {
 
             <div className="left-panel">
 
-                <div className="video-container">
+                {/* <div className="video-container">
                     <video className="video-player" autoPlay playsInline ref={myVideo} />
                     <p>{user ? user.user.username : "me" }</p>
                     <video className="video-player" playsInline ref={userVideo} autoPlay />
                     <p>{matchedUsername}</p>
                 </div>
-
                 <div className="video-controls">
                     <button onClick={() => toggleCamera()}>
                         {cameraOn ? <FaVideo /> : <FaVideoSlash className={cameraOn ? "" : "red-icon"} />}
@@ -380,7 +379,8 @@ function Room({ user }) {
                             <FaHome /> Home
                         </button>
                     </Link>
-                </div>
+                </div> */}
+
             </div>
 
             <div className="middle-panel">
