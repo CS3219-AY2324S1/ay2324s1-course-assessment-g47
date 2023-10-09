@@ -89,23 +89,3 @@ networks:
   app-network:
     driver: bridge
 
-
-
-# Backend Server with PostgreSQL and MongoDB
-  # backend:
-  #   container_name: backend
-  #   restart: always
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - '8080:8080'
-  #   environment:
-  #     ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
-  #     ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
-  #     ME_CONFIG_MONGODB_URL: ${MONGO_URL}
-  #   networks:
-  #     - app-network
-  #   depends_on:
-  #     - mongodb
-  #     - postgres
