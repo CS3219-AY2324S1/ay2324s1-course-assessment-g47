@@ -8,17 +8,19 @@ const UserOTPVerification = require("./models/UserOTPVerification");
 const mongoose = require("mongoose");
 
 // Connecting to MongoDB and verifying its connection
-mongoose.connect(process.env.MONGO_URI, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-	serverSelectionTimeoutMS: 30000, // Global server selection timeout in milliseconds
-});
+if (process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "ci") {
+	mongoose.connect(process.env.MONGO_URI, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+		serverSelectionTimeoutMS: 30000, // Global server selection timeout in milliseconds
+	});
 
-const db = mongoose.connection;
+	const db = mongoose.connection;
 
-db.on("error", (err) => {
-	console.error("MongoDB connection error:", err);
-});
+	db.on("error", (err) => {
+		console.error("MongoDB connection error:", err);
+	});
+}
 
 // For postgresql
 const cors = require("cors");
@@ -462,4 +464,6 @@ app.post(
 			res.status(500).json({ error: "Internal server error" });
 		}
 	}
-);
+); 
+
+module.exports = app;
