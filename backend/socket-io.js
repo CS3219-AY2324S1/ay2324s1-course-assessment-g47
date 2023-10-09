@@ -17,7 +17,9 @@ const io = require("socket.io")(server, {
 
 io.on("connection", (socket) => {
 
-  socket.emit("me", (socket.id))
+  socket.emit("me", (socket.id));
+
+  socket.emit("message", "Welcome to the chat!");
 
   // socket.on("toggleMic", (newMicState) => {
 	// 	  io.emit("otherUserToggledMic", socket.id, newMicState);
@@ -103,6 +105,12 @@ io.on("connection", (socket) => {
     //setSelectedLanguage({ value: newLanguage, label: newLanguage });
   });
   
+  // Listen for chat messages
+  socket.on("chatMessage", (msg, roomId) => {
+    console.log("Received chat message: " + msg);
+    // Send the message to all users in the room
+    io.to(roomId).emit("message", msg);
+  });
 
 })
 

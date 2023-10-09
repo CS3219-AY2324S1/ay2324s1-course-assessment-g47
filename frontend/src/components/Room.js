@@ -307,6 +307,40 @@ function Room({ user }) {
         socket.emit("disconnected", { roomId: roomId });
     };
 
+    // wait for DOM to load before getting elements
+    useEffect(() => {
+        const chatForm = document.getElementById("chat-form");
+        const chatMessages = document.querySelector('.chat-messages');
+    //Message submit
+    chatForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Get message text
+        const msg = e.target.elements.msg.value;
+
+        // Emit message to server
+        socket.emit("chatMessage", msg, roomId);
+    });
+
+    socket.on("message", (message) => {
+        console.log("message:", message);
+        outputMessage(message);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    // Output message to DOM
+    function outputMessage(message) {
+        const div = document.createElement("div");
+        div.classList.add("message");
+        div.innerHTML = `<p class="meta">Brad <span>9:12pm</span></p>
+        <p class="text"> 
+            ${message} 
+        </p>`;
+        document.querySelector('.chat-messages').appendChild(div);
+    }
+    }, []);
+
     // const toggleMic = () => {
     //     setMicOn((prevMicOn) => !prevMicOn);
     //     socket.emit("toggleMic", !micOn);
@@ -360,7 +394,21 @@ function Room({ user }) {
         <div className="container">
 
             <div className="left-panel">
-
+                <main class="chat-main">
+                    <div class="chat-messages"></div>
+                </main>
+                <div class="chat-form-container">
+                    <form id="chat-form">
+                    <input
+                        id="msg"
+                        type="text"
+                        placeholder="Enter Message"
+                        required
+                        autocomplete="off"
+                    />
+                    <button class="btn"><i class="fas fa-paper-plane"></i> Send</button>
+                    </form>
+                </div>
                 {/* <div className="video-container">
                     <video className="video-player" autoPlay playsInline ref={myVideo} />
                     <p>{user ? user.user.username : "me" }</p>

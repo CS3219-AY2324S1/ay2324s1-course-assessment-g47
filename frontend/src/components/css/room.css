@@ -74,3 +74,106 @@
 .editor-container{
   height: 100%;
 }
+
+/* Chat */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.chat-messages p {
+  margin-bottom: 10px;
+}
+
+.chat-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.chat-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.chat-form button {
+  width: 40px; 
+  height: 40px;
+  border-radius: 50%; 
+  background-color: var(--dark-accent-color); 
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.chat-form button:hover {
+  background-color: rgba(0, 0, 0, 0.1); 
+}
+
+/* Participants */
+.participants-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.participants-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.participants-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.participants-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.participants-list::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.participants-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.participants-list p {
+  margin-bottom: 10px;
+}
