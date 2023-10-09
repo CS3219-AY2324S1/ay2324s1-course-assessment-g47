@@ -44,46 +44,6 @@ const Home = ({ user, handleLogin }) => {
 					</div>
 				) : null}
 				<QuestionQueue user={user.user}/>
-				<div className="table-container">
-					<table className="table-header">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Title</th>
-								<th>Complexity</th>
-								<th>Category</th>
-								<th>Created</th>
-								{user.account_type !== "user" ? (
-									<th>Action</th>
-								) : null}
-							</tr>
-						</thead>
-						<tbody>
-							{questions &&
-								questions.map((question) => (
-									<QuestionList
-										id={rowCount++}
-										key={question._id}
-										question={question}
-										onClick={(question) => {
-											setSelectedQuestion(question);
-										}}
-										onDelete={(questionId) => {
-											if (selectedQuestion !== null) {
-												if (
-													selectedQuestion._id ===
-													questionId
-												) {
-													setSelectedQuestion(null);
-												}
-											}
-										}}
-										user={user.user}
-									/>
-								))}
-						</tbody>
-					</table>
-				</div>
 				<div className="QuestionDetails">
 					<QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>
