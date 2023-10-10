@@ -106,10 +106,10 @@ io.on("connection", (socket) => {
   });
   
   // Listen for chat messages
-  socket.on("chatMessage", (msg, roomId) => {
+  socket.on("chatMessage", (msg, roomId, username, time) => {
     console.log("Received chat message: " + msg);
     // Send the message to all users in the room
-    io.to(roomId).emit("message", msg);
+    io.to(roomId).emit("message", { message: msg, username: username, time: time });
   });
 
 })

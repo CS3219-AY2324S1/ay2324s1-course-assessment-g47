@@ -33,16 +33,10 @@ function Room({ user }) {
 
     const { roomId } = useParams();
     const [me, setMe] = useState("");
-    // const [stream, setStream] = useState(null);
     const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
     const [callerSignal, setCallerSignal] = useState();
     const [peerSocketId, setPeerSocketId] = useState(null);
     const [editorText, setEditorText] = useState("");
-    // const [micOn, setMicOn] = useState(true);
-    // const [cameraOn, setCameraOn] = useState(true);
-    // const [otherStream, setOtherStream] = useState(null);
-    // const [otherMicOn, setOtherMicOn] = useState(true);
-    // const [otherCameraOn, setOtherCameraOn] = useState(true);
     const [inCallRoom, setInCallRoom] = useState(false);
     const [peer, setPeer] = useState(null);
 
@@ -88,15 +82,6 @@ function Room({ user }) {
         const getFirstUserMediaWithStatus = async () => {
 
             try {
-                // const userStream = await navigator.mediaDevices.getUserMedia({
-                //     video: {
-                //         width: { ideal: 1280 }, // Preferred width
-                //         height: { ideal: 720 },  // Preferred height
-                //     },
-                //     audio: micOn,
-                // });
-                // setStream(userStream);
-                // myVideo.current.srcObject = userStream;
 
                 socket.emit("join-room", { roomId: roomId }); // Automatically join the socket.io room
 
@@ -126,9 +111,6 @@ function Room({ user }) {
                         setCallerSignal(data);
                         setPeerSocketId(userId)
                     });
-                    // peer.on("stream", (stream) => {
-                    //     userVideo.current.srcObject = stream;
-                    // });
 
                     socket.on("signal-recievedd", (signal) => {
                         console.log("Signal received24:", signal);
@@ -181,9 +163,6 @@ function Room({ user }) {
                 });
             } catch (err) {
                 console.error("Error accessing user media:", err);
-                // const userStream = null;
-                // setStream(userStream);
-                // myVideo.current.srcObject = userStream;
             }
         };
 
@@ -206,49 +185,10 @@ function Room({ user }) {
         };
     }, []);
 
-    // useEffect(() => {
-    //     const getUserMediaWithStatus = async () => {
-    //         try {
-    //             const userStream = await navigator.mediaDevices.getUserMedia({
-    //                 video: cameraOn,
-    //                 audio: micOn,
-    //             });
-    //             setStream(userStream);
-    //             myVideo.current.srcObject = userStream;
-    //         } catch (err) {
-    //             const userStream = null;
-    //             setStream(userStream);
-    //             myVideo.current.srcObject = userStream;
-    //         }
-    //     };
-
-    //     getUserMediaWithStatus();
-    // }, [micOn, cameraOn]);
-
-    // pause peer video when other user toggled video
-    // useEffect(() => {
-    //     if (otherCameraOn) {
-    //         userVideo.current.srcObject = stream;
-    //     } else {
-    //         userVideo.current.srcObject = null;
-    //     }
-    // }, [otherCameraOn]);
-
-    // // pause peer audio when other user toggled mic
-    // useEffect(() => {
-    //     if (otherMicOn) {
-    //         userVideo.current.srcObject = stream;
-    //     } else {
-    //         userVideo.current.srcObject = null;
-    //     }
-    // }, [otherMicOn]);
-
     const handleRefreshQuestion = () => {
         // Call fetchRandomEasyQuestion when "Change Question" button is clicked
         fetchRandomEasyQuestion();
     };
-
-    // Ignore for now
     // const getOtherMediaWithStatus = async () => {
     //     try {
     //       const otherStream = await navigator.mediaDevices.getUserMedia({
@@ -282,20 +222,6 @@ function Room({ user }) {
         }
     });
 
-    // socket.on("otherUserToggledMic", (userId, toggleMicState) => {
-    //     if (userId !== socket.id) {
-    //         setOtherMicOn(toggleMicState);
-    //         console.log("other user toggled mic:", userId, toggleMicState);
-    //     }
-    // });
-
-    // socket.on("otherUserToggledCamera", (userId, toggleCameraState) => {
-    //     if (userId !== socket.id) {
-    //         setOtherCameraOn(toggleCameraState);
-    //         console.log("other user toggled camera:", userId, toggleCameraState);
-    //     }
-    // });
-
     const handleEditorChange = (newValue) => {
         setEditorText(newValue);
         socket.emit("editor-change", { text: newValue, roomId: roomId });
@@ -311,69 +237,40 @@ function Room({ user }) {
     useEffect(() => {
         const chatForm = document.getElementById("chat-form");
         const chatMessages = document.querySelector('.chat-messages');
-    //Message submit
-    chatForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
 
-        // Get message text
-        const msg = e.target.elements.msg.value;
+        //Message submit
+        chatForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
 
-        // Emit message to server
-        socket.emit("chatMessage", msg, roomId);
-    });
+            // Get message text
+            const msg = e.target.elements.msg.value;
 
-    socket.on("message", (message) => {
-        console.log("message:", message);
-        outputMessage(message);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    });
+            // Emit message to server and the current time
+            socket.emit("chatMessage", msg, roomId, user.user.username, new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            e.target.elements.msg.value = "";
+        });
 
-    // Output message to DOM
-    function outputMessage(message) {
-        const div = document.createElement("div");
-        div.classList.add("message");
-        div.innerHTML = `<p class="meta">Brad <span>9:12pm</span></p>
-        <p class="text"> 
-            ${message} 
-        </p>`;
-        document.querySelector('.chat-messages').appendChild(div);
-    }
+        socket.on("message", (data) => {
+            console.log("message:", data.message);
+            outputMessage(data);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        // Output message to DOM
+        function outputMessage(data) {
+            const div = document.createElement("div");
+            div.classList.add("message");
+            div.innerHTML = `
+                <div class="message-content">
+                    <p class="meta">${data.time}</p>
+                    <p class="username">${data.username}:</p>
+                    <p class="message-text">${data.message}</p>
+                </div>
+            `;
+            document.querySelector('.chat-messages').appendChild(div);
+        }
     }, []);
-
-    // const toggleMic = () => {
-    //     setMicOn((prevMicOn) => !prevMicOn);
-    //     socket.emit("toggleMic", !micOn);
-    //     console.log("User toggled mic:", socket.id, !micOn);
-    // };
-
-    // const toggleMic = () => {
-    //     setMicOn((prevMicOn) => !prevMicOn);
-    //     if (stream) {
-    //         console.log("stream:", stream)
-    //         stream.getAudioTracks().forEach((track) => {
-    //             track.enabled = micOn;
-    //         });
-    //     } else {
-    //         console.log("no stream:")
-    //     }
-    //     updatePeerStream();
-    // };
-
-    // const toggleCamera = () => {
-    //     setCameraOn((prevCameraOn) => !prevCameraOn);
-    //     socket.emit("toggleCamera", !cameraOn);
-    // };
-
-    // const toggleCamera = () => {
-    //     setCameraOn((prevCameraOn) => !prevCameraOn);
-    //     if (stream) {
-    //         stream.getVideoTracks().forEach((track) => {
-    //             track.enabled = cameraOn;
-    //         });
-    //     }
-    //     updatePeerStream();
-    // };
 
     const handleLanguageChange = (selectedOption) => {
         console.log(`Option selected:`, selectedOption);
@@ -381,58 +278,21 @@ function Room({ user }) {
         socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
     };
 
-    //Doesnt work
-    // const updatePeerStream = () => {
-    //     if (peer) {
-    //         peer.on("stream", (stream) => {
-    //             userVideo.current.srcObject = stream;
-    //         });
-    //     }
-    // };
-
     return (
+        <div className="room-container">
         <div className="container">
-
-            <div className="left-panel">
-                <main class="chat-main">
-                    <div class="chat-messages"></div>
-                </main>
-                <div class="chat-form-container">
-                    <form id="chat-form">
-                    <input
-                        id="msg"
-                        type="text"
-                        placeholder="Enter Message"
-                        required
-                        autocomplete="off"
-                    />
-                    <button class="btn"><i class="fas fa-paper-plane"></i> Send</button>
-                    </form>
-                </div>
-                {/* <div className="video-container">
-                    <video className="video-player" autoPlay playsInline ref={myVideo} />
-                    <p>{user ? user.user.username : "me" }</p>
-                    <video className="video-player" playsInline ref={userVideo} autoPlay />
-                    <p>{matchedUsername}</p>
-                </div>
-                <div className="video-controls">
-                    <button onClick={() => toggleCamera()}>
-                        {cameraOn ? <FaVideo /> : <FaVideoSlash className={cameraOn ? "" : "red-icon"} />}
-                    </button>
-                    <button onClick={() => toggleMic()}>
-                        {micOn ? <FaMicrophone /> : <FaMicrophoneSlash className={micOn ? "" : "red-icon"} />}
-                    </button>
-                    <Link to="/">
-                        <button onClick={() => leaveCall()}>
-                            <FaHome /> Home
-                        </button>
-                    </Link>
-                </div> */}
-
-            </div>
-
-            <div className="middle-panel">
+            <div className="right-panel">
                 <div className="editor-container">
+                    <div className="editor">
+                        <Editor
+                            height="100vh"
+                            width="100%"
+                            theme="vs-dark"
+                            language={selectedLanguage.value}
+                            value={editorText}
+                            onChange={handleEditorChange}
+                        />
+                    </div>
                     <div className="language-dropdown">
                         <label>Select Language:</label>
                         <Select
@@ -448,26 +308,35 @@ function Room({ user }) {
                             }}
                         />
                     </div>
-                    <div className="editor">
-                        <Editor
-                            height="100vh"
-                            width="100%"
-                            theme="vs-dark"
-                            language={selectedLanguage.value}
-                            value={editorText}
-                            onChange={handleEditorChange}
-                        />
-                    </div>
                 </div>
             </div>
-
-            <div className="right-panel">
+            <div className="middle-panel">
+                <div className="question-container">
                 <DisplayRandomQuestion
                     user={user}
                     randomQuestion={randomQuestion}
                     handleRefreshQuestion={handleRefreshQuestion}
                 />
+                </div>
             </div>
+        </div>
+        <div className="bottom-container">
+            <main class="chat-main">
+                        <div class="chat-messages"></div>
+                    </main>
+                    <div class="chat-form-container">
+                        <form id="chat-form" class="chat-form">
+                        <input
+                            id="msg"
+                            type="text"
+                            placeholder="Enter Message"
+                            required
+                            autocomplete="off"
+                        />
+                        <button class="btn"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
+        </div>
         </div>
     );
 }
