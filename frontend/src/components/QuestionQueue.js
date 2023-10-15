@@ -4,8 +4,6 @@ import "./css/QuestionQueue.css";
 
 
 import io from "socket.io-client";
-const IO_PORT = 4002;
-const socket = io.connect(`http://localhost:${IO_PORT}`); //Connect to backend socket.io server
 
 
 function QuestionQueue({ user }) {
@@ -18,8 +16,9 @@ function QuestionQueue({ user }) {
   const navigate = useNavigate();
   const [socketID, setSocketID] = useState(null);
 
-
   useEffect(() => {
+    const IO_PORT = 4002;
+    const socket = io.connect(`http://localhost:${IO_PORT}`); //Connect to backend socket.io server
     socket.on("me", (id) => {
       console.log("Calling socket function `me` to get socketID, socketID:", id);
       setSocketID(id);
@@ -31,8 +30,8 @@ function QuestionQueue({ user }) {
       // Redirect to the room page with the roomId when matched successfully
       //navigate(`/room/${data.roomId}`); // Replace `roomId` with the actual room ID
       navigate(`/room/${data.roomId}`, { state: { difficultyLevel: data.difficultyLevel, matchedUsername: data.matchedUsername } });
- 
     };
+
     // Attach the event listener for successful matches
     socket.on('matched-successfully', handleMatchedSuccessfully);
 
@@ -53,7 +52,7 @@ function QuestionQueue({ user }) {
 
     return () => {
       // Clean up the event listener when the component unmounts
-      socket.off('matched-successfully', handleMatchedSuccessfully);
+      //socket.off('matched-successfully', handleMatchedSuccessfully);
       // Clear the timer interval when the component unmounts
       clearInterval(timerInterval);
     };
@@ -68,6 +67,12 @@ function QuestionQueue({ user }) {
     setLoading(true); // Set loading state to true
     setQueueStartTime(new Date().getTime()); // Record queue start time
     console.log(`User: ${user}, SocketId: ${socketID}`);
+    // if (socketID === null) {
+    //   socket.on("me", (id) => {
+    //     console.log("Calling socket function `me` to get socketID, socketID:", id);
+    //     setSocketID(id);
+    //   });
+    // }
 
     try {
       console.log(`SocketId: ${socketID}`);

@@ -37,7 +37,6 @@ function Room({ user }) {
     const [callerSignal, setCallerSignal] = useState();
     const [peerSocketId, setPeerSocketId] = useState(null);
     const [editorText, setEditorText] = useState("");
-    const [inCallRoom, setInCallRoom] = useState(false);
     const [peer, setPeer] = useState(null);
 
     const [randomQuestion, setRandomQuestion] = useState(null);
@@ -62,8 +61,6 @@ function Room({ user }) {
         }
     };
 
-    const myVideo = useRef();
-    const userVideo = useRef();
     const connectionRef = useRef();
 
     useEffect(() => {
@@ -94,7 +91,6 @@ function Room({ user }) {
                     const peer = new Peer({
                         initiator: true,
                         trickle: true,
-                        // stream: userStream,
                     });
 
                     setPeer(peer);
@@ -115,7 +111,6 @@ function Room({ user }) {
                     socket.on("signal-recievedd", (signal) => {
                         console.log("Signal received24:", signal);
                         peer.signal(signal.signal);
-                        setInCallRoom(true);
                     });
 
                     connectionRef.current = peer;
@@ -128,22 +123,16 @@ function Room({ user }) {
                     const peer = new Peer({
                         initiator: false,
                         trickle: true,
-                        // stream: userStream,
                     });
 
                     peer.on("signal", (signalData) => {
                         socket.emit("return-signal", { signal: signalData, callerId: data.from });
                     });
 
-                    // peer.on("stream", (stream) => {
-                    //     userVideo.current.srcObject = stream;
-                    // });
-
                     console.log("Signal received2:", callerSignal);
                     console.log("Signal received23:", data.signal);
                     peer.signal(data.signal);
                     connectionRef.current = peer;
-                    setInCallRoom(true);
                 });
 
                 socket.on("initial-editor-content", (initialContent) => {
