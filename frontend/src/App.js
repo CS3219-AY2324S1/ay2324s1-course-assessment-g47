@@ -39,12 +39,15 @@ import ChangeTypeHome from "./components/ChangeTypeHome";
 import VerifyOTP from "./components/VerifyOTP";
 import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from "./hooks/useAuthContext";
+import Room from "./components/Room";
 import Navbar from "./components/Navbar";
 import * as Constants from "./constants/constants.js";
+import RoomUserExit from "./components/RoomUserExit";
 
 function App() {
 	const [user, setUser] = useState(null);
 	const { dispatch } = useAuthContext();
+	// const postgresqlPort = 4001;
 
 	// Load user data from localStorage when the component mounts
 	useEffect(() => {
@@ -149,6 +152,21 @@ function App() {
 								/>
 							}
 						/>
+					</Route>
+					<Route path="/verifyOTP" element={<VerifyOTP />}>
+						{" "}
+					</Route>
+					<Route
+						path="/resendOTPVerificationCode"
+						element={<ResendOTP />}
+					>
+						{" "}
+					</Route>
+					<Route path="/room/:roomId" element={<Room user={user} />}>
+						{" "}
+					</Route>
+					<Route path="/roomexit" element={<RoomUserExit />}>
+						{" "}
 					</Route>
 				</Routes>
 			</BrowserRouter>

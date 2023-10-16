@@ -8,6 +8,7 @@ import QuestionList from "../components/QuestionList";
 import QuestionForm from "../components/QuestionForm";
 import QuestionDetails from "../components/QuestionDetails";
 import LoginPage from "../components/Login";
+import QuestionQueue from "../components/QuestionQueue";
 
 const Home = ({ user, handleLogin }) => {
 	const { questions, dispatch } = useQuestionsContext();
@@ -18,7 +19,7 @@ const Home = ({ user, handleLogin }) => {
 	useEffect(() => {
 		const fetchQuestions = async () => {
 			const response = await fetch("/api/questions", {
-				headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+				headers: { Authorization: `Bearer ${user.tokens.accessToken}` }
 			});
 			const json = await response.json();
 
@@ -36,7 +37,13 @@ const Home = ({ user, handleLogin }) => {
 		<>
 			<div className="header"></div>{" "}
 			<div className="home">
-				{user.user.account_type !== "user" ? <QuestionForm /> : null}
+				{user.user.account_type !== "user" ? (
+					<div>
+						
+						<QuestionForm />
+					</div>
+				) : null}
+				<QuestionQueue user={user.user}/>
 				<div className="QuestionDetails">
 					<QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>
