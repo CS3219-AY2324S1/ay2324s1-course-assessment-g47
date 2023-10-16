@@ -23,8 +23,8 @@ function Room({ user }) {
     console.log("user:", user);
     const location = useLocation();
     const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
-    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Get the difficultyLevel from location state
-    const currUsername = user.user.email;
+    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's email
+    const currUsername = user.user.email; // Stores current user's email
     // Code language settings 
     const [selectedLanguage, setSelectedLanguage] = useState(
         codeLanguages.find((language) => language.value === "python")
@@ -35,10 +35,9 @@ function Room({ user }) {
     const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
     const [callerSignal, setCallerSignal] = useState();
     const [peerSocketId, setPeerSocketId] = useState(null);
-    const [editorText, setEditorText] = useState("");
+    const [editorText, setEditorText] = useState(""); // Stores the code
     const [peer, setPeer] = useState(null);
-
-    const [randomQuestion, setRandomQuestion] = useState(null);
+    const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
 
     const fetchRandomEasyQuestion = async () => {
         if (user) {
@@ -74,14 +73,14 @@ function Room({ user }) {
             setCallerSignal(data.signal);
         });
 
-        // Sends the matched users' info to backend
-        const emitUserInfo = () => {
-            socket.emit("set-user-info", {
-                userName: currUsername, 
-                matchedName: matchedUsername,
-                roomId: roomId,
-            });
-        };
+        // Sends the matched users' info to backend (TO BE REMOVED)
+        // const emitUserInfo = () => {
+        //     socket.emit("set-user-info", {
+        //         userName: currUsername, 
+        //         matchedName: matchedUsername,
+        //         roomId: roomId,
+        //     });
+        // };
 
         const getFirstUserMediaWithStatus = async () => {
 
@@ -123,8 +122,8 @@ function Room({ user }) {
 
                     connectionRef.current = peer;
 
-                    // Call the function to send both users' info to backend once they are connected
-                    emitUserInfo();
+                    // Call the function to send both users' info to backend once they are connected (TO BE REMOVED)
+                    // emitUserInfo();
                 });
 
                 socket.on("signal-received", (data) => {
@@ -210,8 +209,32 @@ function Room({ user }) {
     socket.on("editor-changed", (text) => {
         if (editorText !== text) {
             setEditorText(text);
+            updateData(text);
         }
     });
+
+    const updateData = (text) => {
+        try {
+            const code = text;
+            const currUser = currUsername;
+            const matchedUser = matchedUsername;
+            const question_difficulty = randomQuestion.complexity;
+            const question_name = randomQuestion.title;
+            const time_of_creation = randomQuestion.updatedAt;
+            const question_category = randomQuestion.category;
+            const question_description = randomQuestion.description;
+            console.log("User 1: ", currUser);
+            console.log("User 2: ", matchedUser);
+            console.log("Question Name: ", question_name);
+            console.log("Question Difficulty: ", question_difficulty);
+            console.log("Question Category: ", question_category);
+            console.log("Time of Creation: ", time_of_creation);
+            console.log("Question Description: ", question_description);
+            console.log("Code: ", code);
+        } catch (err) {
+            console.error("Unexpected error occurred while updating data:", err);
+        }
+    };
 
     socket.on("user-disconnected", (userId) => {
         // A user has disconnected from the room

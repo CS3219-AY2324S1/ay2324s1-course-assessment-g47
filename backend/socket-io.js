@@ -14,9 +14,9 @@ const io = require("socket.io")(server, {
   }
 })
 
-const codeByRoom = {}; // Create an object to store code by room
-const connectedUsers = {}; // Create an object to store users by room
-const questionByRoom = {}; // Create an object to store question by room
+// const codeByRoom = {}; // Create an object to store code by room (TO BE REMOVED)
+// const connectedUsers = {}; // Create an object to store users by room (TO BE REMOVED)
+// const questionByRoom = {}; // Create an object to store question by room (TO BE REMOVED)
 
 io.on("connection", (socket) => {
 
@@ -53,14 +53,14 @@ io.on("connection", (socket) => {
     // Send the user their own ID
     socket.emit("me", socket.id);
 
-    codeByRoom[roomName] = ''; // Store an empty code based on the current roomId when initial join
+    // codeByRoom[roomName] = ''; // Store an empty code based on the current roomId when initial join (TO BE REMOVED)
   });
 
-  // Receive and store user information when they connect
-  socket.on("set-user-info", ({ userName, matchedName, roomId }) => {
-    const roomName = roomId;
-    connectedUsers[roomName] = { userName, matchedName }; // Store both users' info based on the current roomId
-  });
+  // Receive and store user information when they connect (TO BE REMOVED)
+  // socket.on("set-user-info", ({ userName, matchedName, roomId }) => {
+  //   const roomName = roomId;
+  //   connectedUsers[roomName] = { userName, matchedName }; // Store both users' info based on the current roomId
+  // });
 
   // Handle signaling
   socket.on("send-signal", (data) => {
@@ -94,7 +94,7 @@ io.on("connection", (socket) => {
 
   socket.on('newRandomQuestion', (data) => {
     // Emit the updated random question to the room
-    questionByRoom[data.roomId] = data.randomQuestion; // Store the question info into the current roomId
+    // questionByRoom[data.roomId] = data.randomQuestion; // Store the question info into the current roomId (TO BE REMOVED)
     socket.to(data.roomId).emit('updateRandomQuestion', data.randomQuestion);
   });
 
@@ -102,33 +102,26 @@ io.on("connection", (socket) => {
   socket.on("disconnected", (data) => {
     console.log("A user disconnected: " + socket.id);
 
-    // const codeToSave = codeByRoom[data.roomId];
-    // const userInfo = connectedUsers[socket.id];
-    // console.log(codeToSave);
-    // console.log(userInfo);
-    // delete codeByRoom[data.roomId];
-    // delete connectedUsers[data.roomId];
-
     // Notify other users in the room that a user has disconnected
     socket.to(data.roomId).emit("user-disconnected", socket.id);
   });
 
   socket.on("editor-change", (data) => {
     editorContent = data.text;
-    const roomName = data.roomId;
-    // Update the code for the room
-    codeByRoom[data.roomId] = data.text; // Update the code stored based on the current roomId
-    // console.log(codeByRoom[data.roomId]); // Code written by users
-    // console.log(connectedUsers[data.roomId]); // Both users' email
-    // console.log(questionByRoom[data.roomId]); // Question info (Difficulty, Question Name, Date and Time)
-    const user_1 = connectedUsers[roomName].userName;
-    const user_2 = connectedUsers[roomName].matchedName;
-    const question_difficulty = questionByRoom[roomName].complexity;
-    const question_name = questionByRoom[roomName].title;
-    const time_of_creation = questionByRoom[roomName].updatedAt;
-    const question_category = questionByRoom[roomName].category;
-    const question_description = questionByRoom[roomName].description;
-    const code = data.text;
+    // const roomName = data.roomId; (TO BE REMOVED)
+    // // Update the code for the room (TO BE REMOVED)
+    // codeByRoom[data.roomId] = data.text; // Update the code stored based on the current roomId (TO BE REMOVED)
+    // // console.log(codeByRoom[data.roomId]); // Code written by users (TO BE REMOVED)
+    // // console.log(connectedUsers[data.roomId]); // Both users' email (TO BE REMOVED)
+    // // console.log(questionByRoom[data.roomId]); // Question info (Difficulty, Question Name, Date and Time) (TO BE REMOVED)
+    // const user_1 = connectedUsers[roomName].userName; (TO BE REMOVED)
+    // const user_2 = connectedUsers[roomName].matchedName; (TO BE REMOVED)
+    // const question_difficulty = questionByRoom[roomName].complexity; (TO BE REMOVED)
+    // const question_name = questionByRoom[roomName].title; (TO BE REMOVED)
+    // const time_of_creation = questionByRoom[roomName].updatedAt; (TO BE REMOVED)
+    // const question_category = questionByRoom[roomName].category; (TO BE REMOVED)
+    // const question_description = questionByRoom[roomName].description; (TO BE REMOVED)
+    // const code = data.text; (TO BE REMOVED)
     io.to(data.roomId).emit("editor-changed", data.text)
   })
 
