@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const questionRoutes = require("./routes/questions");
 
 const app = express();
+const port = process.env.MONGO_PORT || 27017;
 
 //middleware
 app.use(express.json()); //Allows us to use json in the body of the request
@@ -27,8 +28,8 @@ const connectWithRetry = () => {
 		.then(() => {
 			console.log("Connected to MongoDB");
 			// Only start the application server once the database connection is established
-			app.listen(process.env.PORT, () => {
-				console.log("Listening on port", process.env.PORT);
+			app.listen(port, () => {
+				console.log("Listening on port", port);
 			});
 		})
 		.catch((error) => {

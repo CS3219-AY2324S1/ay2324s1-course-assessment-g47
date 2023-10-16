@@ -64,6 +64,32 @@ services:
     depends_on:
       - mongodb
 
+  # Matching Service
+  matching-service:
+    container_name: matching-service
+    restart: always
+    build:
+      context: ./backend/matching-service
+      dockerfile: Dockerfile
+    ports:
+      - '8083:8083'
+    depends_on:
+      - collaboration-service
+    networks:
+      - app-network
+
+  # Colaboration Service
+  collaboration-service:
+    container_name: collaboration-service
+    restart: always
+    build:
+      context: ./backend/collaboration-service
+      dockerfile: Dockerfile
+    ports:
+      - '8084:8084'
+    networks:
+      - app-network
+
   # Frontend React App
   frontend:
     container_name: frontend
@@ -82,6 +108,8 @@ services:
     depends_on:
       - user-service
       - question-service
+      - matching-service
+      - collaboration-service
     networks:
       - app-network
 
