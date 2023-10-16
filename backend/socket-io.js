@@ -21,17 +21,6 @@ io.on("connection", (socket) => {
 
   socket.emit("message", "Welcome to the chat!");
 
-  // socket.on("toggleMic", (newMicState) => {
-	// 	  io.emit("otherUserToggledMic", socket.id, newMicState);
-  //     console.log("Mic toggled")
-	// });
-  
-	
-	// socket.on("toggleCamera", (newCameraState) => {
-	// 	  io.emit("otherUserToggledCamera", socket.id, newCameraState);
-  //     console.log("Camera toggled")
-	// });
-
   socket.on("matchUser", (data) => {
     //socket.join(data.roomName)
     socket.to(data.socketId).emit("matched-successfully", {roomId: data.roomName,difficultyLevel: data.difficultyLevel, matchedUsername: data.matchedUsername})

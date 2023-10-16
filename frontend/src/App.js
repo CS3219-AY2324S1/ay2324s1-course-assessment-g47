@@ -41,6 +41,7 @@ import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from './hooks/useAuthContext';
 import Room from "./components/Room";
 import Navbar from "./components/Navbar";
+import RoomUserExit from "./components/RoomUserExit";
 
 function App() {
 	const [user, setUser] = useState(null);
@@ -157,6 +158,7 @@ function App() {
 					<Route path="/verifyOTP" element={<VerifyOTP />}> </Route>
 					<Route path="/resendOTPVerificationCode" element={<ResendOTP />}> </Route>
 					<Route path="/room/:roomId" element={<Room user={user}/>}> </Route>
+					<Route path="/roomexit" element={<RoomUserExit />}> </Route>
 				</Routes>
 			</BrowserRouter>
 		</>

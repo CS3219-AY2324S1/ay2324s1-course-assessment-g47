@@ -8,9 +8,6 @@ const Navbar = ({ user, handleLogout }) => {
 				<Link to="/">
 					<h1>PeerPrep</h1>
 				</Link>
-				<Link to="/rm">
-                    <h1>Room1</h1>
-                </Link>
 
 				{user ? (
 					<div className="center">
