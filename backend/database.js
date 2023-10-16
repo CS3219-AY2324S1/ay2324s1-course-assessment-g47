@@ -47,4 +47,29 @@ module.exports = pool;
 // 		// pool.end();
 // 	});
 
+// CREATE TABLE
+// const createTblQry = `CREATE TABLE code_attempts (
+//     attempt_id serial PRIMARY KEY,
+//     user_email VARCHAR ( 255 ) NOT NULL,
+//	   matched_user_email VARCHAR ( 255 ) NOT NULL,
+//     question_name VARCHAR ( 255 ) NOT NULL,
+//	   question_difficulty VARCHAR ( 255 ) NOT NULL,
+// 	   question_category VARCHAR ( 255 ) NOT NULL,
+//	   question_description TEXT NOT NULL,
+//     code TEXT NOT NULL,
+// 	   timestamp TIMESTAMP NOT NULL
+// 	   );
+//     `;
+
+// pool.query(createTblQry)
+// 	.then((res) => {
+// 		console.log("Table created");
+// 		console.log(res);
+// 		// pool.end();
+// 	})
+// 	.catch((err) => {
+// 		console.log(err);
+// 		// pool.end();
+// 	});
+
 module.exports = pool;

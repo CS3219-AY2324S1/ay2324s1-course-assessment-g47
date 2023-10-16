@@ -14,6 +14,9 @@ const io = require("socket.io")(server, {
   }
 })
 
+const codeByRoom = {}; // Create an object to store code by room
+const connectedUsers = {}; // Create an object to store users by room
+const questionByRoom = {}; // Create an object to store question by room
 
 io.on("connection", (socket) => {
 
@@ -49,6 +52,14 @@ io.on("connection", (socket) => {
 
     // Send the user their own ID
     socket.emit("me", socket.id);
+
+    codeByRoom[roomName] = ''; // Store an empty code based on the current roomId when initial join
+  });
+
+  // Receive and store user information when they connect
+  socket.on("set-user-info", ({ userName, matchedName, roomId }) => {
+    const roomName = roomId;
+    connectedUsers[roomName] = { userName, matchedName }; // Store both users' info based on the current roomId
   });
 
   // Handle signaling
@@ -83,18 +94,41 @@ io.on("connection", (socket) => {
 
   socket.on('newRandomQuestion', (data) => {
     // Emit the updated random question to the room
+    questionByRoom[data.roomId] = data.randomQuestion; // Store the question info into the current roomId
     socket.to(data.roomId).emit('updateRandomQuestion', data.randomQuestion);
   });
 
   // Handle user disconnection
   socket.on("disconnected", (data) => {
     console.log("A user disconnected: " + socket.id);
+
+    // const codeToSave = codeByRoom[data.roomId];
+    // const userInfo = connectedUsers[socket.id];
+    // console.log(codeToSave);
+    // console.log(userInfo);
+    // delete codeByRoom[data.roomId];
+    // delete connectedUsers[data.roomId];
+
     // Notify other users in the room that a user has disconnected
     socket.to(data.roomId).emit("user-disconnected", socket.id);
   });
 
   socket.on("editor-change", (data) => {
     editorContent = data.text;
+    const roomName = data.roomId;
+    // Update the code for the room
+    codeByRoom[data.roomId] = data.text; // Update the code stored based on the current roomId
+    // console.log(codeByRoom[data.roomId]); // Code written by users
+    // console.log(connectedUsers[data.roomId]); // Both users' email
+    // console.log(questionByRoom[data.roomId]); // Question info (Difficulty, Question Name, Date and Time)
+    const user_1 = connectedUsers[roomName].userName;
+    const user_2 = connectedUsers[roomName].matchedName;
+    const question_difficulty = questionByRoom[roomName].complexity;
+    const question_name = questionByRoom[roomName].title;
+    const time_of_creation = questionByRoom[roomName].updatedAt;
+    const question_category = questionByRoom[roomName].category;
+    const question_description = questionByRoom[roomName].description;
+    const code = data.text;
     io.to(data.roomId).emit("editor-changed", data.text)
   })
 

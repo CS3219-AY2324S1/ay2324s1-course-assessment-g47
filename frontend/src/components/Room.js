@@ -24,8 +24,7 @@ function Room({ user }) {
     const location = useLocation();
     const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
     const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Get the difficultyLevel from location state
-    console.log("matchedUsername:", matchedUsername);
-    console.log("difficultyLevel:", difficultyLevel);
+    const currUsername = user.user.email;
     // Code language settings 
     const [selectedLanguage, setSelectedLanguage] = useState(
         codeLanguages.find((language) => language.value === "python")
@@ -56,8 +55,8 @@ function Room({ user }) {
             } catch (error) {
                 console.error(`Error fetching random ${difficultyLevel} question:`, error);
             }
-        
-  
+
+
         }
     };
 
@@ -69,12 +68,20 @@ function Room({ user }) {
         socket.on('updateRandomQuestion', (newRandomQuestion) => {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
-          });
-      
+        });
 
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
         });
+
+        // Sends the matched users' info to backend
+        const emitUserInfo = () => {
+            socket.emit("set-user-info", {
+                userName: currUsername, 
+                matchedName: matchedUsername,
+                roomId: roomId,
+            });
+        };
 
         const getFirstUserMediaWithStatus = async () => {
 
@@ -87,6 +94,7 @@ function Room({ user }) {
                     setConnectedUsers((prevUsers) => [...prevUsers, userId]);
 
                     console.log("Another User connected:", userId);
+
                     // Create a new Peer connection for the new user
                     const peer = new Peer({
                         initiator: true,
@@ -108,12 +116,15 @@ function Room({ user }) {
                         setPeerSocketId(userId)
                     });
 
-                    socket.on("signal-recievedd", (signal) => {
+                    socket.on("signal-recieved", (signal) => {
                         console.log("Signal received24:", signal);
                         peer.signal(signal.signal);
                     });
 
                     connectionRef.current = peer;
+
+                    // Call the function to send both users' info to backend once they are connected
+                    emitUserInfo();
                 });
 
                 socket.on("signal-received", (data) => {
@@ -269,52 +280,52 @@ function Room({ user }) {
 
     return (
         <div className="room-container">
-        <div className="container">
-            <div className="right-panel">
-                <div className="editor-container">
-                    <div className="editor">
-                        <Editor
-                            height="100vh"
-                            width="100%"
-                            theme="vs-dark"
-                            language={selectedLanguage.value}
-                            value={editorText}
-                            onChange={handleEditorChange}
-                        />
+            <div className="container">
+                <div className="right-panel">
+                    <div className="editor-container">
+                        <div className="editor">
+                            <Editor
+                                height="100vh"
+                                width="100%"
+                                theme="vs-dark"
+                                language={selectedLanguage.value}
+                                value={editorText}
+                                onChange={handleEditorChange}
+                            />
+                        </div>
+                        <div className="language-dropdown">
+                            <label>Select Language:</label>
+                            <Select
+                                value={selectedLanguage}
+                                onChange={handleLanguageChange}
+                                options={codeLanguages}
+                                isSearchable={true}
+                                placeholder="Search for a language..."
+                                className="select-language"
+                                styles={customSelectStyles}
+                                components={{
+                                    Option: CustomSelectOption, // Use the custom component to render options
+                                }}
+                            />
+                        </div>
                     </div>
-                    <div className="language-dropdown">
-                        <label>Select Language:</label>
-                        <Select
-                            value={selectedLanguage}
-                            onChange={handleLanguageChange}
-                            options={codeLanguages}
-                            isSearchable={true}
-                            placeholder="Search for a language..."
-                            className="select-language"
-                            styles={customSelectStyles}
-                            components={{
-                                Option: CustomSelectOption, // Use the custom component to render options
-                            }}
+                </div>
+                <div className="middle-panel">
+                    <div className="question-container">
+                        <DisplayRandomQuestion
+                            user={user}
+                            randomQuestion={randomQuestion}
+                            handleRefreshQuestion={handleRefreshQuestion}
                         />
                     </div>
                 </div>
             </div>
-            <div className="middle-panel">
-                <div className="question-container">
-                <DisplayRandomQuestion
-                    user={user}
-                    randomQuestion={randomQuestion}
-                    handleRefreshQuestion={handleRefreshQuestion}
-                />
-                </div>
-            </div>
-        </div>
-        <div className="bottom-container">
-            <main class="chat-main">
-                        <div class="chat-messages"></div>
-                    </main>
-                    <div class="chat-form-container">
-                        <form id="chat-form" class="chat-form">
+            <div className="bottom-container">
+                <main class="chat-main">
+                    <div class="chat-messages"></div>
+                </main>
+                <div class="chat-form-container">
+                    <form id="chat-form" class="chat-form">
                         <input
                             id="msg"
                             type="text"
@@ -323,9 +334,9 @@ function Room({ user }) {
                             autocomplete="off"
                         />
                         <button class="btn"><i class="fas fa-paper-plane"></i></button>
-                        </form>
-                    </div>
-        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 }
