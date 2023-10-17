@@ -25,7 +25,7 @@ module.exports = pool;
 // // 		// pool.end();
 // // 	});
 
-// // //CREATE TABLE
+// CREATE TABLE
 // const createTblQry = `CREATE TABLE accounts (
 //     user_id serial PRIMARY KEY,
 //     username VARCHAR ( 255 ) NOT NULL,
@@ -50,12 +50,13 @@ module.exports = pool;
 // CREATE TABLE
 // const createTblQry = `CREATE TABLE code_attempts (
 //     attempt_id serial PRIMARY KEY,
-//     user_email VARCHAR ( 255 ) NOT NULL,
-//	   matched_user_email VARCHAR ( 255 ) NOT NULL,
+//     user1_email VARCHAR ( 255 ) NOT NULL,
+// 	   user2_email VARCHAR ( 255 ) NOT NULL,
+// 	   room_id VARCHAR ( 255 ) NOT NULL,
 //     question_name VARCHAR ( 255 ) NOT NULL,
-//	   question_difficulty VARCHAR ( 255 ) NOT NULL,
+// 	   question_difficulty VARCHAR ( 255 ) NOT NULL,
 // 	   question_category VARCHAR ( 255 ) NOT NULL,
-//	   question_description TEXT NOT NULL,
+// 	   question_description TEXT NOT NULL,
 //     code TEXT NOT NULL,
 // 	   timestamp TIMESTAMP NOT NULL
 // 	   );

@@ -16,6 +16,7 @@ import DisplayRandomQuestion from "./DisplayRandomQuestion"
 import Select, { components } from "react-select";
 
 const IO_PORT = 4002;
+const HISTORY_PORT = 4005;
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
 
 
@@ -83,7 +84,7 @@ function Room({ user }) {
         // };
 
         const getFirstUserMediaWithStatus = async () => {
-
+            let numOfUsers = 0;
             try {
 
                 socket.emit("join-room", { roomId: roomId }); // Automatically join the socket.io room
@@ -91,7 +92,6 @@ function Room({ user }) {
                 socket.on("user-connected", (userId) => {
                     // A new user has connected to the room
                     setConnectedUsers((prevUsers) => [...prevUsers, userId]);
-
                     console.log("Another User connected:", userId);
 
                     // Create a new Peer connection for the new user
@@ -112,7 +112,7 @@ function Room({ user }) {
                             signal: data,
                         });
                         setCallerSignal(data);
-                        setPeerSocketId(userId)
+                        setPeerSocketId(userId);
                     });
 
                     socket.on("signal-recieved", (signal) => {
@@ -209,13 +209,15 @@ function Room({ user }) {
     socket.on("editor-changed", (text) => {
         if (editorText !== text) {
             setEditorText(text);
-            updateData(text);
+            if (randomQuestion !== null) {
+                updateData(text);
+            }
         }
     });
 
-    const updateData = (text) => {
+    const updateData = async (codeText) => {
         try {
-            const code = text;
+            const code = codeText;
             const currUser = currUsername;
             const matchedUser = matchedUsername;
             const question_difficulty = randomQuestion.complexity;
@@ -231,6 +233,28 @@ function Room({ user }) {
             console.log("Time of Creation: ", time_of_creation);
             console.log("Question Description: ", question_description);
             console.log("Code: ", code);
+            console.log("RoomId: ", roomId);
+            const response = await fetch(
+				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ currUsername, matchedUsername, randomQuestion, roomId, codeText }),
+				}
+			);
+
+			if (response.status === 200) {
+				// Successful update of Code Attempt History
+				const data = await response.json();
+                console.log(data);
+				console.log(`Saved the progress for ${randomQuestion.title} for ${currUsername} and ${matchedUsername}.`);
+			} else {
+				// Handle other error cases
+				console.log("Server error");
+			}
+
         } catch (err) {
             console.error("Unexpected error occurred while updating data:", err);
         }

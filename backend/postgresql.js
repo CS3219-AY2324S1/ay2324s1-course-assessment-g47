@@ -616,6 +616,65 @@ app.post('/exitqueue', async (req, res) => {
 	}
   });
 
+  // Edit the code attempt entry in the database
+  app.post("/code-attempt-management/manage-code-attempt", async(req, res) => {
+    res.setHeader("Content-Type", "application/json");
+
+    const { currUser, matchedUser, question, roomId, code } = req.body;
+
+	console.log("Current User: ", currUser);
+	console.log("Matched User: ", matchedUser);
+	console.log("Question: ", question);
+	console.log("Room ID: ", roomId);
+    console.log("Code: ", code);
+
+    const questionName = question.title;
+    const questionDifficulty = question.complexity;
+    const questionCategory = question.category;
+    const time_of_creation = question.updatedAt;
+    const questionDescription = question.description;
+	console.log("LMAOOOOOOOO");
+
+	try {
+		// Check if the code attempt exists in the database already
+		const codeAttemptExistsQuery = `
+            SELECT *
+            FROM code_attempts
+            WHERE (
+                (user1_email = $1 OR user2_email = $1)
+                AND (user1_email = $2 OR user2_email = $2)
+                AND room_id = $3
+            );
+        `;
+		const codeAttemptExistsResult = await pool.query(codeAttemptExistsQuery, [currUser, matchedUser, roomId]);
+
+        // Modify the entry in the database if code attempt exists
+		if (codeAttemptExistsResult.rowCount > 0) {
+            const updateQuery = `
+                UPDATE code_attempts
+                SET question_name = $1, question_difficulty = $2, question_category = $3, question_description = $4, code = $5, timestamp = $6
+                WHERE (
+                    (user1_email = $7 OR user2_email = $7)
+                    AND (user1_email = $8 OR user2_email = $8)
+                    AND room_id = $9
+                );
+            `;
+            await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, code, time_of_creation, currUser, matchedUser, roomId]);
+            res.json({ message: "Code attempt updated successfully into the database for storage.", data: req.body });
+		} else { // Else add the code attempt into the database as a new entry
+            const insertQuery = `
+                INSERT INTO code_attempts (user1_email, user2_email, room_id, question_name, question_difficulty, question_category, question_description, code, timestamp)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            `;
+            await pool.query(insertQuery, [currUser, matchedUser, roomId, questionName, questionDifficulty, questionCategory, questionDescription, code, time_of_creation]);
+            res.json({ message: "Code attempt inserted successfully into the database for storage." });
+        }
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err.message });
+	}
+});
+
 app.listen(port, () => {
 	console.log(`PostgreSQL server running on port ${port}`)
 	createMatchingChannel(); // Creates a connection to the Cloud AMQP server (RabbitMQ)
