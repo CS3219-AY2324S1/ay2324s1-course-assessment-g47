@@ -2,8 +2,6 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const amqp = require("amqplib");
-// const socketIO = require("./socket-io.js");
-const socketIO = require("socket.io-client")("http://collaboration-service");
 
 const { v4: uuidv4 } = require("uuid");
 const port = process.env.MATCHING_SERVICE_PORT || 8083;
@@ -158,20 +156,20 @@ const matchUsers = async () => {
 
 						console.log("roomID: ", roomId);
 						// Notify the matched users with the roomId
-						socketIO.io.to(socketId).emit("matched-successfully", {
-							roomId: roomId,
-							socketId: socketId,
-							difficultyLevel: difficultyLevel,
-							matchedUsername: matchingUser.email,
-						});
-						socketIO.io
-							.to(matchingUser.socketId)
-							.emit("matched-successfully", {
-								roomId: roomId,
-								socketId: matchingUser.socketId,
-								difficultyLevel: difficultyLevel,
-								matchedUsername: email,
-							});
+						// socketIO.io.to(socketId).emit("matched-successfully", {
+						// 	roomId: roomId,
+						// 	socketId: socketId,
+						// 	difficultyLevel: difficultyLevel,
+						// 	matchedUsername: matchingUser.email,
+						// });
+						// socketIO.io
+						// 	.to(matchingUser.socketId)
+						// 	.emit("matched-successfully", {
+						// 		roomId: roomId,
+						// 		socketId: matchingUser.socketId,
+						// 		difficultyLevel: difficultyLevel,
+						// 		matchedUsername: email,
+						// 	});
 						console.log("after socketio");
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
