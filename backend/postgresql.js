@@ -3,7 +3,6 @@ const express = require("express");
 const amqp = require("amqplib");
 const nodemailer = require("nodemailer");
 const authenticateToken = require("./middleware/authorization"); // Import the middleware
-const socketIO = require('./socket-io');
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -548,9 +547,10 @@ const matchUsers = async () => {
       					rooms[roomId] = [email, matchingUser.email]; // Store the matched users in the room
 
 						// Notify the matched users with the roomId
-						socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel, matchedUsername: matchingUser.email});
-						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel, matchedUsername: email});
+						//socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel, matchedUsername: matchingUser.email});
+						//socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel, matchedUsername: email});
 
+						
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
 					} else {
