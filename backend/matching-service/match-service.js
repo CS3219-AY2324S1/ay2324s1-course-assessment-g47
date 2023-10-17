@@ -170,7 +170,7 @@ const matchUsers = async () => {
 						// 		difficultyLevel: difficultyLevel,
 						// 		matchedUsername: email,
 						// 	});
-						console.log("after socketio");
+						// console.log("after socketio");
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
 					} else {
