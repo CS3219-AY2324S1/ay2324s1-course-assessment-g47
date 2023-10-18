@@ -8,7 +8,8 @@
       "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
       "frontend": "cd frontend && npm start",
       "backend": "cd backend && concurrently \"nodemon server.js\" \"nodemon postgresql.js\"",
-      "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+      "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+      "create-db": "cd backend && node init-database.js && node database.js"
     },
     "keywords": [],
     "author": "",
