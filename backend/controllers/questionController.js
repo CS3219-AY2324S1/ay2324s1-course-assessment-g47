@@ -108,9 +108,11 @@ const updateQuestion = async (req, res) => {
         return res.status(404).json({ error: 'No such question' })
     }
 
-    const question = await Question.findOneAndUpdate({ _id: id }, {
-        ...req.body // ... spread operator to get all the fields from the request body
-    })
+    const question = await Question.findOneAndUpdate(
+            { _id: id },
+            { ...req.body },
+            { new: true, runValidators: true }
+    )
 
     if (!question) {
         return res.status(400).json({ error: 'Question not found' })

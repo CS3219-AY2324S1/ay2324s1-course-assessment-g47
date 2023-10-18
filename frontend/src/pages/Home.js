@@ -45,7 +45,7 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 					</p>
 				</div>
 			</div>{" "}
-			(
+			
 			<div className="home">
 				<QuestionForm />
 				<div className="table-container">
@@ -86,7 +86,10 @@ const Home = ({ user, handleLogin, handleLogout }) => {
 					</table>
 				</div>
 				<div className="QuestionDetails">
-					<QuestionDetails selectedQuestion={selectedQuestion} />
+					<QuestionDetails 
+					selectedQuestion={selectedQuestion}
+					onUpdate={(questionId, updatedQuestion) => {
+						setSelectedQuestion(updatedQuestion);}}/>
 				</div>
 			</div>
 		</>
