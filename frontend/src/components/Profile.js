@@ -1,12 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LoginPage from "./Login";
 import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Manual parsing function to extract out the relevant information for question category
+function Parser(data, type) {
+	if (type === "category") {
+		const parsedData = data.replace(/[{"}]/g, '');
+		return parsedData.replace(/,/g, ", ");
+	} else {
+		const date = new Date(data);
+
+		// Extract date and time components
+		const year = date.getFullYear();
+		const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed, so we add 1
+		const day = date.getDate().toString().padStart(2, "0");
+		const hours = date.getHours().toString().padStart(2, "0");
+		const minutes = date.getMinutes().toString().padStart(2, "0");
+		const seconds = date.getSeconds().toString().padStart(2, "0");
+
+		// Create a formatted date and time string
+		const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+		return formattedDateTime;
+	}
+}
+
 function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	const postgresqlPort = 4001;
+	const [historyData, setHistoryData] = useState([]);
 	const [isEditingUserDetails, setIsEditingUserDetails] = useState(false);
 	const [isEditingPassword, setIsEditingPassword] = useState(false);
 	const [localUser, setLocalUser] = useState({
@@ -18,6 +41,45 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		newPassword: "",
 		repeatNewPassword: "",
 	});
+
+	const fetchUserHistory = async () => {
+		if (!user.user.email) {
+			console.log("Email cannot be empty");
+			return;
+		}
+		try {
+			const response = await fetch(
+				`http://localhost:${postgresqlPort}/users/user-history/${user.user.user_id}`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						'Authorization': `Bearer ${user.tokens.accessToken}`
+					},
+					body: JSON.stringify({
+						email: user.user.email,
+					}),
+				}
+			);
+			if (response.status === 200) {
+				// Successful update
+				const data = await response.json();
+				setHistoryData(data);
+				console.log("Fetched user's history successfully");
+			} else {
+				// Handle other error cases
+				console.log("Server error");
+			}
+		} catch (error) {
+			console.error("Error:", error);
+		}
+	};
+
+	useEffect(() => {
+		if (user) {
+			fetchUserHistory();
+		}
+	}, [user]);
 
 	// When user click on edit user details button
 	const handleEditUserDetailsClick = () => {
@@ -230,134 +292,71 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 					</p>
 				</div> */}
 			</div>{" "}
-			<div className="profile-container">
-				<p>
-					{user.user.account_type === "superadmin" ||
-					user.user.account_type === "admin" ? (
-						<Link
-							className="button-link-change-account"
-							to="/changetype"
-						>
-							Change Account Type
-						</Link>
-					) : null}
-				</p>
-				<h1 className="profile-label">Profile Settings</h1>
-				<div className="username-wrapper">
-					<label className="profile-label">Username:</label>
-					{isEditingUserDetails ? (
-						<input
-							className="profile-input"
-							type="text"
-							onChange={(e) => {
-								setLocalUser({
-									...localUser,
-									username: e.target.value,
-								});
-							}}
-							value={localUser.username}
-							name="username"
-						/>
-					) : (
-						<span className="profile-display">
-							{user.user.username}
-						</span>
-					)}
-				</div>
-				<div className="email-wrapper">
-					<label className="profile-label">Email:</label>
-					{isEditingUserDetails ? (
-						<input
-							className="profile-input"
-							type="email"
-							onChange={(e) => {
-								setLocalUser({
-									...localUser,
-									email: e.target.value,
-								});
-							}}
-							value={localUser.email}
-							name="email"
-						/>
-					) : (
-						<span className="profile-display">
-							{user.user.email}
-						</span>
-					)}
-				</div>
+			<div className="profile-history-wrapper">
+				<div className="profile-container">
+					<p>
+						{user.user.account_type === "superadmin" ||
+							user.user.account_type === "admin" ? (
+							<Link
+								className="button-link-change-account"
+								to="/changetype"
+							>
+								Change Account Type
+							</Link>
+						) : null}
+					</p>
+					<h1 className="profile-label">Profile Settings</h1>
+					<div className="username-wrapper">
+						<label className="profile-label">Username:</label>
+						{isEditingUserDetails ? (
+							<input
+								className="profile-input"
+								type="text"
+								onChange={(e) => {
+									setLocalUser({
+										...localUser,
+										username: e.target.value,
+									});
+								}}
+								value={localUser.username}
+								name="username"
+							/>
+						) : (
+							<span className="profile-display">
+								{user.user.username}
+							</span>
+						)}
+					</div>
+					<div className="email-wrapper">
+						<label className="profile-label">Email:</label>
+						{isEditingUserDetails ? (
+							<input
+								className="profile-input"
+								type="email"
+								onChange={(e) => {
+									setLocalUser({
+										...localUser,
+										email: e.target.value,
+									});
+								}}
+								value={localUser.email}
+								name="email"
+							/>
+						) : (
+							<span className="profile-display">
+								{user.user.email}
+							</span>
+						)}
+					</div>
 
-				<div className="buttons">
-					{isEditingUserDetails ? (
-						<div className="edit-user-button">
-							<button
-								className="profile-button"
-								onClick={(e) => handleSaveUserDetailsClick(e)}
-							>
-								Save User Details
-							</button>
-							<button
-								className="profile-button"
-								onClick={(e) => handleBackButtonClick(e)}
-							>
-								Back
-							</button>
-						</div>
-					) : isEditingPassword ? (
-						<>
-							<div className="password-wrapper">
-								<label className="profile-label">
-									Current Password:
-								</label>
-								<input
-									className="profile-input"
-									type="password"
-									value={passwordData.currentPassword}
-									onChange={(e) => {
-										setPasswordData({
-											...passwordData,
-											currentPassword: e.target.value,
-										});
-									}}
-								/>
-							</div>
-							<div className="password-wrapper">
-								<label className="profile-label">
-									New Password:
-								</label>
-								<input
-									className="profile-input"
-									type="password"
-									value={passwordData.newPassword}
-									onChange={(e) => {
-										setPasswordData({
-											...passwordData,
-											newPassword: e.target.value,
-										});
-									}}
-								/>
-							</div>
-							<div className="password-wrapper">
-								<label className="profile-label">
-									Repeat Password:
-								</label>
-								<input
-									className="profile-input"
-									type="password"
-									value={passwordData.repeatNewPassword}
-									onChange={(e) => {
-										setPasswordData({
-											...passwordData,
-											repeatNewPassword: e.target.value,
-										});
-									}}
-								/>
-							</div>
-							<div className="edit-password-button">
+					<div className="buttons">
+						{isEditingUserDetails ? (
+							<div className="edit-user-button">
 								<button
 									className="profile-button"
-									onClick={(e) => handleSavePasswordClick(e)}
+									onClick={(e) => handleSaveUserDetailsClick(e)}
 								>
-									Save Password
+									Save User Details
 								</button>
 								<button
 									className="profile-button"
@@ -366,31 +365,131 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 									Back
 								</button>
 							</div>
-						</>
+						) : isEditingPassword ? (
+							<>
+								<div className="password-wrapper">
+									<label className="profile-label">
+										Current Password:
+									</label>
+									<input
+										className="profile-input"
+										type="password"
+										value={passwordData.currentPassword}
+										onChange={(e) => {
+											setPasswordData({
+												...passwordData,
+												currentPassword: e.target.value,
+											});
+										}}
+									/>
+								</div>
+								<div className="password-wrapper">
+									<label className="profile-label">
+										New Password:
+									</label>
+									<input
+										className="profile-input"
+										type="password"
+										value={passwordData.newPassword}
+										onChange={(e) => {
+											setPasswordData({
+												...passwordData,
+												newPassword: e.target.value,
+											});
+										}}
+									/>
+								</div>
+								<div className="password-wrapper">
+									<label className="profile-label">
+										Repeat Password:
+									</label>
+									<input
+										className="profile-input"
+										type="password"
+										value={passwordData.repeatNewPassword}
+										onChange={(e) => {
+											setPasswordData({
+												...passwordData,
+												repeatNewPassword: e.target.value,
+											});
+										}}
+									/>
+								</div>
+								<div className="edit-password-button">
+									<button
+										className="profile-button"
+										onClick={(e) => handleSavePasswordClick(e)}
+									>
+										Save Password
+									</button>
+									<button
+										className="profile-button"
+										onClick={(e) => handleBackButtonClick(e)}
+									>
+										Back
+									</button>
+								</div>
+							</>
+						) : (
+							<div className="edit-profile-button">
+								<button
+									className="profile-button"
+									onClick={handleEditUserDetailsClick}
+								>
+									Edit User Details
+								</button>
+								<button
+									className="profile-button"
+									onClick={handleEditPasswordClick}
+								>
+									Edit Password
+								</button>
+								<button
+									className="profile-button"
+									onClick={handleDeleteClick}
+								>
+									Delete account
+								</button>
+							</div>
+						)}
+					</div>
+					<ToastContainer />
+				</div>
+				<div className="history-container">
+					<h2 className="profile-label">History</h2>
+					{historyData.length === 0 ? (
+						<p>No history found.</p>
 					) : (
-						<div className="edit-profile-button">
-							<button
-								className="profile-button"
-								onClick={handleEditUserDetailsClick}
-							>
-								Edit User Details
-							</button>
-							<button
-								className="profile-button"
-								onClick={handleEditPasswordClick}
-							>
-								Edit Password
-							</button>
-							<button
-								className="profile-button"
-								onClick={handleDeleteClick}
-							>
-								Delete account
-							</button>
-						</div>
+						<table className="history-table">
+							<thead>
+								<tr>
+									<th>Question Name</th>
+									<th>Question Difficulty</th>
+									<th>Question Category</th>
+									<th>Language</th>
+									<th>Users Involved</th>
+									<th>Date & Time</th>
+								</tr>
+							</thead>
+							<tbody>
+								{historyData.data.rows.map((historyItem, index) => (
+									<tr key={index}>
+										<td>{historyItem.question_name}</td>
+										<td>{historyItem.question_difficulty}</td>
+										<td>{Parser(historyItem.question_category, "category")}</td>
+										<td>{JSON.parse(historyItem.language).label}</td>
+										<td>
+										{historyItem.user1_email === user.user.email
+											? historyItem.user2_email
+											: historyItem.user1_email}
+										</td>
+										<td>{Parser(historyItem.timestamp, "time")}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
 					)}
 				</div>
-				<ToastContainer />
 			</div>
 		</>
 	) : (

@@ -449,6 +449,30 @@ app.post('/users/fetch/:id', authenticateToken(['user', 'superuser', 'admin', 's
 	}
 });
 
+app.post('/users/user-history/:id', authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
+	const user_email = req.body.email;
+	try {
+		const historyQuery = `
+			SELECT *
+			FROM code_attempts
+			WHERE (
+				user1_email = $1 OR user2_email = $1
+			);
+		`;
+		const result = await pool.query(historyQuery, [user_email]);
+		if (result.rows.length === 0) {
+			return res.status(200).json({ message: 'No history found.' });
+		} else {
+			return res
+				.status(200)
+				.json({ message: "Found User's History!", data: result });
+		}
+	} catch (err) {
+		console.error('Error:', error);
+		return res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
 // Establish a RabbitMQ connection if it is not already
 const createRabbitMQConnection = async () => {
 	try {
