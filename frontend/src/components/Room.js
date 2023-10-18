@@ -1,15 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import "./css/room.css";
-import { Link } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import Peer from "simple-peer";
 import io from "socket.io-client";
-import { ca } from "date-fns/locale";
-import { connect } from "mongoose";
-import { set } from "date-fns";
 import { codeLanguages } from "./constants";
-import { FaHome, FaVideo, FaVideoSlash, FaMicrophone, FaMicrophoneSlash, FaCheck } from 'react-icons/fa';
+import { FaCheck } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom'
 import DisplayRandomQuestion from "./DisplayRandomQuestion"
 
@@ -84,8 +80,6 @@ function Room({ user }) {
             } catch (error) {
                 console.error(`Error fetching random ${difficultyLevel} question:`, error);
             }
-
-
         }
     };
 
@@ -98,13 +92,13 @@ function Room({ user }) {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
         });
-
+          
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
         });
 
         const getFirstUserMediaWithStatus = async () => {
-            let numOfUsers = 0;
+            
             try {
 
                 socket.emit("join-room", { roomId: roomId }); // Automatically join the socket.io room
@@ -187,6 +181,25 @@ function Room({ user }) {
             setMe(id);
         });
 
+        socket.on("user-disconnected", (userId) => {
+            window.removeEventListener('unload', myBeforeUnloadListener);
+            setConnectedUsers((prevUsers) =>
+                prevUsers.filter((prevUserId) => prevUserId !== userId)
+            );
+            window.location.href = "/roomexit";
+        });
+
+        function myBeforeUnloadListener(event) {
+            const confirmationMessage = 'Are you sure you want to leave?';
+            event.returnValue = confirmationMessage;
+      
+            window.addEventListener('unload', () => {
+                socket.disconnect();
+            });
+        }
+    
+        window.addEventListener('unload', myBeforeUnloadListener);
+
         // Call the getUserMedia function only once when the component mounts
         getFirstUserMediaWithStatus();
 
@@ -207,36 +220,10 @@ function Room({ user }) {
         const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
         updateData(editorText, selectedLanguage, newQuestion);
     };
-    // const getOtherMediaWithStatus = async () => {
-    //     try {
-    //       const otherStream = await navigator.mediaDevices.getUserMedia({
-    //         video: otherCameraOn,
-    //         audio: otherMicOn,
-    //       });
-    //       setOtherStream(otherStream);
-    //       if (userVideo.current) {
-    //         console.log("otherStream:", otherStream);
-    //         userVideo.current.srcObject = otherStream;
-    //       }
-    //     } catch (err) {
-    //       const otherStream = null;
-    //       setOtherStream(otherStream);
-    //       userVideo.current.srcObject = otherStream;
-    //     }
-    // };
 
     socket.on("editor-changed", (text) => {
         if (editorText !== text) {
             setEditorText(text);
-        }
-    });
-
-    socket.on("user-disconnected", (userId) => {
-        // A user has disconnected from the room
-        console.log("User disconnected:", userId);
-        setConnectedUsers((prevUsers) => prevUsers.filter((id) => id !== userId));
-        if (connectionRef.current) {
-            connectionRef.current.destroy();
         }
     });
 
@@ -250,7 +237,9 @@ function Room({ user }) {
         // Disconnect from the room
         console.log("Leaving call");
         socket.emit("disconnected", { roomId: roomId });
+        socket.disconnect();
     };
+
 
     // wait for DOM to load before getting elements
     useEffect(() => {
@@ -298,6 +287,11 @@ function Room({ user }) {
         socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
     };
 
+    const handleExit = () => {
+        leaveCall();
+        window.location.href = "/";
+    };
+
     return (
         <div className="room-container">
             <div className="container">
@@ -330,22 +324,25 @@ function Room({ user }) {
                         </div>
                     </div>
                 </div>
-                <div className="middle-panel">
-                    <div className="question-container">
-                        <DisplayRandomQuestion
-                            user={user}
-                            randomQuestion={randomQuestion}
-                            handleRefreshQuestion={handleRefreshQuestion}
-                        />
-                    </div>
+            <div className="middle-panel">
+                <div className="question-container">
+                    <button className="exit-button" onClick={handleExit}>
+                        Exit
+                    </button>
+                    <DisplayRandomQuestion
+                        user={user}
+                        randomQuestion={randomQuestion}
+                        handleRefreshQuestion={handleRefreshQuestion}
+                    />
                 </div>
             </div>
-            <div className="bottom-container">
-                <main class="chat-main">
-                    <div class="chat-messages"></div>
-                </main>
-                <div class="chat-form-container">
-                    <form id="chat-form" class="chat-form">
+        </div>
+        <div className="bottom-container">
+            <main class="chat-main">
+                        <div class="chat-messages"></div>
+                    </main>
+                    <div class="chat-form-container">
+                        <form id="chat-form" class="chat-form">
                         <input
                             id="msg"
                             type="text"
@@ -362,15 +359,6 @@ function Room({ user }) {
 }
 
 export default Room;
-
-
-//TODO: Only allow 2 people to enter room. (Bug: a third user can copy and paste same link and join the room)
-//TODO: add toggle mic and camera button.
-//TODO: Queuing system require refresh to work.
-//TODO: Once disconnected, cannot reconnect.
-// Add "currently in queue" UI in home page, because user cant see if he/she is in queue or not (only can see in console for now)
-// extra: Add "waitting for other user to join" UI in room page 
-
 
 const customSelectStyles = {
     container: (provided) => ({

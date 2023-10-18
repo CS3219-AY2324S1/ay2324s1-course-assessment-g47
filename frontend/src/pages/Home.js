@@ -37,13 +37,14 @@ const Home = ({ user, handleLogin }) => {
 		<>
 			<div className="header"></div>{" "}
 			<div className="home">
+				<QuestionQueue user={user.user}/>
 				{user.user.account_type !== "user" ? (
 					<div>
 						
 						<QuestionForm />
 					</div>
 				) : null}
-				<QuestionQueue user={user.user}/>
+				
 				<div className="QuestionDetails">
 					<QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>
