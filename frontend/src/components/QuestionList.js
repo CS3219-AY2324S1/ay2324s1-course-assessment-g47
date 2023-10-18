@@ -116,17 +116,20 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				})}
 			</td>
 			<td onClick={handleUpvote}>
-				<button id="upvoteButton">
-				{upvoted ? (
-    				<i className="fas fa-arrow-down"></i>
-				) : (
-					<i className="fas fa-arrow-up"></i>
-				)}
-				{upvoted ? 'Unvote' : 'Upvote'}
-				</button>
-				<div class="mini-upvote-box">
-        			<span class="popularity">Popularity:{upvoteCount}</span>
-    			</div>
+				<div className="upvote-container">
+    				<button id="upvoteButton"
+						className={upvoted ? "unvote-button" : "upvote-button"}>
+						{upvoted ? (
+							<i className="fas fa-arrow-down"></i>
+						) : (
+							<i className="fas fa-arrow-up"></i>
+						)}
+						{upvoted ? 'Unvote' : 'Upvote'}
+    				</button>
+					<div className="mini-upvote-box">
+						<span className="popularity"> Upvotes: {upvoteCount}</span>
+					</div>
+  				</div>
 			</td>
 			{user.user.account_type !== "user" ? (
 				<td

@@ -1,15 +1,46 @@
 /* Define styles for the mini upvote box */
 .mini-upvote-box {
-    width: 200px; /* Adjust the width as needed */
-    height: 24px; /* Adjust the height as needed */
-    background-color: #3498db; /* Background color */
-    color: #fff; /* Text color */
-    border-radius: 5px; /* Create a circular shape */
-    text-align: center; /* Center the text horizontally */
-    line-height: 24px; /* Center the text vertically */
+    width: 200px; 
+    height: 24px; 
+    background-color: #3498db; 
+    color: #fff; 
+    border-radius: 5px; 
+    text-align: center; 
+    line-height: 24px; 
 }
 
 /* Define styles for the upvote count */
 .upvote-count {
-    font-size: 14px; /* Adjust the font size as needed */
+    font-size: 14px; 
+}
+
+/* Add this CSS to your stylesheet or in a style tag in your component */
+.upvote-container {
+    display: flex;
+    align-items: center;
+  }
+  
+/* Optional: Add some spacing between the button and the popularity count */
+button#upvoteButton {
+    margin-right: 10px; 
+}
+
+.upvote-button {
+    background-color: #56d356;
+  }
+  
+.unvote-button {
+    background-color: #f15858; 
+}
+  
+
+/* Ensure that the content remains readable on smaller screens */
+@media (max-width: 768px) {
+    .upvote-container {
+      flex-direction: column;
+      align-items: flex-start; 
+    }
+    .mini-upvote-box {
+      text-align: left; 
+    }
 }
