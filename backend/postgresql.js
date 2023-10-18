@@ -618,9 +618,12 @@ app.post('/exitqueue', async (req, res) => {
 
   // Edit the code attempt entry in the database
   app.post("/code-attempt-management/manage-code-attempt", async(req, res) => {
-    res.setHeader("Content-Type", "application/json");
+    // res.setHeader("Content-Type", "application/json");
+	console.log("HIIIIIIIIIIII");
 
     const { currUser, matchedUser, question, roomId, code } = req.body;
+
+	console.log("hereeeeee");
 
 	console.log("Current User: ", currUser);
 	console.log("Matched User: ", matchedUser);
@@ -628,6 +631,7 @@ app.post('/exitqueue', async (req, res) => {
 	console.log("Room ID: ", roomId);
     console.log("Code: ", code);
 
+	console.log("testingggg");
     const questionName = question.title;
     const questionDifficulty = question.complexity;
     const questionCategory = question.category;
@@ -660,14 +664,14 @@ app.post('/exitqueue', async (req, res) => {
                 );
             `;
             await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, code, time_of_creation, currUser, matchedUser, roomId]);
-            res.json({ message: "Code attempt updated successfully into the database for storage.", data: req.body });
+            return res.status(200).json({ message: "Code attempt updated successfully into the database for storage.", data: req.body });
 		} else { // Else add the code attempt into the database as a new entry
             const insertQuery = `
                 INSERT INTO code_attempts (user1_email, user2_email, room_id, question_name, question_difficulty, question_category, question_description, code, timestamp)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             `;
             await pool.query(insertQuery, [currUser, matchedUser, roomId, questionName, questionDifficulty, questionCategory, questionDescription, code, time_of_creation]);
-            res.json({ message: "Code attempt inserted successfully into the database for storage." });
+            return res.status(200).json({ message: "Code attempt inserted successfully into the database for storage." });
         }
 	} catch (err) {
 		console.error(err);
