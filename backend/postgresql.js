@@ -495,32 +495,32 @@ const enqueueUser = async (email, difficultyLevel, socketId) => {
 const dequeueUserByEmail = async (email) => {
 	console.log(`Removing user ${email} from the waiting queue...`);
 	try {
-	  const channel = await createMatchingChannel();
-  
-	  // Set up a consumer to check and remove the user by email
-	  channel.consume("user_queue", (message) => {
-		console.log('Checking for user in the waiting queue...');
-		if (message !== null) {
-		  const { messageEmail, difficultyLevel, socketId } = JSON.parse(message.content.toString());
-  
-		  if (messageEmail === email) {
-			// Dequeue the user by acknowledging the message
-			channel.ack(message);
-			console.log(`User ${email} has been dequeued from the waiting queue.`);
-		  }
-		}
-	  });
+		const channel = await createMatchingChannel();
+
+		// Set up a consumer to check and remove the user by email
+		channel.consume("user_queue", (message) => {
+			console.log('Checking for user in the waiting queue...');
+			if (message !== null) {
+				const { messageEmail, difficultyLevel, socketId } = JSON.parse(message.content.toString());
+
+				if (messageEmail === email) {
+					// Dequeue the user by acknowledging the message
+					channel.ack(message);
+					console.log(`User ${email} has been dequeued from the waiting queue.`);
+				}
+			}
+		});
 	} catch (error) {
-	  console.error('Failed to remove user by email due to an internal issue: ', error);
+		console.error('Failed to remove user by email due to an internal issue: ', error);
 	}
-  };
+};
 const rooms = {}; // Store rooms and their participants
 
 // Matching service to match users of the same difficulty, upon match add them into the matched queue as a pair and remove them from waiting queue
 const matchUsers = async () => {
 	try {
 		const channel = await createMatchingChannel();
-		
+
 		await channel.prefetch(1);
 
 		const difficultyMap = new Map();
@@ -545,11 +545,11 @@ const matchUsers = async () => {
 						console.log(`Matched user ${email} with user ${matchingUser.email} for difficulty level: ${difficultyLevel}`);
 
 						const roomId = uuidv4(); // Implement a function to generate a unique roomId
-      					rooms[roomId] = [email, matchingUser.email]; // Store the matched users in the room
+						rooms[roomId] = [email, matchingUser.email]; // Store the matched users in the room
 
 						// Notify the matched users with the roomId
-						socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel, matchedUsername: matchingUser.email});
-						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel, matchedUsername: email});
+						socketIO.io.to(socketId).emit("matched-successfully", { roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel, matchedUsername: matchingUser.email });
+						socketIO.io.to(matchingUser.socketId).emit("matched-successfully", { roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel, matchedUsername: email });
 
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
@@ -576,7 +576,7 @@ app.post('/matchmake', async (req, res) => {
 
 	console.log('Matchmake request received');
 	// Upon every matching request, user sends his/her 'email' and 'difficultyLevel' to the waiting queue
-	const { email, difficultyLevel, socketId } = req.body; 
+	const { email, difficultyLevel, socketId } = req.body;
 
 	try {
 		// Checks for missing email address or difficulty level of the question
@@ -598,84 +598,21 @@ app.post('/matchmake', async (req, res) => {
 app.post('/exitqueue', async (req, res) => {
 	console.log('Exit queue request received');
 	const { email, socketId } = req.body;
-  
+
 	try {
-	  // Checks for missing email or socketId
-	  if (!email || !socketId) {
-		return res.status(400).json({ error: 'Email and socketId are required fields.' });
-	  }
-  
-	  // Remove the user from the queue (you'll need to implement a function to do this)
-	  dequeueUserByEmail(email);
-  
-	  console.log(`User ${email} with socket ID (${socketId}) has exited the queue.`);
-	  return res.status(200).json({ message: 'User exited the queue successfully.' });
+		// Checks for missing email or socketId
+		if (!email || !socketId) {
+			return res.status(400).json({ error: 'Email and socketId are required fields.' });
+		}
+
+		// Remove the user from the queue (you'll need to implement a function to do this)
+		dequeueUserByEmail(email);
+
+		console.log(`User ${email} with socket ID (${socketId}) has exited the queue.`);
+		return res.status(200).json({ message: 'User exited the queue successfully.' });
 	} catch (error) {
-	  console.error('Error exiting the queue:', error);
-	  return res.status(500).json({ error: 'Internal server error' });
-	}
-  });
-
-  // Edit the code attempt entry in the database
-  app.post("/code-attempt-management/manage-code-attempt", async(req, res) => {
-    // res.setHeader("Content-Type", "application/json");
-	console.log("HIIIIIIIIIIII");
-
-    const { currUser, matchedUser, question, roomId, code } = req.body;
-
-	console.log("hereeeeee");
-
-	console.log("Current User: ", currUser);
-	console.log("Matched User: ", matchedUser);
-	console.log("Question: ", question);
-	console.log("Room ID: ", roomId);
-    console.log("Code: ", code);
-
-	console.log("testingggg");
-    const questionName = question.title;
-    const questionDifficulty = question.complexity;
-    const questionCategory = question.category;
-    const time_of_creation = question.updatedAt;
-    const questionDescription = question.description;
-	console.log("LMAOOOOOOOO");
-
-	try {
-		// Check if the code attempt exists in the database already
-		const codeAttemptExistsQuery = `
-            SELECT *
-            FROM code_attempts
-            WHERE (
-                (user1_email = $1 OR user2_email = $1)
-                AND (user1_email = $2 OR user2_email = $2)
-                AND room_id = $3
-            );
-        `;
-		const codeAttemptExistsResult = await pool.query(codeAttemptExistsQuery, [currUser, matchedUser, roomId]);
-
-        // Modify the entry in the database if code attempt exists
-		if (codeAttemptExistsResult.rowCount > 0) {
-            const updateQuery = `
-                UPDATE code_attempts
-                SET question_name = $1, question_difficulty = $2, question_category = $3, question_description = $4, code = $5, timestamp = $6
-                WHERE (
-                    (user1_email = $7 OR user2_email = $7)
-                    AND (user1_email = $8 OR user2_email = $8)
-                    AND room_id = $9
-                );
-            `;
-            await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, code, time_of_creation, currUser, matchedUser, roomId]);
-            return res.status(200).json({ message: "Code attempt updated successfully into the database for storage.", data: req.body });
-		} else { // Else add the code attempt into the database as a new entry
-            const insertQuery = `
-                INSERT INTO code_attempts (user1_email, user2_email, room_id, question_name, question_difficulty, question_category, question_description, code, timestamp)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `;
-            await pool.query(insertQuery, [currUser, matchedUser, roomId, questionName, questionDifficulty, questionCategory, questionDescription, code, time_of_creation]);
-            return res.status(200).json({ message: "Code attempt inserted successfully into the database for storage." });
-        }
-	} catch (err) {
-		console.error(err);
-		return res.status(500).json({ message: err.message });
+		console.error('Error exiting the queue:', error);
+		return res.status(500).json({ error: 'Internal server error' });
 	}
 });
 

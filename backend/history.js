@@ -1,11 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-//const axios = require("axios"); // Import Axios
 const pool = require("./database");
 const historyPort = process.env.HISTORYPORT;
-const postgresqlPort = process.env.POSTGRESQLPORT;
-const http = require("http");
 
 const appForHistory = express();
 
@@ -13,96 +10,59 @@ const appForHistory = express();
 appForHistory.use(express.json());
 appForHistory.use(cors());
 
+// Edit the code attempt entry in the database
 appForHistory.post("/history/manage-code-attempt", async (req, res) => {
     res.setHeader("Content-Type", "application/json");
 
-    const { currUsername, matchedUsername, randomQuestion, roomId, codeText } = req.body;
+    const { currUsername, matchedUsername, question, roomId, codeText, language } = req.body;
 
-    console.log("Current User: ", currUsername);
-    console.log("Matched User: ", matchedUsername);
-    console.log("Question: ", randomQuestion);
-    console.log("Room ID: ", roomId);
-    console.log("Code: ", codeText);
+    // Extract out relevant information about the question
+    const questionName = question.title;
+    const questionDifficulty = question.complexity;
+    const questionCategory = question.category;
+    const time_of_creation = question.updatedAt;
+    const questionDescription = question.description;
 
-    // try {
-    //     const postData = JSON.stringify(req.body);
+	try {
+		// Check if the code attempt exists in the database already
+		const codeAttemptExistsQuery = `
+            SELECT *
+            FROM code_attempts
+            WHERE (
+                (user1_email = $1 OR user2_email = $1)
+                AND (user1_email = $2 OR user2_email = $2)
+                AND room_id = $3
+            );
+        `;
+		const codeAttemptExistsResult = await pool.query(codeAttemptExistsQuery, [currUsername, matchedUsername, roomId]);
 
-    //     // Use Axios to send the POST request
-    //     const axiosOptions = {
-    //         baseURL: `http://localhost:${postgresqlPort}`, // Adjust the base URL
-    //         url: "/code-attempt-management/manage-code-attempt",
-    //         method: "POST",
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //         },
-    //         data: postData,
-    //     };
-
-    //     const response = await axios(axiosOptions);
-
-    //     if (response.status === 200) {
-    //         // Successful update of Code Attempt History
-    //         const data = response.data;
-    //         console.log(data);
-    //         console.log(`Updated the code attempt in the database for ${randomQuestion.title} for ${currUsername} and ${matchedUsername}.`);
-    //         res.status(200).json(data); // Send a JSON response to the frontend
-    //     } else {
-    //         // Handle other error cases
-    //         console.error("Server error");
-    //         res.status(response.status).json({ message: "Server error" }); // Send an error response
-    //     }
-    // } catch (err) {
-    //     console.error(err);
-    //     res.status(500).json({ message: err.message }); // Send an error response
-    // }
-    try {
-        const postData = JSON.stringify(req.body);
-
-        const options = {
-            hostname: "localhost",
-            port: postgresqlPort, // Replace with the port of your PostgreSQlocalL service
-            path: "/code-attempt-management/manage-code-attempt",
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Content-Length": Buffer.byteLength(postData),
-            },
-        };
-
-        const request = http.request(options, (response) => {
-            let responseData = "";
-
-            response.on("data", (chunk) => {
-                responseData += chunk;
-            });
-
-            response.on("end", () => {
-                if (response.statusCode === 200) {
-                    // Successful update of Code Attempt History
-                    const data = JSON.parse(responseData);
-                    console.log(data);
-                    console.log(`Updated the code attempt in the database for ${randomQuestion.title} for ${currUsername} and ${matchedUsername}.`);
-                    res.status(200).json(data); // Send a JSON response to the frontend
-                } else {
-                    // Handle other error cases
-                    console.log("Server error");
-                    res.status(response.statusCode).json({ message: "Server error" }); // Send an error response
-                }
-            });
-        });
-
-        request.on("error", (error) => {
-            console.error(error);
-            res.status(500).json({ message: error.message }); // Send an error response
-        });
-
-        request.write(postData);
-        request.end();
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: err.message }); // Send an error response
-    }
+        // Modify the entry in the database if code attempt exists
+		if (codeAttemptExistsResult.rowCount > 0) {
+            const updateQuery = `
+                UPDATE code_attempts
+                SET question_name = $1, question_difficulty = $2, question_category = $3, question_description = $4, code = $5, timestamp = $6, language = $10
+                WHERE (
+                    (user1_email = $7 OR user2_email = $7)
+                    AND (user1_email = $8 OR user2_email = $8)
+                    AND room_id = $9
+                );
+            `;
+            await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, currUsername, matchedUsername, roomId, language]);
+            return res.status(200).json({ message: "Code attempt updated successfully into the database for storage.", data: req.body });
+		} else { // Else add the code attempt into the database as a new entry
+            const insertQuery = `
+                INSERT INTO code_attempts (user1_email, user2_email, room_id, question_name, question_difficulty, question_category, question_description, code, timestamp, language)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            `;
+            await pool.query(insertQuery, [currUsername, matchedUsername, roomId, questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, language]);
+            return res.status(200).json({ message: "Code attempt inserted successfully into the database for storage." });
+        }
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: err.message });
+	}
 });
+
 // For History Service
 appForHistory.listen(historyPort, () => {
     console.log(`History service running on port ${historyPort}`);

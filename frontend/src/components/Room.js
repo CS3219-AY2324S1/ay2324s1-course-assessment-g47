@@ -31,7 +31,7 @@ function Room({ user }) {
         codeLanguages.find((language) => language.value === "python")
     );
 
-    const { roomId } = useParams();
+    const { roomId } = useParams(); // Stores the Room ID
     const [me, setMe] = useState("");
     const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
     const [callerSignal, setCallerSignal] = useState();
@@ -39,6 +39,34 @@ function Room({ user }) {
     const [editorText, setEditorText] = useState(""); // Stores the code
     const [peer, setPeer] = useState(null);
     const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
+
+    const updateData = async (codeText, language, question) => {
+        try {
+            const response = await fetch(
+				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ currUsername, matchedUsername, question, roomId, codeText, language }),
+				}
+			);
+
+			if (response.status === 200) {
+				// Successful update of Code Attempt History
+				const data = await response.json();
+                console.log(data);
+				console.log(`Saved the progress for ${question.title} for ${currUsername} and ${matchedUsername}.`);
+			} else {
+				// Handle Unexpected Errors caused from the Server
+				console.log("Server error");
+			}
+
+        } catch (err) {
+            console.error("Unexpected error occurred while updating data:", err);
+        }
+    };
 
     const fetchRandomEasyQuestion = async () => {
         if (user) {
@@ -51,6 +79,7 @@ function Room({ user }) {
                 if (response.ok) {
                     setRandomQuestion(json);
                     socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json });
+                    return json; // Return the fetched question
                 }
             } catch (error) {
                 console.error(`Error fetching random ${difficultyLevel} question:`, error);
@@ -73,15 +102,6 @@ function Room({ user }) {
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
         });
-
-        // Sends the matched users' info to backend (TO BE REMOVED)
-        // const emitUserInfo = () => {
-        //     socket.emit("set-user-info", {
-        //         userName: currUsername, 
-        //         matchedName: matchedUsername,
-        //         roomId: roomId,
-        //     });
-        // };
 
         const getFirstUserMediaWithStatus = async () => {
             let numOfUsers = 0;
@@ -122,8 +142,6 @@ function Room({ user }) {
 
                     connectionRef.current = peer;
 
-                    // Call the function to send both users' info to backend once they are connected (TO BE REMOVED)
-                    // emitUserInfo();
                 });
 
                 socket.on("signal-received", (data) => {
@@ -184,9 +202,10 @@ function Room({ user }) {
         };
     }, []);
 
-    const handleRefreshQuestion = () => {
+    const handleRefreshQuestion = async () => {
         // Call fetchRandomEasyQuestion when "Change Question" button is clicked
-        fetchRandomEasyQuestion();
+        const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
+        updateData(editorText, selectedLanguage, newQuestion);
     };
     // const getOtherMediaWithStatus = async () => {
     //     try {
@@ -209,56 +228,8 @@ function Room({ user }) {
     socket.on("editor-changed", (text) => {
         if (editorText !== text) {
             setEditorText(text);
-            if (randomQuestion !== null) {
-                updateData(text);
-            }
         }
     });
-
-    const updateData = async (codeText) => {
-        try {
-            const code = codeText;
-            const currUser = currUsername;
-            const matchedUser = matchedUsername;
-            const question_difficulty = randomQuestion.complexity;
-            const question_name = randomQuestion.title;
-            const time_of_creation = randomQuestion.updatedAt;
-            const question_category = randomQuestion.category;
-            const question_description = randomQuestion.description;
-            console.log("User 1: ", currUser);
-            console.log("User 2: ", matchedUser);
-            console.log("Question Name: ", question_name);
-            console.log("Question Difficulty: ", question_difficulty);
-            console.log("Question Category: ", question_category);
-            console.log("Time of Creation: ", time_of_creation);
-            console.log("Question Description: ", question_description);
-            console.log("Code: ", code);
-            console.log("RoomId: ", roomId);
-            const response = await fetch(
-				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ currUsername, matchedUsername, randomQuestion, roomId, codeText }),
-				}
-			);
-
-			if (response.status === 200) {
-				// Successful update of Code Attempt History
-				const data = await response.json();
-                console.log(data);
-				console.log(`Saved the progress for ${randomQuestion.title} for ${currUsername} and ${matchedUsername}.`);
-			} else {
-				// Handle other error cases
-				console.log("Server error");
-			}
-
-        } catch (err) {
-            console.error("Unexpected error occurred while updating data:", err);
-        }
-    };
 
     socket.on("user-disconnected", (userId) => {
         // A user has disconnected from the room
@@ -271,6 +242,7 @@ function Room({ user }) {
 
     const handleEditorChange = (newValue) => {
         setEditorText(newValue);
+        updateData(newValue, selectedLanguage, randomQuestion);
         socket.emit("editor-change", { text: newValue, roomId: roomId });
     };
 
@@ -322,6 +294,7 @@ function Room({ user }) {
     const handleLanguageChange = (selectedOption) => {
         console.log(`Option selected:`, selectedOption);
         setSelectedLanguage(selectedOption);
+        updateData(editorText, selectedOption, randomQuestion);
         socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
     };
 
