@@ -124,10 +124,10 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 						) : (
 							<i className="fas fa-arrow-up"></i>
 						)}
-						{upvoted ? 'Unvote' : 'Upvote'}
+						{upvoted ? ' Unvote' : ' Upvote'}
     				</button>
 					<div className="mini-upvote-box">
-						<span className="popularity"> Upvotes: {upvoteCount}</span>
+						<span className="popularity">Upvotes: {upvoteCount}</span>
 					</div>
   				</div>
 			</td>

@@ -32,7 +32,7 @@ button#upvoteButton {
 .unvote-button {
     background-color: #f15858; 
 }
-  
+
 
 /* Ensure that the content remains readable on smaller screens */
 @media (max-width: 768px) {
