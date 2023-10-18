@@ -2,7 +2,9 @@ require("dotenv").config(); // Load environment variables from .env file
 
 const express = require("express")
 const http = require("http")
+const amqp = require("amqplib");
 const app = express()
+const { v4: uuidv4 } = require('uuid');
 
 const IO_PORT = 4002
 
@@ -13,6 +15,8 @@ const io = require("socket.io")(server, {
     methods: ["GET", "POST"]
   }
 })
+
+
 
 
 io.on("connection", (socket) => {
@@ -103,8 +107,37 @@ io.on("connection", (socket) => {
 
 })
 
-server.listen(IO_PORT, () => console.log(`socket-io is running on port ${IO_PORT}`))
+const consumeFromQueue = async () => {
+  try {
+      const queueName = 'matched_pairs'
+      const connection = await amqp.connect(process.env.AMQP_URL);
+      const channel = await connection.createChannel();
+      await channel.assertQueue(queueName, {durable: true});
+      console.log('Connected to RabbitMQ through socket-io.js');
+      console.log(`Waiting for messages in ${queueName}`);
 
-module.exports = {
-  io,
-};
+      channel.consume(queueName,(message) => {
+              if (message !== null) {
+                  const roomId = uuidv4(); // Implement a function to generate a unique roomId
+                  const data = JSON.parse(message.content.toString()); // Convert the message content back to JSON
+                  // Emit the signal to the clients
+                  console.log('Message received from matched_pair queue in socket-io.js: ', data);
+
+                  io.to(data.Player1.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player1.socketId, difficultyLevel: data.Player1.difficultyLevel, matchedUsername: data.Player2.email});
+                  io.to(data.Player2.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player2.socketId, difficultyLevel: data.Player2.difficultyLevel, matchedUsername: data.Player1.email});
+
+                  channel.ack(message);
+              } else {
+                console.log('Listening but there was no message, socket-io.js')
+              }
+          })
+  } catch (error) {
+      console.error('Error consuming message from queue: ', error);
+  }
+}
+
+server.listen(IO_PORT, () => {
+  console.log(`socket-io is running on port ${IO_PORT}`)
+  consumeFromQueue();
+})
+

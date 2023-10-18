@@ -263,7 +263,7 @@ const QuestionForm = () => {
 			/>
 			<label>Description:</label>
 			<div
-				className={`editor-container ${
+				className={`description-container ${
 					emptyFields.includes("description") ? "error" : ""
 				}`}
 				ref={wrapperRef}
