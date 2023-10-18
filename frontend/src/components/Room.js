@@ -157,19 +157,9 @@ function Room({ user }) {
             setConnectedUsers((prevUsers) =>
                 prevUsers.filter((prevUserId) => prevUserId !== userId)
             );
+            socket.disconnect();
             window.location.href = "/roomexit";
         });
-
-        function myBeforeUnloadListener(event) {
-            const confirmationMessage = 'Are you sure you want to leave?';
-            event.returnValue = confirmationMessage;
-      
-            window.addEventListener('unload', () => {
-                socket.disconnect();
-            });
-        }
-    
-        window.addEventListener('unload', myBeforeUnloadListener);
 
         // Call the getUserMedia function only once when the component mounts
         getFirstUserMediaWithStatus();
