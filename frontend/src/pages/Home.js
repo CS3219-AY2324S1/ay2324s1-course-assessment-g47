@@ -58,6 +58,7 @@ const Home = ({ user, handleLogin }) => {
 							<th>Complexity</th>
 							<th>Category</th>
 							<th>Created</th>
+							<th>Upvote Action</th>
 							{user.account_type !== "user" ? (
 								<th>Action</th>
 							) : null}
