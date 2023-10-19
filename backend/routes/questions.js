@@ -36,6 +36,10 @@ router.delete('/:id',authenticateToken(['superuser', 'admin', 'superadmin']), de
 // Only superuser, admin and superadmin can access this route
 router.patch('/:id',authenticateToken(['superuser', 'admin', 'superadmin']), updateQuestion)
 
+// UPDATE vote value of a question
+// All authenticated can access this route
+router.patch('/vote/:id',authenticateToken(['user','superuser', 'admin', 'superadmin']), updateQuestion)
+
 
 
 module.exports = router

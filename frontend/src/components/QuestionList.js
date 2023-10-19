@@ -51,7 +51,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				if (!question.upvotes.includes(user.user.email)) {
 					question.upvotes.push(user.user.email);
 					console.log(user.user.email);
-					const response = await fetch(`/api/questions/` + question._id, {
+					const response = await fetch(`/api/questions/vote/` + question._id, {
 						method: "PATCH",
 						headers: {
 							"Content-Type": "application/json",
@@ -76,7 +76,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				if (question.upvotes.includes(user.user.email)) {
 					question.upvotes = question.upvotes.filter((email) => email !== user.user.email);
 				
-					const response = await fetch(`/api/questions/` + question._id, {
+					const response = await fetch(`/api/questions/vote/` + question._id, {
 						method: "PATCH",
 						headers: {
 							"Content-Type": "application/json",
