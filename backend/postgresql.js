@@ -449,6 +449,27 @@ app.post('/users/fetch/:id', authenticateToken(['user', 'superuser', 'admin', 's
 	}
 });
 
+//Fetch user's email
+app.post('/users/fetch/:id/username', authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
+	const email = req.body.email;
+	try {
+		const query = `SELECT username FROM accounts WHERE email = '${email}'`;
+		const result = await pool.query(query);
+		if (result.rows.length === 1) {
+			res.json({
+				message: "User found",
+				user: result.rows[0],
+				tokens: req.body.tokens,
+			});
+		} else {
+			res.status(404).json({ error: 'Account not found' });
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
 app.post('/users/user-history/:id', authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
 	const user_email = req.body.email;
 	try {

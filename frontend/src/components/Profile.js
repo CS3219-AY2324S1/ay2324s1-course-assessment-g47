@@ -5,7 +5,36 @@ import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// Manual parsing function to extract out the relevant information for question category
+const postgresqlPort = 4001;
+
+// Function used to retrieve user's name based on email given
+async function fetchUserName(email, user) {
+	try {
+		const response = await fetch(
+			`http://localhost:${postgresqlPort}/users/fetch/${user.user.user_id}/username`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					'Authorization': `Bearer ${user.tokens.accessToken}`
+				},
+				body: JSON.stringify({ email }),
+			}
+		);
+		if (response.ok) {
+			const result = await response.json();
+			return result.user.username; // Extract the username from the result
+		} else {
+			console.error('API request failed');
+			return "User not found"; // Return an appropriate default value
+		}
+	} catch (err) {
+		console.error("Error: ", err);
+		return "Error"; // Return an error message
+	}
+}
+
+// Manual parsing function to extract out the relevant information for category of question and date time of attempt
 function Parser(data, type) {
 	if (type === "category") {
 		const parsedData = data.replace(/[{"}]/g, '');
@@ -28,7 +57,6 @@ function Parser(data, type) {
 }
 
 function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
-	const postgresqlPort = 4001;
 	const [historyData, setHistoryData] = useState([]);
 	const [isEditingUserDetails, setIsEditingUserDetails] = useState(false);
 	const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -41,6 +69,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		newPassword: "",
 		repeatNewPassword: "",
 	});
+	const [userNames, setUserNames] = useState({}); // Store user names
 
 	const fetchUserHistory = async () => {
 		if (!user.user.email) {
@@ -66,6 +95,18 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 				const data = await response.json();
 				setHistoryData(data);
 				console.log("Fetched user's history successfully");
+
+				const userNamesData = {};
+				for (const historyItem of data.data.rows) {
+					const userEmail = historyItem.user1_email === user.user.email
+						? historyItem.user2_email
+						: historyItem.user1_email;
+
+					// Fetch the user name and store it in the state
+					const userName = await fetchUserName(userEmail, user);
+					userNamesData[userEmail] = userName;
+				}
+				setUserNames(userNamesData);
 			} else {
 				// Handle other error cases
 				console.log("Server error");
@@ -457,8 +498,8 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 				</div>
 				<div className="history-container">
 					<h2 className="profile-label">History</h2>
-					{historyData.length === 0 ? (
-						<p>No history found.</p>
+					{!historyData.data || !historyData.data.rows ? (
+						<p>No history found. Start a new PeerPrep Session today!</p>
 					) : (
 						<table className="history-table">
 							<thead>
@@ -479,9 +520,9 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 										<td>{Parser(historyItem.question_category, "category")}</td>
 										<td>{JSON.parse(historyItem.language).label}</td>
 										<td>
-										{historyItem.user1_email === user.user.email
-											? historyItem.user2_email
-											: historyItem.user1_email}
+											{userNames[historyItem.user1_email === user.user.email
+												? historyItem.user2_email
+												: historyItem.user1_email] || 'Loading...'}
 										</td>
 										<td>{Parser(historyItem.timestamp, "time")}</td>
 									</tr>
