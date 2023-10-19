@@ -1,36 +1,74 @@
 /* Define styles for the mini upvote box */
 .mini-upvote-box {
-    width: 200px; 
-    height: 24px; 
-    background-color: #3498db; 
-    color: #fff; 
-    border-radius: 5px; 
-    text-align: center; 
-    line-height: 24px; 
+  display: grid;
+  grid-template-columns: auto 1fr;
+  background-color: #3498db;
+  color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 24px;
+  padding: 0 10px;
 }
 
 /* Define styles for the upvote count */
 .upvote-count {
-    font-size: 14px; 
+    font-size: 14px;
 }
 
-/* Add this CSS to your stylesheet or in a style tag in your component */
+/* Container for the upvote button */
 .upvote-container {
-    display: flex;
-    align-items: center;
-  }
-  
-/* Optional: Add some spacing between the button and the popularity count */
-button#upvoteButton {
-    margin-right: 10px; 
+  display: flex;
+  align-items: center;
+}
+
+/* Upvote and downvote buttons */
+.unvote-button {
+  background-color: #ff4500; /* Reddit orange color */
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.unvote-button:hover {
+  background-color: #ff5700; /* Slightly darker orange on hover */
+}
+
+.unvote-button i {
+  font-size: 18px;
+  margin-bottom: 4px;
 }
 
 .upvote-button {
-    background-color: #56d356;
-  }
-  
-.unvote-button {
-    background-color: #f15858; 
+  background-color: #b1bec5; /* Reddit orange color */
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.upvote-button:hover {
+  background-color: #bec1c3; /* Slightly darker orange on hover */
+}
+
+.upvote-button i {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+/* Text label for upvote button */
+.upvote-label {
+  font-size: 12px;
 }
 
 

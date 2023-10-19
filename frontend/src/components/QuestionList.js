@@ -4,14 +4,12 @@ import "../App.css";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import "./css/QuestionList.css";
 import { useEffect, useState } from "react";
-import { set } from "date-fns";
-import { ca } from "date-fns/locale";
 
 const QuestionList = ({ id, question, onClick, onDelete }) => {
 	const { dispatch } = useQuestionsContext();
 	const { user } = useAuthContext();
-	const [upvoted, setUpvoted] = useState(false);
-  	const [upvoteCount, setUpvoteCount] = useState(question.upvotes.length);
+	let [upvoted, setUpvoted] = useState(false);
+  	let [upvoteCount, setUpvoteCount] = useState(question.upvotes.length);
 
 	useEffect(() => {
 		if (user) {
@@ -52,6 +50,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				console.log("upvoted");
 				if (!question.upvotes.includes(user.user.email)) {
 					question.upvotes.push(user.user.email);
+					console.log(user.user.email);
 					const response = await fetch(`/api/questions/` + question._id, {
 						method: "PATCH",
 						headers: {
@@ -119,12 +118,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				<div className="upvote-container">
     				<button id="upvoteButton"
 						className={upvoted ? "unvote-button" : "upvote-button"}>
-						{upvoted ? (
-							<i className="fas fa-arrow-down"></i>
-						) : (
 							<i className="fas fa-arrow-up"></i>
-						)}
-						{upvoted ? ' Unvote' : ' Upvote'}
     				</button>
 					<div className="mini-upvote-box">
 						<span className="popularity">Upvotes: {upvoteCount}</span>
