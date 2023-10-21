@@ -82,6 +82,7 @@ function QuestionQueue({ user }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          username: user.username,
           email: user.email, // Change this to the user's email
           difficultyLevel: selectedDifficulty,
           socketId: socketID, // Change this to the user's socket ID
