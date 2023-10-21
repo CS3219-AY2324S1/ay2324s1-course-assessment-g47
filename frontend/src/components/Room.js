@@ -6,7 +6,7 @@ import Peer from "simple-peer";
 import io from "socket.io-client";
 import { codeLanguages } from "./constants";
 import { FaCheck } from 'react-icons/fa';
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import DisplayRandomQuestion from "./DisplayRandomQuestion"
 
 import Select, { components } from "react-select";
@@ -44,25 +44,25 @@ function Room({ user }) {
     const updateData = async (codeText, language, question) => {
         try {
             const response = await fetch(
-				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ currUsername, matchedUsername, question, roomId, codeText, language }),
-				}
-			);
+                `http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ currUsername, matchedUsername, question, roomId, codeText, language }),
+                }
+            );
 
-			if (response.status === 200) {
-				// Successful update of Code Attempt History
-				const data = await response.json();
+            if (response.status === 200) {
+                // Successful update of Code Attempt History
+                const data = await response.json();
                 console.log(data);
-				console.log(`Saved the progress for ${question.title} for ${currUsername} and ${matchedUsername}.`);
-			} else {
-				// Handle Unexpected Errors caused from the Server
-				console.log("Server error");
-			}
+                console.log(`Saved the progress for ${question.title} for ${currUsername} and ${matchedUsername}.`);
+            } else {
+                // Handle Unexpected Errors caused from the Server
+                console.log("Server error");
+            }
 
         } catch (err) {
             console.error("Unexpected error occurred while updating data:", err);
@@ -79,7 +79,7 @@ function Room({ user }) {
 
                 if (response.ok) {
                     setRandomQuestion(json);
-                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user});
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user });
                 }
             } catch (error) {
                 console.error(`Error fetching random ${difficultyLevel} question:`, error);
@@ -97,7 +97,7 @@ function Room({ user }) {
                 console.log("TESTTTTT: ", json);
                 if (response.ok) {
                     setRandomQuestion(json);
-                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user});
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user });
                     //const roomName = roomId;
                     const msg = `${user.user.username} changed to question to ${json.title}`;
                     socket.emit('chatNotifcationMessage', { message: msg, roomId: roomId, senderInfo: user.user, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
@@ -124,15 +124,15 @@ function Room({ user }) {
             setRandomQuestion(question); // Set the question from the profile
             setEditorText(code); // Set the code from the profile
             setSelectedLanguage(language); // Set the language from the profile
-         } else {
+        } else {
             setIsFromProfile(false);
             fetchInitialRandomEasyQuestion();
-         }
+        }
         socket.on('updateRandomQuestion', (newRandomQuestion) => {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
         });
-          
+
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
         });
@@ -231,12 +231,12 @@ function Room({ user }) {
         function myBeforeUnloadListener(event) {
             const confirmationMessage = 'Are you sure you want to leave?';
             event.returnValue = confirmationMessage;
-      
+
             window.addEventListener('unload', () => {
                 socket.disconnect();
             });
         }
-    
+
         window.addEventListener('unload', myBeforeUnloadListener);
 
         // Call the getUserMedia function only once when the component mounts
@@ -367,35 +367,33 @@ function Room({ user }) {
     };
 
     return (
-        <div className="room-container">
-            <div className="container">
-                <div className="right-panel">
-                    <div className="editor-container">
-                        <div className="editor">
-                            <Editor
-                                height="100vh"
-                                width="100%"
-                                theme="vs-dark"
-                                language={selectedLanguage.value}
-                                value={editorText}
-                                onChange={handleEditorChange}
-                            />
-                        </div>
-                        <div className="language-dropdown">
-                            <label>Select Language:</label>
-                            <Select
-                                value={selectedLanguage}
-                                onChange={handleLanguageChange}
-                                options={codeLanguages}
-                                isSearchable={true}
-                                placeholder="Search for a language..."
-                                className="select-language"
-                                styles={customSelectStyles}
-                                components={{
-                                    Option: CustomSelectOption, // Use the custom component to render options
-                                }}
-                            />
-                        </div>
+        <div className="container">
+            <div className="right-panel">
+                <div className="editor-container">
+                    <div className="editor">
+                        <Editor
+                            height="100%"
+                            width="100%"
+                            theme="vs-dark"
+                            language={selectedLanguage.value}
+                            value={editorText}
+                            onChange={handleEditorChange}
+                        />
+                    </div>
+                    <div className="language-dropdown">
+                        <label>Select Language:</label>
+                        <Select
+                            value={selectedLanguage}
+                            onChange={handleLanguageChange}
+                            options={codeLanguages}
+                            isSearchable={true}
+                            placeholder="Search for a language..."
+                            className="select-language"
+                            styles={customSelectStyles}
+                            components={{
+                                Option: CustomSelectOption, // Use the custom component to render options
+                            }}
+                        />
                     </div>
                 </div>
             </div>
@@ -413,13 +411,13 @@ function Room({ user }) {
             </div>
             <div className="left-panel">
                 <div>
-                <p className="room-id">In a chat with: {matchedUsername}</p>
+                    <p className="room-id">In a chat with: {matchedUsername}</p>
                 </div>
-            <main class="chat-main">
-                        <div class="chat-messages"></div>
-                    </main>
-                    <div class="chat-form-container">
-                        <form id="chat-form" class="chat-form">
+                <main class="chat-main">
+                    <div class="chat-messages"></div>
+                </main>
+                <div class="chat-form-container">
+                    <form id="chat-form" class="chat-form">
                         <input
                             id="msg"
                             type="text"
@@ -428,10 +426,10 @@ function Room({ user }) {
                             autocomplete="off"
                         />
                         <button class="btn"><i class="fas fa-paper-plane"></i></button>
-                        </form>
-                    </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        </div >
     );
 }
 
