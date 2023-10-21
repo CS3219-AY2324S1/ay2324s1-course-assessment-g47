@@ -35,11 +35,12 @@ io.on("connection", (socket) => {
   socket.on("join-room", (data) => {
     const roomName = data.roomId; // Replace with your desired room name
     socket.join(roomName);
-    console.log(`User ${socket.id} joined room ${roomName}`);
+    console.log(`User ${data.user.username} joined room ${roomName}`);
 
     // Notify other users in the room that a new user has connected
     socket.to(roomName).emit("user-connected", socket.id);
-
+    //io.to(data.roomId).emit("chatNotifcationMessage", { message: `${data.user.username} joined the room`, roomId: data.roomId});
+    socket.broadcast.to(roomName).emit("messageNotification", { message: `User ${data.user.username} joined room ${roomName}`, senderInfo: data.user, time: new Date().toLocaleTimeString([], { }) });
     // Send the user their own ID
     socket.emit("me", socket.id);
   });
@@ -77,6 +78,10 @@ io.on("connection", (socket) => {
   socket.on('newRandomQuestion', (data) => {
     // Emit the updated random question to the room
     socket.to(data.roomId).emit('updateRandomQuestion', data.randomQuestion);
+    console.log('Question changed by', data.user.username);
+    //socket.to(data.roomId).emit("messageNotification", { message: `${data.user.username} changed to question to ${data.randomQuestion.title}`, senderInfo: data.user, time: new Date().toLocaleTimeString([], { }) });
+    
+    
   });
 
   // Handle user disconnection
@@ -99,10 +104,17 @@ io.on("connection", (socket) => {
   });
   
   // Listen for chat messages
-  socket.on("chatMessage", (msg, roomId, username, time) => {
+  socket.on("chatMessage", (msg, roomId, senderInfo, time) => {
     console.log("Received chat message: " + msg);
     // Send the message to all users in the room
-    io.to(roomId).emit("message", { message: msg, username: username, time: time });
+    io.to(roomId).emit("message", { message: msg, senderInfo: senderInfo, time: time });
+  });
+
+  socket.on("chatNotifcationMessage", (data) => {
+    console.log("Received chat notification: " + data.message + "to:" + data.roomId + "from:" + data.senderInfo.username + "at:" + data.time);
+    // Send the message to all users in the room
+    io.to(data.roomId).emit("messageNotification", { message: data.message, senderInfo: data.senderInfo, time:data.time});
+    //io.to(roomId).emit("messageNotification", { message: msg });
   });
 
 })
@@ -123,8 +135,8 @@ const consumeFromQueue = async () => {
                   // Emit the signal to the clients
                   console.log('Message received from matched_pair queue in socket-io.js: ', data);
 
-                  io.to(data.Player1.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player1.socketId, difficultyLevel: data.Player1.difficultyLevel, matchedUsername: data.Player2.email});
-                  io.to(data.Player2.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player2.socketId, difficultyLevel: data.Player2.difficultyLevel, matchedUsername: data.Player1.email});
+                  io.to(data.Player1.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player1.socketId, difficultyLevel: data.Player1.difficultyLevel, matchedUsername: data.Player2.username});
+                  io.to(data.Player2.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player2.socketId, difficultyLevel: data.Player2.difficultyLevel, matchedUsername: data.Player1.username});
 
                   channel.ack(message);
               } else {

@@ -37,6 +37,24 @@ function Room({ user }) {
 
     const [randomQuestion, setRandomQuestion] = useState(null);
 
+    const fetchInitialRandomEasyQuestion = async () => {
+        if (user) {
+            try {
+                const response = await fetch(`/api/questions/random-${difficultyLevel}`, {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
+
+                if (response.ok) {
+                    setRandomQuestion(json);
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user});
+                }
+            } catch (error) {
+                console.error(`Error fetching random ${difficultyLevel} question:`, error);
+            }
+        }
+    };
+
     const fetchRandomEasyQuestion = async () => {
         if (user) {
             try {
@@ -47,7 +65,11 @@ function Room({ user }) {
 
                 if (response.ok) {
                     setRandomQuestion(json);
-                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json });
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user});
+                    //const roomName = roomId;
+                    const msg = `${user.user.username} changed to question to ${json.title}`;
+                    socket.emit('chatNotifcationMessage', { message: msg, roomId: roomId, senderInfo: user.user, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  
                 }
             } catch (error) {
                 console.error(`Error fetching random ${difficultyLevel} question:`, error);
@@ -59,7 +81,7 @@ function Room({ user }) {
 
     useEffect(() => {
 
-        fetchRandomEasyQuestion();
+        fetchInitialRandomEasyQuestion();
         socket.on('updateRandomQuestion', (newRandomQuestion) => {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
@@ -73,7 +95,7 @@ function Room({ user }) {
             
             try {
 
-                socket.emit("join-room", { roomId: roomId }); // Automatically join the socket.io room
+                socket.emit("join-room", { user: user.user, roomId: roomId }); // Automatically join the socket.io room
 
                 socket.on("user-connected", (userId) => {
                     // A new user has connected to the room
@@ -188,7 +210,9 @@ function Room({ user }) {
 
     const handleRefreshQuestion = () => {
         // Call fetchRandomEasyQuestion when "Change Question" button is clicked
+        
         fetchRandomEasyQuestion();
+        
     };
 
     socket.on("editor-changed", (text) => {
@@ -224,25 +248,50 @@ function Room({ user }) {
             const msg = e.target.elements.msg.value;
 
             // Emit message to server and the current time
-            socket.emit("chatMessage", msg, roomId, user.user.username, new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            socket.emit("chatMessage", msg, roomId, user.user, new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
             e.target.elements.msg.value = "";
         });
 
+        //Recieve message
         socket.on("message", (data) => {
             console.log("message:", data.message);
-            outputMessage(data);
+            const isUser = user.user.email === data.senderInfo.email;
+            outputMessage(data, isUser);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         });
 
-        // Output message to DOM
-        function outputMessage(data) {
+        socket.on("messageNotification", (data) => {
+            console.log("messageNotification:", data.message);
+            outputNotifcationMessage(data);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        function outputNotifcationMessage(data) {
             const div = document.createElement("div");
             div.classList.add("message");
+            div.classList.add("notification-message");
             div.innerHTML = `
                 <div class="message-content">
-                    <p class="meta">${data.time}</p>
-                    <p class="username">${data.username}:</p>
                     <p class="message-text">${data.message}</p>
+                </div>
+            `;
+            document.querySelector('.chat-messages').appendChild(div);
+        }
+
+        // Output message to DOM
+        function outputMessage(data, isUser) {
+            const div = document.createElement("div");
+            div.classList.add("message");
+            if (isUser) {
+                div.classList.add("user-message");
+            } else {
+                div.classList.add("received-message");
+            }
+            div.innerHTML = `
+                <div class="message-content">
+                    <p class="username">${data.senderInfo.username}</p>
+                    <p class="message-text">${data.message}</p>
+                    <p class="meta">${data.time}</p>
                 </div>
             `;
             document.querySelector('.chat-messages').appendChild(div);
@@ -253,6 +302,9 @@ function Room({ user }) {
         console.log(`Option selected:`, selectedOption);
         setSelectedLanguage(selectedOption);
         socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
+        const msg = `${user.user.username} changed the code edtior language to ${selectedOption.label}`
+        socket.emit('chatNotifcationMessage', { message: msg, roomId: roomId, senderInfo: user.user, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  
     };
 
     const handleExit = () => {
@@ -261,13 +313,12 @@ function Room({ user }) {
     };
 
     return (
-        <div className="room-container">
         <div className="container">
             <div className="right-panel">
                 <div className="editor-container">
                     <div className="editor">
                         <Editor
-                            height="100vh"
+                            height="100%"
                             width="100%"
                             theme="vs-dark"
                             language={selectedLanguage.value}
@@ -304,8 +355,10 @@ function Room({ user }) {
                     />
                 </div>
             </div>
-        </div>
-        <div className="bottom-container">
+            <div className="left-panel">
+                <div>
+                <p className="room-id">In a chat with: {matchedUsername}</p>
+                </div>
             <main class="chat-main">
                         <div class="chat-messages"></div>
                     </main>
@@ -321,7 +374,7 @@ function Room({ user }) {
                         <button class="btn"><i class="fas fa-paper-plane"></i></button>
                         </form>
                     </div>
-        </div>
+            </div>
         </div>
     );
 }
