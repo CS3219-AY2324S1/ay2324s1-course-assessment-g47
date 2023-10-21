@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"node server.js\" \"node postgresql.js\" \"node history.js\"",
-    "dev": "concurrently \"nodemon socket-io.js\" \"nodemon server.js\" \"nodemon postgresql.js\" \"nodemon history.js\""
+    "start": "concurrently \"node server.js\" \"node postgresql.js\" \"node history.js\" \"node matching-service.js\"",
+    "dev": "concurrently \"nodemon socket-io.js\" \"nodemon server.js\" \"nodemon postgresql.js\" \"nodemon history.js\" \"nodemon matching-service.js\""
   },
   "keywords": [],
   "author": "",

@@ -12,7 +12,7 @@ function QuestionQueue({ user }) {
   const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
   const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
 
-
+  const MATCHING_SERVICE_PORT = 4004;
   const navigate = useNavigate();
   const [socketID, setSocketID] = useState(null);
 
@@ -76,7 +76,7 @@ function QuestionQueue({ user }) {
 
     try {
       console.log(`SocketId: ${socketID}`);
-      const response = await fetch('http://localhost:4001/matchmake', {
+      const response = await fetch(`http://localhost:${MATCHING_SERVICE_PORT}/matchmake`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ function QuestionQueue({ user }) {
     setElapsedTime(0); // Reset elapsed time
 
     try {
-      const response = await fetch('http://localhost:4001/exitqueue', {
+      const response = await fetch(`http://localhost:${MATCHING_SERVICE_PORT}/exitqueue`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
