@@ -112,18 +112,11 @@ function Room({ user }) {
     const connectionRef = useRef();
 
     useEffect(() => {
-        console.log(location.search);
-        console.log(location.pathname);
-        console.log(location);
-        console.log(location.state);
-        console.log(question);
-        console.log("yes");
         if (source === 'profile' && question && code && language) {
-            console.log("yes2");
             setIsFromProfile(true);
             setRandomQuestion(question); // Set the question from the profile
             setEditorText(code); // Set the code from the profile
-            setSelectedLanguage(language); // Set the language from the profile
+            setSelectedLanguage(language);  // Set the language from the profile
         } else {
             setIsFromProfile(false);
             fetchInitialRandomEasyQuestion();

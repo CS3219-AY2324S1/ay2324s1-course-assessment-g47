@@ -39,6 +39,15 @@ function Parser(data, type) {
 	if (type === "category") {
 		const parsedData = data.replace(/[{"}]/g, '');
 		return parsedData.replace(/,/g, ", ");
+	} else if (type === "category2") { // Used to format the categories into appropriate ones for parsing into the Room component for past code review
+		// Define a regular expression to match the elements inside the curly braces
+		const regex = /"([^"]+)"/g;
+		const result = [];
+		let match;
+		while ((match = regex.exec(data)) !== null) {
+			result.push(match[1]);
+		}
+		return result;
 	} else {
 		const date = new Date(data);
 
@@ -71,13 +80,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	});
 	const [userNames, setUserNames] = useState({}); // Store user names
 
-	const location = useLocation();
-
-	console.log('Location State in Profile:', location.state);
-	console.log('Source:', location.state?.source);
-	console.log('Question:', location.state?.question);
-	console.log('Code:', location.state?.code);
-	console.log('Language:', location.state?.language);
+	let location = useLocation();
 
 	const fetchUserHistory = async () => {
 		if (!user.user.email) {
@@ -527,21 +530,19 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 									<tr key={index} className="history-row">
 										<td>
 											<Link
-												to={{
-													pathname: `/room/${historyItem.room_id}`,
-													state: {
-														source: 'profile',
-														question: {
-															category: historyItem.question_category,
-															complexity: historyItem.question_difficulty,
-															createdAt: historyItem.timestamp,
-															description: historyItem.question_description,
-															title: historyItem.question_name,
-															updatedAt: historyItem.timestamp,
-														},
-														code: historyItem.code,
-														language: JSON.parse(historyItem.language).label,
+												to={`/room/${historyItem.room_id}`}
+												state={{
+													source: 'profile',
+													question: {
+														category: Parser(historyItem.question_category, "category2"),
+														complexity: historyItem.question_difficulty,
+														createdAt: historyItem.timestamp,
+														description: historyItem.question_description,
+														title: historyItem.question_name,
+														updatedAt: historyItem.timestamp,
 													},
+													code: historyItem.code,
+													language: JSON.parse(historyItem.language).label,
 												}}
 												className="left-align-link"
 											>
