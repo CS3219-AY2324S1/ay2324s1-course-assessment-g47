@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "./css/room.css";
-import { Link } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import Peer from "simple-peer";
 import io from "socket.io-client";
@@ -10,7 +9,7 @@ import { connect } from "mongoose";
 import { set } from "date-fns";
 import { codeLanguages } from "./constants";
 import { FaHome, FaVideo, FaVideoSlash, FaMicrophone, FaMicrophoneSlash, FaCheck } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import DisplayRandomQuestion from "./DisplayRandomQuestion"
 
 import Select, { components } from "react-select";
@@ -23,6 +22,10 @@ const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the back
 function Room({ user }) {
     console.log("user:", user);
     const location = useLocation();
+    const source = location.state?.source;
+    const question = location.state?.question;
+    const code = location.state?.code;
+    const language = location.state?.language;
     const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
     const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's email
     const currUsername = user.user.email; // Stores current user's email
@@ -39,6 +42,7 @@ function Room({ user }) {
     const [editorText, setEditorText] = useState(""); // Stores the code
     const [peer, setPeer] = useState(null);
     const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
+    const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
 
     const updateData = async (codeText, language, question) => {
         try {
@@ -75,7 +79,7 @@ function Room({ user }) {
                     headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
                 });
                 const json = await response.json();
-
+                console.log("TESTTTTT: ", json);
                 if (response.ok) {
                     setRandomQuestion(json);
                     socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json });
@@ -92,8 +96,22 @@ function Room({ user }) {
     const connectionRef = useRef();
 
     useEffect(() => {
-
-        fetchRandomEasyQuestion();
+        console.log(location.search);
+        console.log(location.pathname);
+        console.log(location);
+        console.log(location.state);
+        console.log(question);
+        console.log("yes");
+        if (source === 'profile' && question && code && language) {
+            console.log("yes2");
+            setIsFromProfile(true);
+            setRandomQuestion(question); // Set the question from the profile
+            setEditorText(code); // Set the code from the profile
+            setSelectedLanguage(language); // Set the language from the profile
+         } else {
+            setIsFromProfile(false);
+            fetchRandomEasyQuestion();
+         }
         socket.on('updateRandomQuestion', (newRandomQuestion) => {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
@@ -203,9 +221,11 @@ function Room({ user }) {
     }, []);
 
     const handleRefreshQuestion = async () => {
-        // Call fetchRandomEasyQuestion when "Change Question" button is clicked
-        const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
-        updateData(editorText, selectedLanguage, newQuestion);
+        if (!isFromProfile) {
+            // Call fetchRandomEasyQuestion when "Change Question" button is clicked
+            const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
+            updateData(editorText, selectedLanguage, newQuestion);
+        }
     };
     // const getOtherMediaWithStatus = async () => {
     //     try {
@@ -241,15 +261,19 @@ function Room({ user }) {
     });
 
     const handleEditorChange = (newValue) => {
-        setEditorText(newValue);
-        updateData(newValue, selectedLanguage, randomQuestion);
-        socket.emit("editor-change", { text: newValue, roomId: roomId });
+        if (!isFromProfile) {
+            setEditorText(newValue);
+            updateData(newValue, selectedLanguage, randomQuestion);
+            socket.emit("editor-change", { text: newValue, roomId: roomId });
+        }
     };
 
     const leaveCall = () => {
-        // Disconnect from the room
-        console.log("Leaving call");
-        socket.emit("disconnected", { roomId: roomId });
+        if (!isFromProfile) {
+            // Disconnect from the room
+            console.log("Leaving call");
+            socket.emit("disconnected", { roomId: roomId });
+        }
     };
 
     // wait for DOM to load before getting elements
@@ -292,10 +316,12 @@ function Room({ user }) {
     }, []);
 
     const handleLanguageChange = (selectedOption) => {
-        console.log(`Option selected:`, selectedOption);
-        setSelectedLanguage(selectedOption);
-        updateData(editorText, selectedOption, randomQuestion);
-        socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
+        if (!isFromProfile) {
+            console.log(`Option selected:`, selectedOption);
+            setSelectedLanguage(selectedOption);
+            updateData(editorText, selectedOption, randomQuestion);
+            socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
+        }
     };
 
     return (

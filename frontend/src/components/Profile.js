@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import LoginPage from "./Login";
 import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -70,6 +70,14 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		repeatNewPassword: "",
 	});
 	const [userNames, setUserNames] = useState({}); // Store user names
+
+	const location = useLocation();
+
+	console.log('Location State in Profile:', location.state);
+	console.log('Source:', location.state?.source);
+	console.log('Question:', location.state?.question);
+	console.log('Code:', location.state?.code);
+	console.log('Language:', location.state?.language);
 
 	const fetchUserHistory = async () => {
 		if (!user.user.email) {
@@ -499,7 +507,9 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 				<div className="history-container">
 					<h2 className="profile-label">History</h2>
 					{!historyData.data || !historyData.data.rows ? (
-						<p>No history found. Start a new PeerPrep Session today!</p>
+						<div className="no-history">
+							<div style={{ marginTop: "2em" }}><h2 className="no-history-text">No history found. Start a new PeerPrep Session today!</h2></div>
+						</div>
 					) : (
 						<table className="history-table">
 							<thead>
@@ -508,14 +518,36 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 									<th>Question Difficulty</th>
 									<th>Question Category</th>
 									<th>Language</th>
-									<th>Users Involved</th>
+									<th>Matched User</th>
 									<th>Date & Time</th>
 								</tr>
 							</thead>
 							<tbody>
 								{historyData.data.rows.map((historyItem, index) => (
-									<tr key={index}>
-										<td>{historyItem.question_name}</td>
+									<tr key={index} className="history-row">
+										<td>
+											<Link
+												to={{
+													pathname: `/room/${historyItem.room_id}`,
+													state: {
+														source: 'profile',
+														question: {
+															category: historyItem.question_category,
+															complexity: historyItem.question_difficulty,
+															createdAt: historyItem.timestamp,
+															description: historyItem.question_description,
+															title: historyItem.question_name,
+															updatedAt: historyItem.timestamp,
+														},
+														code: historyItem.code,
+														language: JSON.parse(historyItem.language).label,
+													},
+												}}
+												className="left-align-link"
+											>
+												{historyItem.question_name}
+											</Link>
+										</td>
 										<td>{historyItem.question_difficulty}</td>
 										<td>{Parser(historyItem.question_category, "category")}</td>
 										<td>{JSON.parse(historyItem.language).label}</td>
