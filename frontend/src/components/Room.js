@@ -1,14 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import "./css/room.css";
 import Editor from "@monaco-editor/react";
 import Peer from "simple-peer";
 import io from "socket.io-client";
-import { ca } from "date-fns/locale";
-import { connect } from "mongoose";
-import { set } from "date-fns";
 import { codeLanguages } from "./constants";
-import { FaHome, FaVideo, FaVideoSlash, FaMicrophone, FaMicrophoneSlash, FaCheck } from 'react-icons/fa';
+import { FaCheck } from 'react-icons/fa';
 import { Link, useLocation } from 'react-router-dom'
 import DisplayRandomQuestion from "./DisplayRandomQuestion"
 
@@ -72,6 +69,24 @@ function Room({ user }) {
         }
     };
 
+    const fetchInitialRandomEasyQuestion = async () => {
+        if (user) {
+            try {
+                const response = await fetch(`/api/questions/random-${difficultyLevel}`, {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
+
+                if (response.ok) {
+                    setRandomQuestion(json);
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user});
+                }
+            } catch (error) {
+                console.error(`Error fetching random ${difficultyLevel} question:`, error);
+            }
+        }
+    };
+
     const fetchRandomEasyQuestion = async () => {
         if (user) {
             try {
@@ -82,14 +97,15 @@ function Room({ user }) {
                 console.log("TESTTTTT: ", json);
                 if (response.ok) {
                     setRandomQuestion(json);
-                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json });
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user});
+                    //const roomName = roomId;
+                    const msg = `${user.user.username} changed to question to ${json.title}`;
+                    socket.emit('chatNotifcationMessage', { message: msg, roomId: roomId, senderInfo: user.user, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
                     return json; // Return the fetched question
                 }
             } catch (error) {
                 console.error(`Error fetching random ${difficultyLevel} question:`, error);
             }
-
-
         }
     };
 
@@ -110,22 +126,21 @@ function Room({ user }) {
             setSelectedLanguage(language); // Set the language from the profile
          } else {
             setIsFromProfile(false);
-            fetchRandomEasyQuestion();
+            fetchInitialRandomEasyQuestion();
          }
         socket.on('updateRandomQuestion', (newRandomQuestion) => {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
         });
-
+          
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
         });
 
         const getFirstUserMediaWithStatus = async () => {
-            let numOfUsers = 0;
             try {
 
-                socket.emit("join-room", { roomId: roomId }); // Automatically join the socket.io room
+                socket.emit("join-room", { user: user.user, roomId: roomId }); // Automatically join the socket.io room
 
                 socket.on("user-connected", (userId) => {
                     // A new user has connected to the room
@@ -205,6 +220,25 @@ function Room({ user }) {
             setMe(id);
         });
 
+        socket.on("user-disconnected", (userId) => {
+            window.removeEventListener('unload', myBeforeUnloadListener);
+            setConnectedUsers((prevUsers) =>
+                prevUsers.filter((prevUserId) => prevUserId !== userId)
+            );
+            window.location.href = "/roomexit";
+        });
+
+        function myBeforeUnloadListener(event) {
+            const confirmationMessage = 'Are you sure you want to leave?';
+            event.returnValue = confirmationMessage;
+      
+            window.addEventListener('unload', () => {
+                socket.disconnect();
+            });
+        }
+    
+        window.addEventListener('unload', myBeforeUnloadListener);
+
         // Call the getUserMedia function only once when the component mounts
         getFirstUserMediaWithStatus();
 
@@ -227,36 +261,10 @@ function Room({ user }) {
             updateData(editorText, selectedLanguage, newQuestion);
         }
     };
-    // const getOtherMediaWithStatus = async () => {
-    //     try {
-    //       const otherStream = await navigator.mediaDevices.getUserMedia({
-    //         video: otherCameraOn,
-    //         audio: otherMicOn,
-    //       });
-    //       setOtherStream(otherStream);
-    //       if (userVideo.current) {
-    //         console.log("otherStream:", otherStream);
-    //         userVideo.current.srcObject = otherStream;
-    //       }
-    //     } catch (err) {
-    //       const otherStream = null;
-    //       setOtherStream(otherStream);
-    //       userVideo.current.srcObject = otherStream;
-    //     }
-    // };
 
     socket.on("editor-changed", (text) => {
         if (editorText !== text) {
             setEditorText(text);
-        }
-    });
-
-    socket.on("user-disconnected", (userId) => {
-        // A user has disconnected from the room
-        console.log("User disconnected:", userId);
-        setConnectedUsers((prevUsers) => prevUsers.filter((id) => id !== userId));
-        if (connectionRef.current) {
-            connectionRef.current.destroy();
         }
     });
 
@@ -273,8 +281,10 @@ function Room({ user }) {
             // Disconnect from the room
             console.log("Leaving call");
             socket.emit("disconnected", { roomId: roomId });
+            socket.disconnect();
         }
     };
+
 
     // wait for DOM to load before getting elements
     useEffect(() => {
@@ -290,25 +300,50 @@ function Room({ user }) {
             const msg = e.target.elements.msg.value;
 
             // Emit message to server and the current time
-            socket.emit("chatMessage", msg, roomId, user.user.username, new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            socket.emit("chatMessage", msg, roomId, user.user, new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
             e.target.elements.msg.value = "";
         });
 
+        //Recieve message
         socket.on("message", (data) => {
             console.log("message:", data.message);
-            outputMessage(data);
+            const isUser = user.user.email === data.senderInfo.email;
+            outputMessage(data, isUser);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         });
 
-        // Output message to DOM
-        function outputMessage(data) {
+        socket.on("messageNotification", (data) => {
+            console.log("messageNotification:", data.message);
+            outputNotifcationMessage(data);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        function outputNotifcationMessage(data) {
             const div = document.createElement("div");
             div.classList.add("message");
+            div.classList.add("notification-message");
             div.innerHTML = `
                 <div class="message-content">
-                    <p class="meta">${data.time}</p>
-                    <p class="username">${data.username}:</p>
                     <p class="message-text">${data.message}</p>
+                </div>
+            `;
+            document.querySelector('.chat-messages').appendChild(div);
+        }
+
+        // Output message to DOM
+        function outputMessage(data, isUser) {
+            const div = document.createElement("div");
+            div.classList.add("message");
+            if (isUser) {
+                div.classList.add("user-message");
+            } else {
+                div.classList.add("received-message");
+            }
+            div.innerHTML = `
+                <div class="message-content">
+                    <p class="username">${data.senderInfo.username}</p>
+                    <p class="message-text">${data.message}</p>
+                    <p class="meta">${data.time}</p>
                 </div>
             `;
             document.querySelector('.chat-messages').appendChild(div);
@@ -321,7 +356,14 @@ function Room({ user }) {
             setSelectedLanguage(selectedOption);
             updateData(editorText, selectedOption, randomQuestion);
             socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
+            const msg = `${user.user.username} changed the code edtior language to ${selectedOption.label}`
+            socket.emit('chatNotifcationMessage', { message: msg, roomId: roomId, senderInfo: user.user, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
         }
+    };
+
+    const handleExit = () => {
+        leaveCall();
+        window.location.href = "/";
     };
 
     return (
@@ -356,22 +398,28 @@ function Room({ user }) {
                         </div>
                     </div>
                 </div>
-                <div className="middle-panel">
-                    <div className="question-container">
-                        <DisplayRandomQuestion
-                            user={user}
-                            randomQuestion={randomQuestion}
-                            handleRefreshQuestion={handleRefreshQuestion}
-                        />
-                    </div>
+            </div>
+            <div className="middle-panel">
+                <div className="question-container">
+                    <button className="exit-button" onClick={handleExit}>
+                        Exit
+                    </button>
+                    <DisplayRandomQuestion
+                        user={user}
+                        randomQuestion={randomQuestion}
+                        handleRefreshQuestion={handleRefreshQuestion}
+                    />
                 </div>
             </div>
-            <div className="bottom-container">
-                <main class="chat-main">
-                    <div class="chat-messages"></div>
-                </main>
-                <div class="chat-form-container">
-                    <form id="chat-form" class="chat-form">
+            <div className="left-panel">
+                <div>
+                <p className="room-id">In a chat with: {matchedUsername}</p>
+                </div>
+            <main class="chat-main">
+                        <div class="chat-messages"></div>
+                    </main>
+                    <div class="chat-form-container">
+                        <form id="chat-form" class="chat-form">
                         <input
                             id="msg"
                             type="text"
@@ -380,23 +428,14 @@ function Room({ user }) {
                             autocomplete="off"
                         />
                         <button class="btn"><i class="fas fa-paper-plane"></i></button>
-                    </form>
-                </div>
+                        </form>
+                    </div>
             </div>
         </div>
     );
 }
 
 export default Room;
-
-
-//TODO: Only allow 2 people to enter room. (Bug: a third user can copy and paste same link and join the room)
-//TODO: add toggle mic and camera button.
-//TODO: Queuing system require refresh to work.
-//TODO: Once disconnected, cannot reconnect.
-// Add "currently in queue" UI in home page, because user cant see if he/she is in queue or not (only can see in console for now)
-// extra: Add "waitting for other user to join" UI in room page 
-
 
 const customSelectStyles = {
     container: (provided) => ({

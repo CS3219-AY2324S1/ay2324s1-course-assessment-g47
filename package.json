@@ -7,7 +7,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
         "frontend": "cd frontend && npm start",
-        "backend": "cd backend && concurrently \"nodemon server.js\" \"nodemon postgresql.js\" \"nodemon history.js\"",
+        "backend": "cd backend && concurrently \"nodemon socket-io.js\" \"nodemon server.js\" \"nodemon postgresql.js\" \"nodemon history.js\"",
         "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
     },
     "keywords": [],
