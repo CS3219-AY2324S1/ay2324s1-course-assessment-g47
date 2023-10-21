@@ -116,9 +116,11 @@ form {
 
 /* Style for Add new Question Form */
 .create {
-  height: 720px;
+  height: 750px;
   background-color: var(--secondary-color);
   border-radius: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .question-header {
@@ -127,13 +129,20 @@ form {
   color: var(--accent-color);
 }
 
+.editor-parent {
+  flex-grow: 1;
+}
+
 .editor-container {
-  height: 200px;
+  padding: 0 !important;
+  border: None !important;
+  background-color: transparent !important;
+  height: auto;
 }
 
 /* CSS for the Quill editor toolbar */
 .ql-toolbar {
-  position: sticky;
+  position: unset;
   top: 0;
   background-color: var(--accent-color); 
   z-index: 1; 
@@ -144,14 +153,23 @@ form {
 
 /* CSS for the Quill editor content area */
 .ql-editor {
-  max-height: 100%; 
-  overflow-y: auto;
   border: none;
-  outline: none;
+}
+
+.ql-container {
+  position: unset !important;
+  height: 220px !important;
+}
+
+@media screen and (max-width: 768px) {
+  .ql-container {
+    height: 250px !important;
+  }
+  
 }
 
 .add-button {
-  margin-top: 70px;
+  margin-top: 5px;
   position: absolute;
   background-color: var(--dark-accent-color);
 }
@@ -305,7 +323,7 @@ form {
 
 /* Style for question detail page */
 .question-details {
-  height: 720px;
+  height: 750px;
   background-color: var(--secondary-color);
   border-radius: 20px;
   overflow-y: auto;

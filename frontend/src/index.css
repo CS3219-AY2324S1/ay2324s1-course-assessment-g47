@@ -47,6 +47,13 @@ header a {
   margin-right: 50px;
 }
 
+@media screen and (max-width: 768px) {
+  .home {
+    display: block;
+  }
+  
+}
+
 .questions {
   grid-column: 1 / 2;
   grid-row: 2 / 3;

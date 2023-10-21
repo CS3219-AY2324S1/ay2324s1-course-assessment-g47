@@ -262,13 +262,16 @@ const QuestionForm = () => {
 				}
 			/>
 			<label>Description:</label>
-			<div
-				className={`editor-container ${
-					emptyFields.includes("description") ? "error" : ""
-				}`}
-				ref={wrapperRef}
-			></div>
-			<button className="add-button"> Add Question </button>
+			<div className="editor-parent">
+				<div
+					className={`editor-container ${
+						emptyFields.includes("description") ? "error" : ""
+					}`}
+					ref={wrapperRef}
+				></div>
+				<button className="add-button"> Add Question </button>
+			</div>
+
 			{error && <div className="error">{error}</div>}
 		</form>
 	);

@@ -19,7 +19,7 @@ const Home = ({ user, handleLogin }) => {
 	useEffect(() => {
 		const fetchQuestions = async () => {
 			const response = await fetch("/api/questions", {
-				headers: { Authorization: `Bearer ${user.tokens.accessToken}` }
+				headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
 			});
 			const json = await response.json();
 
@@ -39,11 +39,10 @@ const Home = ({ user, handleLogin }) => {
 			<div className="home">
 				{user.user.account_type !== "user" ? (
 					<div>
-						
 						<QuestionForm />
 					</div>
 				) : null}
-				<QuestionQueue user={user.user}/>
+				<QuestionQueue user={user.user} />
 				<div className="QuestionDetails">
 					<QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>

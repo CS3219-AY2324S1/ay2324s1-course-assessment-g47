@@ -285,7 +285,7 @@ function Room({ user }) {
 		<div className="room-container">
 			<div className="container">
 				<div className="right-panel">
-					<div className="editor-container">
+					<div className="editor-container-room">
 						<div className="editor">
 							<Editor
 								height="100vh"

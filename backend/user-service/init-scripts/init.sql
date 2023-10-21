@@ -14,6 +14,10 @@ CREATE TABLE IF NOT EXISTS accounts (
     authentication_stats BOOLEAN DEFAULT false
 );
 
+-- Enable the pgcrypto extension if it's not already enabled
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- -- Insert a test record to verify initialization
--- INSERT INTO accounts (username, email, password, account_type)
--- VALUES ('testuser', 'test@example.com', 'password123', 'standard');
+INSERT INTO accounts (username, email, password, account_type, authentication_stats)
+VALUES ('admin', 'admin@example.com', crypt('123456', gen_salt('bf', 10)::text), 'admin', true)
+ON CONFLICT (email) DO NOTHING;

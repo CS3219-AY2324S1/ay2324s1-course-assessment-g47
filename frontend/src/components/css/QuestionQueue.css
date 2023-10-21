@@ -1,6 +1,6 @@
 /* Style the outer container */
 .question-queue {
-    margin: 20px;
+    margin: 10px;
     padding: 20px;
     border: 1px solid var(--primary-color);
     border-radius: 20px;
