@@ -175,9 +175,7 @@
 				</div>
 			  </div>
 			  <div className="table-container" style={pageStyles}>
-			{/* Filters Section */}
 			<div className="filter-container">
-				{/* Sort by Popularity */}
 				<div className="filter-option">
 				<button onClick={handleSortByPopularity}
 					className={
@@ -188,17 +186,15 @@
 						: "none-button"
 					}>
 					{asc ? (
-					<i className="fas fa-arrow-up"></i>
+					<i className="fas fa-sort-up"></i>
 					) : desc ? (
-					<i className="fas fa-arrow-down"></i>
+					<i className="fas fa-sort-down"></i>
 					) : (
 					<i className="fas fa-sort"></i>
 					)}
 					Sort by Popularity
 				</button>
 				</div>
-
-				{/* Select Categories */}
 				<div className="filter-option">
 				<label>Select Categories:</label>
 				<Select
@@ -212,8 +208,6 @@
 					components={{ Option: CustomOption }}
 				/>
 				</div>
-
-				{/* Select Difficulty */}
 				<div className="filter-option">
 				<label>Select Difficulty:</label>
 				<Select
@@ -228,8 +222,6 @@
 				/>
 				</div>
 			</div>
-		
-				{/* Table Section */}
 				<table className="table-header">
 				  <thead>
 					<tr>
