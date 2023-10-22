@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
 
   socket.on("matchUser", (data) => {
     //socket.join(data.roomName)
-    socket.to(data.socketId).emit("matched-successfully", {roomId: data.roomName,difficultyLevel: data.difficultyLevel, matchedUsername: data.matchedUsername})
+    socket.to(data.socketId).emit("matched-successfully", {roomId: data.roomName,difficultyLevel: data.difficultyLevel, matchedUsername: data.matchedUsername, matchedEmail: data.matchedEmail})
   })
 
 
@@ -133,8 +133,8 @@ const consumeFromQueue = async () => {
                   // Emit the signal to the clients
                   console.log('Message received from matched_pair queue in socket-io.js: ', data);
 
-                  io.to(data.Player1.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player1.socketId, difficultyLevel: data.Player1.difficultyLevel, matchedUsername: data.Player2.username});
-                  io.to(data.Player2.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player2.socketId, difficultyLevel: data.Player2.difficultyLevel, matchedUsername: data.Player1.username});
+                  io.to(data.Player1.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player1.socketId, difficultyLevel: data.Player1.difficultyLevel, matchedUsername: data.Player2.username, matchedEmail: data.Player2.email});
+                  io.to(data.Player2.socketId).emit("matched-successfully", {roomId: roomId, socketId: data.Player2.socketId, difficultyLevel: data.Player2.difficultyLevel, matchedUsername: data.Player1.username, matchedEmail: data.Player1.email});
 
                   channel.ack(message);
               } else {

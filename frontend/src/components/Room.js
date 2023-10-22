@@ -19,12 +19,14 @@ const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the back
 function Room({ user }) {
     console.log("user:", user);
     const location = useLocation();
+    console.log(location);
     const source = location.state?.source;
     const question = location.state?.question;
     const code = location.state?.code;
     const language = location.state?.language;
     const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
-    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's email
+    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's username
+    const matchedEmail = location.state?.matchedEmail || "peerplan@peerplan.com" // Stores the matched user's email
     const currUsername = user.user.email; // Stores current user's email
     // Code language settings 
     const [selectedLanguage, setSelectedLanguage] = useState(
@@ -50,7 +52,7 @@ function Room({ user }) {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ currUsername, matchedUsername, question, roomId, codeText, language }),
+                    body: JSON.stringify({ currUsername, matchedEmail, question, roomId, codeText, language }),
                 }
             );
 
@@ -58,7 +60,7 @@ function Room({ user }) {
                 // Successful update of Code Attempt History
                 const data = await response.json();
                 console.log(data);
-                console.log(`Saved the progress for ${question.title} for ${currUsername} and ${matchedUsername}.`);
+                console.log(`Saved the progress for ${question.title} for ${currUsername} and ${matchedEmail}.`);
             } else {
                 // Handle Unexpected Errors caused from the Server
                 console.log("Server error");
