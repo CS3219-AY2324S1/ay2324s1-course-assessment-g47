@@ -137,7 +137,16 @@
 			menu: (provided) => ({
 				...provided,
 				width: "200px",
+				maxHeight: "300px",
+				overflowY: "auto",
+				zIndex: 999,
 			}),
+		};
+
+		// CSS for the entire page
+		const pageStyles = {
+			height: "100vh", // Make sure the page takes up the full viewport height
+			overflowY: "auto", // Allow the entire page to scroll if the content doesn't fit
 		};
 
 		const CustomOption = ({ innerProps, label, isSelected }) => (
@@ -165,7 +174,7 @@
 				  <QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>
 			  </div>
-			  <div className="table-container">
+			  <div className="table-container" style={pageStyles}>
 			{/* Filters Section */}
 			<div className="filter-container">
 				{/* Sort by Popularity */}
@@ -196,7 +205,7 @@
 					options={categoryOptions}
 					isMulti
 					value={categoryOptions.filter((option) =>
-					selectedCategories.includes(option.value)
+						selectedCategories.includes(option.value)
 					)}
 					onChange={handleCategoryChange}
 					styles={customStyles}
@@ -211,7 +220,7 @@
 					options={difficultyOptions}
 					isMulti
 					value={difficultyOptions.filter((option) =>
-					selectedDifficulty.includes(option.value)
+						selectedDifficulty.includes(option.value)
 					)}
 					onChange={handleDifficultyChange}
 					styles={customStyles}
