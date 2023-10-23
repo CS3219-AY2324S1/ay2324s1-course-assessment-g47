@@ -182,18 +182,16 @@ function Room({ user }) {
         });
 
         socket.on("user-disconnected", (userId) => {
-            window.removeEventListener('unload', myBeforeUnloadListener);
             setConnectedUsers((prevUsers) =>
                 prevUsers.filter((prevUserId) => prevUserId !== userId)
             );
+            socket.disconnect();
             window.location.href = "/roomexit";
         });
 
         function myBeforeUnloadListener(event) {
-            const confirmationMessage = 'Are you sure you want to leave?';
-            event.returnValue = confirmationMessage;
-      
             window.addEventListener('unload', () => {
+                socket.emit("disconnected", { roomId: roomId });
                 socket.disconnect();
             });
         }
@@ -212,6 +210,18 @@ function Room({ user }) {
             socket.off("initial-editor-content");
             socket.off("editor-changed");
             socket.off("me");
+            socket.off("language-changed");
+            socket.off("set-caller-signal");
+            socket.off("newRandomQuestion");
+            socket.off("updateRandomQuestion");
+            socket.off("disconnected");
+            window.removeEventListener('unload', myBeforeUnloadListener);
+
+            socket.disconnect();
+
+            console.log("Disconnected from socket.io");
+
+            console.log("Destroyed user media stream");
         };
     }, []);
 
@@ -278,6 +288,11 @@ function Room({ user }) {
             `;
             document.querySelector('.chat-messages').appendChild(div);
         }
+
+        return () => {
+            socket.off("message");
+            socket.off("chatMessage");
+        };
     }, []);
 
     const handleLanguageChange = (selectedOption) => {
