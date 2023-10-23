@@ -356,24 +356,31 @@ function Room({ user }) {
                 </div>
             </div>
             <div className="left-panel">
-                <div>
-                <p className="room-id">In a chat with: {matchedUsername}</p>
-                </div>
-            <main class="chat-main">
-                        <div class="chat-messages"></div>
-                    </main>
-                    <div class="chat-form-container">
-                        <form id="chat-form" class="chat-form">
-                        <input
-                            id="msg"
-                            type="text"
-                            placeholder="Enter Message"
-                            required
-                            autocomplete="off"
-                        />
-                        <button class="btn"><i class="fas fa-paper-plane"></i></button>
-                        </form>
+                <div className="chat-container">
+                <div class="partner-info-card">
+                    <div class="partner-details">
+                    {/* <div className="profile-picture">
+                        <img src={process.env.PUBLIC_URL + '/images/placeholder.jpg'} alt="Profile Picture" />
+                    </div> */}
+                        <p class="partner-username">Matched partner {matchedUsername}</p>
                     </div>
+                </div>
+                <main class="chat-main">
+                    <div class="chat-messages"></div>
+                </main>
+                <div class="chat-form-container">
+                    <form id="chat-form" class="chat-form">
+                    <input
+                        id="msg"
+                        type="text"
+                        placeholder="Enter Message"
+                        required
+                        autocomplete="off"
+                    />
+                    <button class="btn"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+                </div>
             </div>
         </div>
     );

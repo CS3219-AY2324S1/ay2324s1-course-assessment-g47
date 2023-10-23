@@ -22,6 +22,16 @@
   order: 3;
 }
 
+.chat-container{
+  height:100%;
+  background-color: var(--secondary-color);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #ffffff;
+}
+
 .middle-panel {
   height: 80vh;
   padding: 10px;
@@ -51,17 +61,49 @@
 
 /* Chat */
 
-.chat-main{
-  height: 100%;
-  margin: 0%;
+.partner-info-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--secondary-color);
+}
+
+.profile-picture img {
+  width: 40px; /* Set the width to the desired size */
+  height: 40px; /* Set the height to the desired size */
+  border-radius: 50%; /* Make the image appear as a circle */
+  object-fit: cover; /* Ensure the image covers the entire container */
+  flex-shrink: 0; /* Prevent the image from shrinking */
+}
+
+.partner-details {
+  width: 100%;
+  display: flex;
+  align-items: center; /* Align items in the center */
+  margin-left: 10px; /* Add a margin to separate the details from the picture */
+}
+
+.partner-username {
+  width: 100%;
+  font-size: 18px;
+  margin: 0;
+  color: var(--text-color);
+  border-bottom: 1px solid #ccc;
+
+}
+
+.chat-main {
+  display: flex;
+  flex-direction: column; /* Ensure the chat messages fill the height properly */
+  height: 85%;
 }
 
 .chat-messages {
-  height: 100%;
-  overflow-y: scroll;
+  overflow: auto;
   padding: 10px;
-  border: 1px solid #ffffff;
   border-radius: 20px;
+  height: 100%;
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -168,7 +210,9 @@
   flex: 1;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 20px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 
 .chat-form button {
