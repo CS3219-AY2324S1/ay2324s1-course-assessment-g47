@@ -5,18 +5,21 @@ const {
 	createQuestion,
 	deleteQuestion,
 	updateQuestion,
+	getRandomEasyQuestion,
+	getRandomMediumQuestion,
+	getRandomHardQuestion,
 } = require("../controllers/questionController");
 
 const router = express.Router();
 const authenticateToken = require("../middleware/authorization"); // Import the middleware
 
+// GET all questions
 // All authenticated users can access this route
-router.get(
-	"/",
-	authenticateToken(["user", "superuser", "admin", "superadmin"]),
-	getQuestions
-);
-
+router.get("/", getQuestions);
+router.get("/random-easy", getRandomEasyQuestion);
+router.get("/random-medium", getRandomMediumQuestion);
+router.get("/random-hard", getRandomHardQuestion);
+// GET a single question
 // All authenticated can access this route
 router.get(
 	"/:id",
@@ -24,6 +27,7 @@ router.get(
 	getQuestion
 );
 
+// POST a new question
 // Only superuser, admin and superadmin can access this route
 router.post(
 	"/",
@@ -31,6 +35,7 @@ router.post(
 	createQuestion
 );
 
+// DELETE a new question
 // Only superuser, admin and superadmin can access this route
 router.delete(
 	"/:id",
@@ -38,6 +43,7 @@ router.delete(
 	deleteQuestion
 );
 
+// UPDATE a new question
 // Only superuser, admin and superadmin can access this route
 router.patch(
 	"/:id",
