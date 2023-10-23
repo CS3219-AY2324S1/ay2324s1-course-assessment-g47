@@ -18,187 +18,203 @@ const HISTORY_PORT = Constants.HISTORY_SERVICE_PORT;
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
 
 function Room({ user }) {
-	console.log("user:", user);
-	const location = useLocation();
-	const difficultyLevel = location.state?.difficultyLevel || "easy"; // Get the difficultyLevel from location state
-	const matchedUsername = location.state?.matchedUsername || "Peer2"; // Stores the matched user's email
-	const currUsername = user.user.email; // Stores current user's email
-	// Code language settings
-	const [selectedLanguage, setSelectedLanguage] = useState(
-		codeLanguages.find((language) => language.value === "python")
-	);
+    console.log("user:", user);
+    const location = useLocation();
+    console.log(location);
+    const source = location.state?.source;
+    const question = location.state?.question;
+    const code = location.state?.code;
+    const language = location.state?.language;
+    const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
+    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's username
+    const matchedEmail = location.state?.matchedEmail || "peerplan@peerplan.com" // Stores the matched user's email
+    const currUsername = user.user.email; // Stores current user's email
+    // Code language settings 
+    const [selectedLanguage, setSelectedLanguage] = useState(
+        codeLanguages.find((language) => language.value === "python")
+    );
 
-	const { roomId } = useParams(); // Stores the Room ID
-	const [me, setMe] = useState("");
-	const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
-	const [callerSignal, setCallerSignal] = useState();
-	const [peerSocketId, setPeerSocketId] = useState(null);
-	const [editorText, setEditorText] = useState(""); // Stores the code
-	const [peer, setPeer] = useState(null);
-	const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
+    const { roomId } = useParams(); // Stores the Room ID
+    const [me, setMe] = useState("");
+    const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
+    const [callerSignal, setCallerSignal] = useState();
+    const [peerSocketId, setPeerSocketId] = useState(null);
+    const [editorText, setEditorText] = useState(""); // Stores the code
+    const [peer, setPeer] = useState(null);
+    const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
+    const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
 
-	const updateData = async (codeText, language, question) => {
-		try {
-			const response = await fetch(
-				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						currUsername,
-						matchedUsername,
-						question,
-						roomId,
-						codeText,
-						language,
-					}),
-				}
-			);
+    const updateData = async (codeText, language, question) => {
+        try {
+            const response = await fetch(
+                `http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ currUsername, matchedEmail, question, roomId, codeText, language }),
+                }
+            );
 
-			if (response.status === 200) {
-				// Successful update of Code Attempt History
-				const data = await response.json();
-				console.log(data);
-				console.log(
-					`Saved the progress for ${question.title} for ${currUsername} and ${matchedUsername}.`
-				);
-			} else {
-				// Handle Unexpected Errors caused from the Server
-				console.log("Server error");
-			}
-		} catch (err) {
-			console.error(
-				"Unexpected error occurred while updating data:",
-				err
-			);
-		}
-	};
+            if (response.status === 200) {
+                // Successful update of Code Attempt History
+                const data = await response.json();
+                console.log(data);
+                console.log(`Saved the progress for ${question.title} for ${currUsername} and ${matchedEmail}.`);
+            } else {
+                // Handle Unexpected Errors caused from the Server
+                console.log("Server error");
+            }
 
-	const fetchRandomEasyQuestion = async () => {
-		if (user) {
-			try {
-				const response = await fetch(
-					`/api/questions/random-${difficultyLevel}`,
-					{
-						headers: {
-							Authorization: `Bearer ${user.tokens.accessToken}`,
-						},
-					}
-				);
-				const json = await response.json();
+        } catch (err) {
+            console.error("Unexpected error occurred while updating data:", err);
+        }
+    };
 
-				if (response.ok) {
-					setRandomQuestion(json);
-					socket.emit("newRandomQuestion", {
-						roomId: roomId,
-						randomQuestion: json,
-					});
-				}
-			} catch (error) {
-				console.error(
-					`Error fetching random ${difficultyLevel} question:`,
-					error
-				);
-			}
-		}
-	};
+    const fetchInitialRandomEasyQuestion = async () => {
+        if (user) {
+            try {
+                const response = await fetch(`/api/questions/random-${difficultyLevel}`, {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
 
-	const connectionRef = useRef();
+                if (response.ok) {
+                    setRandomQuestion(json);
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user });
+                }
+            } catch (error) {
+                console.error(`Error fetching random ${difficultyLevel} question:`, error);
+            }
+        }
+    };
 
-	useEffect(() => {
-		fetchRandomEasyQuestion();
-		socket.on("updateRandomQuestion", (newRandomQuestion) => {
-			console.log("newRandomQuestion:", newRandomQuestion);
-			setRandomQuestion(newRandomQuestion);
-		});
+    const fetchRandomEasyQuestion = async () => {
+        if (user) {
+            try {
+                const response = await fetch(`/api/questions/random-${difficultyLevel}`, {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
+                console.log("TESTTTTT: ", json);
+                if (response.ok) {
+                    setRandomQuestion(json);
+                    socket.emit('newRandomQuestion', { roomId: roomId, randomQuestion: json, user: user.user });
+                    //const roomName = roomId;
+                    const msg = `${user.user.username} changed to question to ${json.title}`;
+                    socket.emit('chatNotifcationMessage', { message: msg, roomId: roomId, senderInfo: user.user, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+                    return json; // Return the fetched question
+                }
+            } catch (error) {
+                console.error(`Error fetching random ${difficultyLevel} question:`, error);
+            }
+        }
+    };
 
-		socket.on("set-caller-signal", (data) => {
-			setCallerSignal(data.signal);
-		});
+    const connectionRef = useRef();
 
-		const getFirstUserMediaWithStatus = async () => {
-			try {
-				socket.emit("join-room", { roomId: roomId }); // Automatically join the socket.io room
+    useEffect(() => {
+        if (source === 'profile' && question && code && language) {
+            setIsFromProfile(true);
+            setRandomQuestion(question); // Set the question from the profile
+            setEditorText(code); // Set the code from the profile
+            setSelectedLanguage(language);  // Set the language from the profile
+        } else {
+            setIsFromProfile(false);
+            fetchInitialRandomEasyQuestion();
+        }
+        socket.on('updateRandomQuestion', (newRandomQuestion) => {
+            console.log("newRandomQuestion:", newRandomQuestion)
+            setRandomQuestion(newRandomQuestion);
+        });
 
-				socket.on("user-connected", (userId) => {
-					// A new user has connected to the room
-					setConnectedUsers((prevUsers) => [...prevUsers, userId]);
+        socket.on("set-caller-signal", (data) => {
+            setCallerSignal(data.signal);
+        });
 
-					console.log("Another User connected:", userId);
-					// Create a new Peer connection for the new user
-					const peer = new Peer({
-						initiator: true,
-						trickle: true,
-					});
+        const getFirstUserMediaWithStatus = async () => {
+            try {
 
-					setPeer(peer);
+                socket.emit("join-room", { user: user.user, roomId: roomId }); // Automatically join the socket.io room
 
-					peer.on("signal", (data) => {
-						socket.emit("send-signal", {
-							callerId: userId,
-							signal: data,
-						});
-						socket.emit("set-caller-signal", {
-							callerId: userId,
-							signal: data,
-						});
-						setCallerSignal(data);
-						setPeerSocketId(userId);
-					});
+                socket.on("user-connected", (userId) => {
+                    // A new user has connected to the room
+                    setConnectedUsers((prevUsers) => [...prevUsers, userId]);
+                    console.log("Another User connected:", userId);
 
-					socket.on("signal-recievedd", (signal) => {
-						console.log("Signal received24:", signal);
-						peer.signal(signal.signal);
-					});
+                    // Create a new Peer connection for the new user
+                    const peer = new Peer({
+                        initiator: true,
+                        trickle: true,
+                    });
 
-					connectionRef.current = peer;
-				});
+                    setPeer(peer);
 
-				socket.on("signal-received", (data) => {
-					console.log("Signal received1:");
-					setPeerSocketId(data.from);
-					const peer = new Peer({
-						initiator: false,
-						trickle: true,
-					});
+                    peer.on("signal", (data) => {
+                        socket.emit("send-signal", {
+                            callerId: userId,
+                            signal: data,
+                        });
+                        socket.emit("set-caller-signal", {
+                            callerId: userId,
+                            signal: data,
+                        });
+                        setCallerSignal(data);
+                        setPeerSocketId(userId);
+                    });
 
-					peer.on("signal", (signalData) => {
-						socket.emit("return-signal", {
-							signal: signalData,
-							callerId: data.from,
-						});
-					});
+                    socket.on("signal-recieved", (signal) => {
+                        console.log("Signal received24:", signal);
+                        peer.signal(signal.signal);
+                    });
 
-					console.log("Signal received2:", callerSignal);
-					console.log("Signal received23:", data.signal);
-					peer.signal(data.signal);
-					connectionRef.current = peer;
-				});
+                    connectionRef.current = peer;
 
-				socket.on("initial-editor-content", (initialContent) => {
-					setEditorText(initialContent);
-				});
+                });
 
-				// Listen for changes from Socket.io and update the editor
-				socket.on("editor-changed", (text) => {
-					if (editorText !== text) {
-						setEditorText(text);
-					}
-				});
-				socket.on("language-changed", (language) => {
-					console.log("language changed:", language);
-					setSelectedLanguage(language);
-				});
-			} catch (err) {
-				console.error("Error accessing user media:", err);
-			}
-		};
+                socket.on("signal-received", (data) => {
 
-		socket.on("me", (id) => {
-			setMe(id);
-		});
+                    console.log("Signal received1:");
+                    setPeerSocketId(data.from)
+                    const peer = new Peer({
+                        initiator: false,
+                        trickle: true,
+                    });
+
+                    peer.on("signal", (signalData) => {
+                        socket.emit("return-signal", { signal: signalData, callerId: data.from });
+                    });
+
+                    console.log("Signal received2:", callerSignal);
+                    console.log("Signal received23:", data.signal);
+                    peer.signal(data.signal);
+                    connectionRef.current = peer;
+                });
+
+                socket.on("initial-editor-content", (initialContent) => {
+                    setEditorText(initialContent);
+                });
+
+                // Listen for changes from Socket.io and update the editor
+                socket.on("editor-changed", (text) => {
+                    if (editorText !== text) {
+                        setEditorText(text);
+                    }
+                });
+                socket.on("language-changed", (language) => {
+                    console.log("language changed:", language);
+                    setSelectedLanguage(language);
+
+                });
+            } catch (err) {
+                console.error("Error accessing user media:", err);
+            }
+        };
+
+        socket.on("me", (id) => {
+            setMe(id);
+        });
 
 		socket.on("user-disconnected", (userId) => {
 			setConnectedUsers((prevUsers) =>
@@ -242,23 +258,29 @@ function Room({ user }) {
 	}, []);
 
 	const handleRefreshQuestion = async () => {
-		// Call fetchRandomEasyQuestion when "Change Question" button is clicked
-		const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
-		updateData(editorText, selectedLanguage, newQuestion);
-	};
-
-	const leaveCall = () => {
-		// Disconnect from the room
-		console.log("Leaving call");
-		socket.emit("disconnected", { roomId: roomId });
-		socket.disconnect();
-	};
+        if (!isFromProfile) {
+            // Call fetchRandomEasyQuestion when "Change Question" button is clicked
+            const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
+            updateData(editorText, selectedLanguage, newQuestion);
+        }
+    };
 
 	const handleEditorChange = (newValue) => {
-		setEditorText(newValue);
-		updateData(newValue, selectedLanguage, randomQuestion);
-		socket.emit("editor-change", { text: newValue, roomId: roomId });
-	};
+        if (!isFromProfile) {
+            setEditorText(newValue);
+            updateData(newValue, selectedLanguage, randomQuestion);
+            socket.emit("editor-change", { text: newValue, roomId: roomId });
+        }
+    };
+
+	const leaveCall = () => {
+        if (!isFromProfile) {
+            // Disconnect from the room
+            console.log("Leaving call");
+            socket.emit("disconnected", { roomId: roomId });
+            socket.disconnect();
+        }
+    };
 
 	// wait for DOM to load before getting elements
 	useEffect(() => {
@@ -299,8 +321,6 @@ function Room({ user }) {
 			div.classList.add("message");
 			div.innerHTML = `
                 <div class="message-content">
-                    <p class="meta">${data.time}</p>
-                    <p class="username">${data.username}:</p>
                     <p class="message-text">${data.message}</p>
                 </div>
             `;
@@ -314,15 +334,15 @@ function Room({ user }) {
 	}, []);
 
 	const handleLanguageChange = (selectedOption) => {
-		console.log(`Option selected:`, selectedOption);
-		setSelectedLanguage(selectedOption);
-		updateData(editorText, selectedOption, randomQuestion);
-		socket.emit("language-change", {
-			label: selectedOption.label,
-			value: selectedOption.value,
-			roomId: roomId,
-		});
-	};
+        if (!isFromProfile) {
+            console.log(`Option selected:`, selectedOption);
+            setSelectedLanguage(selectedOption);
+            updateData(editorText, selectedOption, randomQuestion);
+            socket.emit("language-change", { label: selectedOption.label, value: selectedOption.value, roomId: roomId });
+            const msg = `${user.user.username} changed the code edtior language to ${selectedOption.label}`
+            socket.emit('chatNotifcationMessage', { message: msg, roomId: roomId, senderInfo: user.user, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+        }
+    };
 
 	const handleExit = () => {
 		leaveCall();

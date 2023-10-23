@@ -14,7 +14,7 @@ appForHistory.use(cors());
 appForHistory.post("/history/manage-code-attempt", async (req, res) => {
     res.setHeader("Content-Type", "application/json");
 
-    const { currUsername, matchedUsername, question, roomId, codeText, language } = req.body;
+    const { currUsername, matchedEmail, question, roomId, codeText, language } = req.body;
 
     // Extract out relevant information about the question
     const questionName = question.title;
@@ -34,7 +34,7 @@ appForHistory.post("/history/manage-code-attempt", async (req, res) => {
                 AND room_id = $3
             );
         `;
-		const codeAttemptExistsResult = await pool.query(codeAttemptExistsQuery, [currUsername, matchedUsername, roomId]);
+		const codeAttemptExistsResult = await pool.query(codeAttemptExistsQuery, [currUsername, matchedEmail, roomId]);
 
         // Modify the entry in the database if code attempt exists
 		if (codeAttemptExistsResult.rowCount > 0) {
@@ -47,14 +47,14 @@ appForHistory.post("/history/manage-code-attempt", async (req, res) => {
                     AND room_id = $9
                 );
             `;
-            await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, currUsername, matchedUsername, roomId, language]);
+            await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, currUsername, matchedEmail, roomId, language]);
             return res.status(200).json({ message: "Code attempt updated successfully into the database for storage.", data: req.body });
 		} else { // Else add the code attempt into the database as a new entry
             const insertQuery = `
                 INSERT INTO code_attempts (user1_email, user2_email, room_id, question_name, question_difficulty, question_category, question_description, code, timestamp, language)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             `;
-            await pool.query(insertQuery, [currUsername, matchedUsername, roomId, questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, language]);
+            await pool.query(insertQuery, [currUsername, matchedEmail, roomId, questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, language]);
             return res.status(200).json({ message: "Code attempt inserted successfully into the database for storage." });
         }
 	} catch (err) {

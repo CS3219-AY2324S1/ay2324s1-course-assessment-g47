@@ -2,12 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-}
-
-.room-container {
-  display: flex;
-  flex-direction: column; 
-  height: 100vh;
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-top: 10px;
 }
 
 .question-container {
@@ -18,25 +15,24 @@
   background-color: #38474f;
 }
 
-.bottom-container {
-  width: 75%;
-  order: 3;
-  align-self: center;
-}
-
 .left-panel {
-  width: 0%;
+  height: 80vh;
+  padding: 10px;
+  width: 25%;
+  order: 3;
 }
 
 .middle-panel {
-  padding: 5px;
-  width: 50%;
+  height: 80vh;
+  padding: 10px;
+  width: 35%;
   order: 1;
 }
 
 .right-panel {
-  padding: 5px;
-  width: 50%;
+  height: 80vh;
+  padding: 10px;
+  width: 40%;
   order: 2;
 }
 
@@ -56,12 +52,12 @@
 /* Chat */
 
 .chat-main{
-  height: 200px;
+  height: 100%;
   margin: 0%;
 }
 
 .chat-messages {
-  height: 75%;
+  height: 100%;
   overflow-y: scroll;
   padding: 10px;
   border: 1px solid #ffffff;
@@ -84,35 +80,82 @@
   background: #555;
 }
 
-.chat-messages p {
+/* .chat-messages p {
   margin-bottom: 10px;
-}
+} */
 
 .message {
-  border: 1px solid #fcfcfc;
-  background-color: #e2e2e2;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 5px;
+  /* background-color: #e2e2e2; */
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 8px;
+  border-radius: 15px;
+  display: inline-block;
+  clear: both; /* Add this to ensure messages appear on separate lines */
+  max-width: 70%; /* Adjust the maximum width of the message box */
+  position: relative;
+  min-width: auto;
+  
 }
 
-.message-content {
-  font-family: Arial, sans-serif;
+.user-message {
+  background-color: green;
+  align-self: flex-end;
+  text-align: left;
+  float: right; /* Float to the right for user messages */
 }
 
-.meta {
+.received-message {
+  background-color: grey;
+  align-self: flex-start;
+  text-align: left;
+  float: left; /* Float to the left for received messages */
+}
+
+.notification-message {
+  color: grey;
   font-size: 12px;
-  color: #000000;
-  margin-bottom: 5px;
+  max-width: 90%;
+  margin: 4px auto; /* Set top and bottom margin to 4px and left and right margin to auto */
+  text-align: center;
+  min-width: auto;
+  display: block; /* Ensure it takes up the full width of the container */
+}
+
+.notification-message .message-text {
+  color: grey;
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  display: block; /* Ensure it takes up the full width of the container */
 }
 
 .username {
   font-weight: bold;
   color: #d15252;
+
 }
 
 .message-text {
   font-size: 16px;
+  word-wrap: break-word;
+  white-space: pre-line;
+}
+
+.meta {
+  font-size: 12px;
+  color: black;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-end; 
+  /* position: absolute;
+  padding-right: 10px;
+  bottom: 0;
+  right: 0;
+  margin: 0; */
 }
 
 .chat-form {
