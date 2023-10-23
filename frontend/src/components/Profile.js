@@ -4,8 +4,9 @@ import LoginPage from "./Login";
 import "./Login.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Navigate } from "react-router-dom";
 
-function Profile({ user, handleUserChange, handleLogout }) {
+function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	const postgresqlPort = 4001;
 	const [isEditing, setIsEditing] = useState(false);
 	const [localUser, setLocalUser] = useState({
@@ -13,6 +14,7 @@ function Profile({ user, handleUserChange, handleLogout }) {
 		email: user ? user.email : "",
 		password: user ? user.password : "",
 	});
+	// const navigate = N();
 
 	const handleEditClick = () => {
 		setIsEditing(true);
@@ -99,8 +101,8 @@ function Profile({ user, handleUserChange, handleLogout }) {
 	};
 
 	if (!user) {
-		// Return a different component or handle the case when user is not defined
-		return <LoginPage />;
+		console.log("User is not defined");
+		return <Navigate to="/" replace={true} />;
 	}
 
 	return (
@@ -122,7 +124,7 @@ function Profile({ user, handleUserChange, handleLogout }) {
 						name="username"
 					/>
 				) : (
-					<span>{user.username}</span>
+					<span>{user && user.username}</span>
 				)}
 			</div>
 			<div className="email-wrapper">
@@ -141,7 +143,7 @@ function Profile({ user, handleUserChange, handleLogout }) {
 						name="email"
 					/>
 				) : (
-					<span>{user.email}</span>
+					<span>{user && user.email}</span>
 				)}
 			</div>
 			<div className="password-wrapper">
