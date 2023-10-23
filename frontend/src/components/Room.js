@@ -127,7 +127,6 @@ function Room({ user }) {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
         });
-
         socket.on("set-caller-signal", (data) => {
             setCallerSignal(data.signal);
         });
@@ -216,10 +215,10 @@ function Room({ user }) {
         });
 
         socket.on("user-disconnected", (userId) => {
-            window.removeEventListener('unload', myBeforeUnloadListener);
             setConnectedUsers((prevUsers) =>
                 prevUsers.filter((prevUserId) => prevUserId !== userId)
             );
+            socket.disconnect();
             window.location.href = "/roomexit";
         });
 
@@ -228,6 +227,7 @@ function Room({ user }) {
             event.returnValue = confirmationMessage;
 
             window.addEventListener('unload', () => {
+                socket.emit("disconnected", { roomId: roomId });
                 socket.disconnect();
             });
         }
@@ -246,6 +246,18 @@ function Room({ user }) {
             socket.off("initial-editor-content");
             socket.off("editor-changed");
             socket.off("me");
+            socket.off("language-changed");
+            socket.off("set-caller-signal");
+            socket.off("newRandomQuestion");
+            socket.off("updateRandomQuestion");
+            socket.off("disconnected");
+            window.removeEventListener('unload', myBeforeUnloadListener);
+
+            socket.disconnect();
+
+            console.log("Disconnected from socket.io");
+
+            console.log("Destroyed user media stream");
         };
     }, []);
 
