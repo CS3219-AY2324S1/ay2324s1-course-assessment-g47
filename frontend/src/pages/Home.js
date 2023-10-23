@@ -121,7 +121,7 @@
 				setDesc(true);
 			} else if (sort === "desc") {
 				// Return to the original order (no sorting)
-				sortedQuestions.reverse();
+				sortedQuestions.sort((a, b) => a._id - b._id);
 				setSort("none");
 				setAsc(false);
 				setDesc(false);
@@ -131,15 +131,20 @@
 
 		const customStyles = {
 			control: (styles) => ({
-				...styles,
-				width: "200px",
+			  ...styles,
+			  width: "400px",
+			}),
+			valueContainer: (provided) => ({
+				...provided,
+				maxHeight: "30px", // Adjust the max height as per your needs
+				overflowY: "auto",
 			}),
 			menu: (provided) => ({
-				...provided,
-				width: "200px",
-				maxHeight: "300px",
-				overflowY: "auto",
-				zIndex: 999,
+			  ...provided,
+			  width: "400px",
+			  maxHeight: "150px",  // Adjust the max height as per your needs
+			  overflowY: "auto",
+			  zIndex: 999,
 			}),
 		};
 
@@ -150,7 +155,7 @@
 		};
 
 		const CustomOption = ({ innerProps, label, isSelected }) => (
-			<div {...innerProps} 
+			<div {...innerProps}
 				className={isSelected ? "option selected" : "option"}
 				style={{width: "200px"}}
 			>
