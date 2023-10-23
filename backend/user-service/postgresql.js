@@ -482,6 +482,51 @@ app.post(
 	}
 );
 
+//Fetch user's email
+app.post('/users/fetch/:id/username', authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
+	const email = req.body.email;
+	try {
+		const query = `SELECT username FROM accounts WHERE email = '${email}'`;
+		const result = await pool.query(query);
+		if (result.rows.length === 1) {
+			res.json({
+				message: "User found",
+				user: result.rows[0],
+				tokens: req.body.tokens,
+			});
+		} else {
+			res.status(404).json({ error: 'Account not found' });
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
+app.post('/users/user-history/:id', authenticateToken(['user', 'superuser', 'admin', 'superadmin']), async (req, res) => {
+	const user_email = req.body.email;
+	try {
+		const historyQuery = `
+			SELECT *
+			FROM code_attempts
+			WHERE (
+				user1_email = $1 OR user2_email = $1
+			);
+		`;
+		const result = await pool.query(historyQuery, [user_email]);
+		if (result.rows.length === 0) {
+			return res.status(200).json({ message: 'No history found.' });
+		} else {
+			return res
+				.status(200)
+				.json({ message: "Found User's History!", data: result });
+		}
+	} catch (err) {
+		console.error('Error:', error);
+		return res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
 app.listen(port, () => {
 	console.log(`PostgreSQL server running on port ${port}`);
 });

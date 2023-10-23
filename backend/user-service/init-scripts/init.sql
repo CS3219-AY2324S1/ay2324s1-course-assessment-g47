@@ -14,6 +14,20 @@ CREATE TABLE IF NOT EXISTS accounts (
     authentication_stats BOOLEAN DEFAULT false
 );
 
+CREATE TABLE IF NOT EXISTS code_attempts (
+    attempt_id serial PRIMARY KEY,
+    user1_email VARCHAR (255) NOT NULL,
+    user2_email VARCHAR (255) NOT NULL,
+    room_id VARCHAR (255) NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    language VARCHAR (255) NOT NULL,
+    question_name VARCHAR (255) NOT NULL,
+    question_difficulty VARCHAR (255) NOT NULL,
+    question_category VARCHAR (255) NOT NULL,
+    code TEXT NOT NULL,
+    question_description TEXT NOT NULL
+);
+
 -- Enable the pgcrypto extension if it's not already enabled
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 

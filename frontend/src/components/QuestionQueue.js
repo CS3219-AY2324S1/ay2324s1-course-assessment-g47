@@ -11,13 +11,13 @@ function QuestionQueue({ user }) {
 	const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
 	const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
 
+	const MATCHING_SERVICE_PORT = Constants.MATCHING_SERVICE_PORT;
+
 	const navigate = useNavigate();
 	const [socketID, setSocketID] = useState(null);
 
-	const MATCHING_SERVICE_PORT = Constants.MATCHING_SERVICE_PORT;
-	const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
-
 	useEffect(() => {
+		const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
 		const socket = io.connect(`http://localhost:${IO_PORT}`); //Connect to backend socket.io server
 		socket.on("me", (id) => {
 			console.log(
@@ -38,6 +38,7 @@ function QuestionQueue({ user }) {
 				state: {
 					difficultyLevel: data.difficultyLevel,
 					matchedUsername: data.matchedUsername,
+					matchedEmail: data.matchedEmail,
 				},
 			});
 		};
@@ -85,37 +86,38 @@ function QuestionQueue({ user }) {
 		//   });
 		// }
 
-		
-
 		try {
 			console.log(`SocketId: ${socketID}`);
-			const response = await fetch(`http://localhost:${MATCHING_SERVICE_PORT}/matchmake`, {
-			  method: 'POST',
-			  headers: {
-				'Content-Type': 'application/json',
-			  },
-			  body: JSON.stringify({
-				username: user.username,
-				email: user.email, // Change this to the user's email
-				difficultyLevel: selectedDifficulty,
-				socketId: socketID, // Change this to the user's socket ID
-			  }),
-			});
-	  
+			const response = await fetch(
+				`http://localhost:${MATCHING_SERVICE_PORT}/matchmake`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						username: user.username,
+						email: user.email, // Change this to the user's email
+						difficultyLevel: selectedDifficulty,
+						socketId: socketID, // Change this to the user's socket ID
+					}),
+				}
+			);
+
 			if (response.status === 200) {
-			  // User successfully enqueued
-			  console.log('User enqueued successfully.');
+				// User successfully enqueued
+				console.log("User enqueued successfully.");
 			} else {
-			  // Handle error cases here
-			  console.error('Failed to enqueue user.');
-			  console.error(response);
-			  setLoading(false);
+				// Handle error cases here
+				console.error("Failed to enqueue user.");
+				console.error(response);
+				setLoading(false);
 			}
-		  } catch (error) {
-			console.error('Error enqueueing user:', error);
+		} catch (error) {
+			console.error("Error enqueueing user:", error);
 			setLoading(false);
-		  }
-		}; 
+		}
+	};
 
 	// Function to allow the user to exit the queue
 	const handleExitQueue = async () => {
@@ -124,31 +126,34 @@ function QuestionQueue({ user }) {
 		setElapsedTime(0); // Reset elapsed time
 
 		try {
-			const response = await fetch(`http://localhost:${MATCHING_SERVICE_PORT}/exitqueue`, {
-			  method: 'POST',
-			  headers: {
-				'Content-Type': 'application/json',
-			  },
-			  body: JSON.stringify({
-				username: user.username,
-				email: user.email, // Change this to the user's email
-				difficultyLevel: selectedDifficulty,
-				socketId: socketID, // Change this to the user's socket ID
-			  }),
-			});
-	  
+			const response = await fetch(
+				`http://localhost:${MATCHING_SERVICE_PORT}/exitqueue`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						username: user.username,
+						email: user.email, // Change this to the user's email
+						difficultyLevel: selectedDifficulty,
+						socketId: socketID, // Change this to the user's socket ID
+					}),
+				}
+			);
+
 			if (response.status === 200) {
-			  // User successfully exited the queue
-			  console.log('User exited the queue successfully.');
+				// User successfully exited the queue
+				console.log("User exited the queue successfully.");
 			} else {
-			  // Handle error cases here
-			  console.error('Failed to exit the queue.');
-			  console.error(response);
+				// Handle error cases here
+				console.error("Failed to exit the queue.");
+				console.error(response);
 			}
-		  } catch (error) {
-			console.error('Error exiting the queue:', error);
-		  }
-		};
+		} catch (error) {
+			console.error("Error exiting the queue:", error);
+		}
+	};
 
 	return (
 		<div className="question-queue">

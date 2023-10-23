@@ -78,7 +78,7 @@ services:
     networks:
       - app-network
 
-  # Colaboration Service
+  # Collaboration Service
   collaboration-service:
     container_name: collaboration-service
     restart: always
@@ -89,6 +89,20 @@ services:
       - '8084:8084'
     networks:
       - app-network
+
+  # History Service
+  history-service:
+    container_name: history-service
+    restart: always
+    build:
+      context: ./backend/history-service
+      dockerfile: Dockerfile
+    ports:
+      - '8085:8085'
+    networks:
+      - app-network
+    depends_on:
+      - postgres
 
   # Frontend React App
   frontend:
@@ -110,6 +124,7 @@ services:
       - question-service
       - matching-service
       - collaboration-service
+      - history-service
     networks:
       - app-network
 

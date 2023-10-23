@@ -15,6 +15,9 @@ let connection;
 // Create a global variable to store the RabbitMQ channel
 let matchmakingChannel;
 
+// Create a new Map to aid in matching different Difficulty Levels
+const difficultyMap = new Map();
+
 const app = express(); //Start up express app
 
 app.use(express.json()); // Body parser middleware
@@ -54,16 +57,21 @@ const createMatchingChannel = async () => {
 };
 
 // Adds users into the waiting queue
-const enqueueUser = async (email, difficultyLevel, socketId) => {
+const enqueueUser = async (username, email, difficultyLevel, socketId) => {
 	try {
 		const channel = await createMatchingChannel();
-		const message = JSON.stringify({ email, difficultyLevel, socketId });
+		const message = JSON.stringify({
+			username,
+			email,
+			difficultyLevel,
+			socketId,
+		});
 
 		channel.sendToQueue("user_queue", Buffer.from(message), {
 			persistent: true,
 		});
 		console.log(
-			`User ${email} with socket ID (${socketId}) enqueued with difficulty level ${difficultyLevel}.`
+			`${username} with email ${email} with socket ID (${socketId}) enqueued with difficulty level ${difficultyLevel}.`
 		);
 	} catch (error) {
 		console.error(
@@ -74,18 +82,16 @@ const enqueueUser = async (email, difficultyLevel, socketId) => {
 };
 
 // Function to remove a user from the "user_queue" by email
-const dequeueUserByEmail = async (email) => {
+const dequeueUserByEmail = async (email, difficultyLevel) => {
 	console.log(`Removing user ${email} from the waiting queue...`);
 	try {
 		const channel = await createMatchingChannel();
-
 		// Set up a consumer to check and remove the user by email
 		channel.consume("user_queue", (message) => {
 			console.log("Checking for user in the waiting queue...");
 			if (message !== null) {
-				const { messageEmail, difficultyLevel, socketId } = JSON.parse(
-					message.content.toString()
-				);
+				const { username, messageEmail, difficultyLevel, socketId } =
+					JSON.parse(message.content.toString());
 
 				if (messageEmail === email) {
 					// Dequeue the user by acknowledging the message
@@ -93,6 +99,9 @@ const dequeueUserByEmail = async (email) => {
 					console.log(
 						`User ${email} has been dequeued from the waiting queue.`
 					);
+					if (difficultyMap.has(difficultyLevel)) {
+						difficultyMap.delete(difficultyLevel);
+					}
 				}
 			}
 		});
@@ -112,16 +121,15 @@ const matchUsers = async () => {
 
 		await channel.prefetch(1);
 
-		const difficultyMap = new Map();
-
 		console.log("Waiting for users to match...");
 
 		// Check for users in the waiting queue to match with the same difficulty level
 		channel.consume("user_queue", (message) => {
 			if (message !== null) {
-				const { email, difficultyLevel, socketId } = JSON.parse(
-					message.content.toString()
-				);
+				const { username, email, difficultyLevel, socketId } =
+					JSON.parse(message.content.toString());
+				const deliveryTag = message.fields.deliveryTag;
+				console.log(deliveryTag);
 				// Checks the map for users waiting to get matched based on their difficulty level
 				if (difficultyMap.has(difficultyLevel)) {
 					const matchingUser = difficultyMap.get(difficultyLevel);
@@ -131,11 +139,13 @@ const matchUsers = async () => {
 						// Send the two users' information into the matched_pairs queue and remove from waiting queue
 						const matchedPair = {
 							Player1: {
+								username: username,
 								email: email,
 								difficultyLevel: difficultyLevel,
 								socketId: socketId,
 							},
 							Player2: {
+								username: matchingUser.username,
 								email: matchingUser.email,
 								difficultyLevel: matchingUser.difficultyLevel,
 								socketId: matchingUser.socketId,
@@ -146,7 +156,7 @@ const matchUsers = async () => {
 							"matched_pairs",
 							Buffer.from(matched_message)
 						);
-						console.log(matched_message);
+						console.log("MATCHED_MESSAGE" + matched_message);
 						console.log(
 							`Matched user ${email} with user ${matchingUser.email} for difficulty level: ${difficultyLevel}`
 						);
@@ -154,23 +164,10 @@ const matchUsers = async () => {
 						const roomId = uuidv4(); // Implement a function to generate a unique roomId
 						rooms[roomId] = [email, matchingUser.email]; // Store the matched users in the room
 
-						console.log("roomID: ", roomId);
 						// Notify the matched users with the roomId
-						// socketIO.io.to(socketId).emit("matched-successfully", {
-						// 	roomId: roomId,
-						// 	socketId: socketId,
-						// 	difficultyLevel: difficultyLevel,
-						// 	matchedUsername: matchingUser.email,
-						// });
-						// socketIO.io
-						// 	.to(matchingUser.socketId)
-						// 	.emit("matched-successfully", {
-						// 		roomId: roomId,
-						// 		socketId: matchingUser.socketId,
-						// 		difficultyLevel: difficultyLevel,
-						// 		matchedUsername: email,
-						// 	});
-						// console.log("after socketio");
+						//socketIO.io.to(socketId).emit("matched-successfully", {roomId: roomId, socketId: socketId, difficultyLevel: difficultyLevel, matchedUsername: matchingUser.email});
+						//socketIO.io.to(matchingUser.socketId).emit("matched-successfully", {roomId: roomId, socketId: matchingUser.socketId, difficultyLevel: difficultyLevel, matchedUsername: email});
+
 						// Remove the matched user from the map
 						difficultyMap.delete(difficultyLevel);
 					} else {
@@ -182,6 +179,8 @@ const matchUsers = async () => {
 				} else {
 					// No match found, store the user's info into the difficultyMap based on the difficulty level he/she chose
 					difficultyMap.set(difficultyLevel, {
+						deliveryTag,
+						username,
 						email,
 						difficultyLevel,
 						socketId,
@@ -204,7 +203,7 @@ const matchUsers = async () => {
 app.post("/matchmake", async (req, res) => {
 	console.log("Matchmake request received");
 	// Upon every matching request, user sends his/her 'email' and 'difficultyLevel' to the waiting queue
-	const { email, difficultyLevel, socketId } = req.body;
+	const { username, email, difficultyLevel, socketId } = req.body;
 
 	try {
 		// Checks for missing email address or difficulty level of the question
@@ -215,8 +214,7 @@ app.post("/matchmake", async (req, res) => {
 		}
 
 		// Enqueue the user into the waiting queue
-		enqueueUser(email, difficultyLevel, socketId);
-
+		enqueueUser(username, email, difficultyLevel, socketId);
 		return res.status(200).json({ message: "User enqueued successfully." });
 	} catch (error) {
 		console.error("Error publishing user to waiting queue:", error);
@@ -227,7 +225,7 @@ app.post("/matchmake", async (req, res) => {
 // Endpoint for users to exit the queue
 app.post("/exitqueue", async (req, res) => {
 	console.log("Exit queue request received");
-	const { email, socketId } = req.body;
+	const { username, difficultyLevel, email, socketId } = req.body;
 
 	try {
 		// Checks for missing email or socketId
@@ -238,10 +236,10 @@ app.post("/exitqueue", async (req, res) => {
 		}
 
 		// Remove the user from the queue (you'll need to implement a function to do this)
-		dequeueUserByEmail(email);
+		dequeueUserByEmail(email, difficultyLevel);
 
 		console.log(
-			`User ${email} with socket ID (${socketId}) has exited the queue.`
+			`${username} with email ${email} with socket ID (${socketId}) has exited the queue.`
 		);
 		return res
 			.status(200)
@@ -253,7 +251,7 @@ app.post("/exitqueue", async (req, res) => {
 });
 
 app.listen(port, () => {
-	console.log(`Matching service server running on port ${port}`);
+	console.log(`Matchmaking service running on port ${port}`);
 	createMatchingChannel(); // Creates a connection to the Cloud AMQP server (RabbitMQ)
 	matchUsers(); // Starts the matching service
 });
