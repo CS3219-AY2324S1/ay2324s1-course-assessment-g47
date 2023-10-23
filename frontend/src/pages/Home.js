@@ -27,15 +27,26 @@ const Home = ({ user, handleLogin }) => {
 	// fetch questions from the backend
 	useEffect(() => {
 		const fetchQuestions = async () => {
-			const response = await fetch("/api/questions", {
-				headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
-			});
-			const json = await response.json();
+			try {
+				const response = await fetch("/api/questions", {
+					headers: {
+						Authorization: `Bearer ${user.tokens.accessToken}`,
+					},
+				});
 
-			if (response.ok) {
+				if (!response.ok) {
+					throw new Error(`HTTP error! Status: ${response.status}`);
+				}
+
+				const json = await response.json();
+
 				setOriginalQuestions(json);
 				setFilteredQuestions(json);
 				dispatch({ type: "SET_QUESTIONS", payload: json });
+			} catch (error) {
+				// Handle the error here
+				console.error("Error fetching questions:", error.message);
+				// You can set an error state or display an error message to the user
 			}
 		};
 

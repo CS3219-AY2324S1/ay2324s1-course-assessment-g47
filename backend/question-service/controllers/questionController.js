@@ -100,7 +100,7 @@ const initializeQuestions = async (defaultQuestions) => {
 
 // create a new question
 const createQuestion = async (req, res) => {
-	const { title, complexity, category, description } = req.body;
+	const { title, complexity, category, description, upvotes } = req.body;
 
 	console.log(req.body);
 	let emptyFields = [];
@@ -154,6 +154,7 @@ const createQuestion = async (req, res) => {
 			complexity,
 			category,
 			description,
+			upvotes,
 		});
 		res.status(200).json(question);
 	} catch (error) {
@@ -188,9 +189,8 @@ const updateQuestion = async (req, res) => {
 
 	const question = await Question.findOneAndUpdate(
 		{ _id: id },
-		{
-			...req.body, // ... spread operator to get all the fields from the request body
-		}
+		{ ...req.body },
+		{ new: true, runValidators: true }
 	);
 
 	if (!question) {
