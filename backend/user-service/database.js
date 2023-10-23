@@ -25,16 +25,43 @@ module.exports = pool;
 // // 		// pool.end();
 // // 	});
 
-// // //CREATE TABLE
+// CREATE TABLE
 // const createTblQry = `CREATE TABLE accounts (
 //     user_id serial PRIMARY KEY,
 //     username VARCHAR ( 255 ) NOT NULL,
-// email VARCHAR ( 255 ) UNIQUE NOT NULL,
+// 	   email VARCHAR ( 255 ) UNIQUE NOT NULL,
 //     password VARCHAR ( 255 ) NOT NULL,
 // 	   account_type VARCHAR ( 255 ) NOT NULL,
 //     authentication_stats BOOLEAN DEFAULT false
 // 	   );
-//     `;
+// `;
+
+// pool.query(createTblQry)
+// 	.then((res) => {
+// 		console.log("Table created");
+// 		console.log(res);
+// 		// pool.end();
+// 	})
+// 	.catch((err) => {
+// 		console.log(err);
+// 		// pool.end();
+// 	});
+
+// CREATE TABLE
+// const createTblQry = `CREATE TABLE code_attempts (
+//     attempt_id serial PRIMARY KEY,
+//     user1_email VARCHAR ( 255 ) NOT NULL,
+// 	user2_email VARCHAR ( 255 ) NOT NULL,
+// 	room_id VARCHAR ( 255 ) NOT NULL,
+//     timestamp TIMESTAMP NOT NULL,
+// 	   language VARCHAR ( 255 ) NOT NULL,
+//     question_name VARCHAR ( 255 ) NOT NULL,
+// 	question_difficulty VARCHAR ( 255 ) NOT NULL,
+// 	question_category VARCHAR ( 255 ) NOT NULL,
+//     code TEXT NOT NULL,
+// 	question_description TEXT NOT NULL
+// 	);
+// `;
 
 // pool.query(createTblQry)
 // 	.then((res) => {

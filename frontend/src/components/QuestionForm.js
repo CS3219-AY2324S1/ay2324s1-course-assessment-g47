@@ -130,13 +130,14 @@ const QuestionForm = () => {
 
 		const category = selectedCategories;
 		let description = "";
+		let upvotes = [];
 
 		const isQuillEmpty = quill.getText().trim() === "";
 		if (!isQuillEmpty) {
 			description = quill.root.innerHTML.trim(); // Get the HTML content from Quill
 		}
 
-		const question = { title, complexity, category, description };
+		const question = { title, complexity, category, description, upvotes };
 
 		console.log(JSON.stringify(question));
 

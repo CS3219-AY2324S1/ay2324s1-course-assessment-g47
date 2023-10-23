@@ -13,29 +13,68 @@ import * as Constants from "../constants/constants.js";
 import Select, { components } from "react-select";
 
 const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
+const HISTORY_PORT = Constants.HISTORY_SERVICE_PORT;
+
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
 
 function Room({ user }) {
 	console.log("user:", user);
 	const location = useLocation();
 	const difficultyLevel = location.state?.difficultyLevel || "easy"; // Get the difficultyLevel from location state
-	const matchedUsername = location.state?.matchedUsername || "Peer2"; // Get the difficultyLevel from location state
-	console.log("matchedUsername:", matchedUsername);
-	console.log("difficultyLevel:", difficultyLevel);
+	const matchedUsername = location.state?.matchedUsername || "Peer2"; // Stores the matched user's email
+	const currUsername = user.user.email; // Stores current user's email
 	// Code language settings
 	const [selectedLanguage, setSelectedLanguage] = useState(
 		codeLanguages.find((language) => language.value === "python")
 	);
 
-	const { roomId } = useParams();
+	const { roomId } = useParams(); // Stores the Room ID
 	const [me, setMe] = useState("");
 	const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
 	const [callerSignal, setCallerSignal] = useState();
 	const [peerSocketId, setPeerSocketId] = useState(null);
-	const [editorText, setEditorText] = useState("");
+	const [editorText, setEditorText] = useState(""); // Stores the code
 	const [peer, setPeer] = useState(null);
+	const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
 
-	const [randomQuestion, setRandomQuestion] = useState(null);
+	const updateData = async (codeText, language, question) => {
+		try {
+			const response = await fetch(
+				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						currUsername,
+						matchedUsername,
+						question,
+						roomId,
+						codeText,
+						language,
+					}),
+				}
+			);
+
+			if (response.status === 200) {
+				// Successful update of Code Attempt History
+				const data = await response.json();
+				console.log(data);
+				console.log(
+					`Saved the progress for ${question.title} for ${currUsername} and ${matchedUsername}.`
+				);
+			} else {
+				// Handle Unexpected Errors caused from the Server
+				console.log("Server error");
+			}
+		} catch (err) {
+			console.error(
+				"Unexpected error occurred while updating data:",
+				err
+			);
+		}
+	};
 
 	const fetchRandomEasyQuestion = async () => {
 		if (user) {
@@ -162,26 +201,21 @@ function Room({ user }) {
 		});
 
 		socket.on("user-disconnected", (userId) => {
-			window.removeEventListener("unload", myBeforeUnloadListener);
 			setConnectedUsers((prevUsers) =>
 				prevUsers.filter((prevUserId) => prevUserId !== userId)
 			);
+			socket.disconnect();
 			window.location.href = "/roomexit";
 		});
 
 		function myBeforeUnloadListener(event) {
-			const confirmationMessage = "Are you sure you want to leave?";
-			event.returnValue = confirmationMessage;
-
 			window.addEventListener("unload", () => {
+				socket.emit("disconnected", { roomId: roomId });
 				socket.disconnect();
 			});
 		}
 
 		window.addEventListener("unload", myBeforeUnloadListener);
-
-		// Call the getUserMedia function only once when the component mounts
-		getFirstUserMediaWithStatus();
 
 		return () => {
 			// Clean up the event listener when the component unmounts
@@ -192,23 +226,25 @@ function Room({ user }) {
 			socket.off("initial-editor-content");
 			socket.off("editor-changed");
 			socket.off("me");
+			socket.off("language-changed");
+			socket.off("set-caller-signal");
+			socket.off("newRandomQuestion");
+			socket.off("updateRandomQuestion");
+			socket.off("disconnected");
+			window.removeEventListener("unload", myBeforeUnloadListener);
+
+			socket.disconnect();
+
+			console.log("Disconnected from socket.io");
+
+			console.log("Destroyed user media stream");
 		};
 	}, []);
 
-	const handleRefreshQuestion = () => {
+	const handleRefreshQuestion = async () => {
 		// Call fetchRandomEasyQuestion when "Change Question" button is clicked
-		fetchRandomEasyQuestion();
-	};
-
-	socket.on("editor-changed", (text) => {
-		if (editorText !== text) {
-			setEditorText(text);
-		}
-	});
-
-	const handleEditorChange = (newValue) => {
-		setEditorText(newValue);
-		socket.emit("editor-change", { text: newValue, roomId: roomId });
+		const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
+		updateData(editorText, selectedLanguage, newQuestion);
 	};
 
 	const leaveCall = () => {
@@ -216,6 +252,12 @@ function Room({ user }) {
 		console.log("Leaving call");
 		socket.emit("disconnected", { roomId: roomId });
 		socket.disconnect();
+	};
+
+	const handleEditorChange = (newValue) => {
+		setEditorText(newValue);
+		updateData(newValue, selectedLanguage, randomQuestion);
+		socket.emit("editor-change", { text: newValue, roomId: roomId });
 	};
 
 	// wait for DOM to load before getting elements
@@ -264,11 +306,17 @@ function Room({ user }) {
             `;
 			document.querySelector(".chat-messages").appendChild(div);
 		}
+
+		return () => {
+			socket.off("message");
+			socket.off("chatMessage");
+		};
 	}, []);
 
 	const handleLanguageChange = (selectedOption) => {
 		console.log(`Option selected:`, selectedOption);
 		setSelectedLanguage(selectedOption);
+		updateData(editorText, selectedOption, randomQuestion);
 		socket.emit("language-change", {
 			label: selectedOption.label,
 			value: selectedOption.value,

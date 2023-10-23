@@ -20,6 +20,10 @@ const questionSchema = new Schema({
         type: Object,
         required: true
     },
+    upvotes: {
+        type: Array,
+        required: true
+    },
 }, { timestamps: true })
 
-module.exports = mongoose.model('Question', questionSchema)
+module.exports = mongoose.model('Question', questionSchema, 'peerprepquestions')
