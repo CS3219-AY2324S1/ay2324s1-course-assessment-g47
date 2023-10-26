@@ -29,4 +29,4 @@ const questionSchema = new Schema(
 	{ timestamps: true }
 );
 
-module.exports = mongoose.model("Question", questionSchema);
+module.exports = mongoose.model("Question", questionSchema, 'peerprepquestions');

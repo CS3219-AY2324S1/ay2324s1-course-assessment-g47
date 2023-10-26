@@ -31,7 +31,7 @@ app.use(
 // Connect to mongodb
 const connectWithRetry = () => {
 	mongoose
-		.connect(process.env.MONGO_URL, {
+		.connect(process.env.MONGO_URI, { // Changed from URL to URI
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			serverSelectionTimeoutMS: 5000, // Timeout in milliseconds for server selection
