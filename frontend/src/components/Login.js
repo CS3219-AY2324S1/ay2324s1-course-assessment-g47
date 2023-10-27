@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./css/Login.css";
 import * as Constants from "../constants/constants.js";
+import loginImage from "../images/login.jpg";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage(props) {
+	const navigate = useNavigate();
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -65,50 +68,108 @@ function LoginPage(props) {
 	};
 
 	return (
-		<div className="login-container">
-			<h1 className="login-label">Login</h1>
-			<form onSubmit={handleSubmit}>
-				<div className="form-group">
-					<label htmlFor="email">Email:</label>
-					<input
-						type="email"
-						id="email"
-						name="email"
-						value={formData.email}
-						onChange={handleChange}
-						required
-					/>
+		<>
+			<div className="container-fluid h-custom">
+				<div className="row d-flex justify-content-center align-items-center h-100">
+					<div className="col-md-9 col-lg-6 col-xl-5">
+						<img
+							src={loginImage}
+							className="img-fluid"
+							alt="Sample image"
+						/>
+					</div>
+					<div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+						<form>
+							<div className="form-outline mb-4">
+								<label
+									className="form-label"
+									for="form3Example3"
+								>
+									Email address
+								</label>
+								<input
+									type="email"
+									id="email"
+									name="email"
+									value={formData.email}
+									onChange={handleChange}
+									required
+									className="form-control form-control-lg"
+									placeholder="Enter a valid email address"
+								/>
+							</div>
+
+							<div className="form-outline mb-3">
+								<label
+									className="form-label"
+									for="form3Example4"
+								>
+									Password
+								</label>
+								<input
+									type="password"
+									id="password"
+									name="password"
+									value={formData.password}
+									onChange={handleChange}
+									required
+									className="form-control form-control-lg"
+									placeholder="Enter password"
+								/>
+							</div>
+
+							{formData.loginError && (
+								<p className="error">{formData.loginError}</p>
+							)}
+							{formData.loginSuccess && (
+								<p className="success">
+									{formData.loginSuccess}
+								</p>
+							)}
+							<div class="d-flex align-items-center justify-content-center pt-4">
+								<button
+									type="button"
+									class="btn btn-dark btn-lg w-100"
+									onClick={handleSubmit}
+								>
+									Login
+								</button>
+							</div>
+
+							<div class="d-flex align-items-center justify-content-center pt-4">
+								<p class="mb-0 me-2">Don't have an account?</p>
+
+								<button
+									type="button"
+									className="btn btn-outline-danger"
+									onClick={() => {
+										navigate("/register"); // Navigate to the registration page
+									}}
+								>
+									Create new
+								</button>
+							</div>
+
+							<div class="d-flex align-items-center justify-content-center pt-4">
+								<p class="mb-0 me-2">
+									Haven't verified your account
+								</p>
+
+								<button
+									type="button"
+									className="btn btn-outline-danger"
+									onClick={() => {
+										navigate("/verifyOTP"); // Navigate to the registration page
+									}}
+								>
+									Verify here
+								</button>
+							</div>
+						</form>
+					</div>
 				</div>
-				<div className="form-group">
-					<label htmlFor="password">Password:</label>
-					<input
-						type="password"
-						id="password"
-						name="password"
-						value={formData.password}
-						onChange={handleChange}
-						required
-					/>
-				</div>
-				{formData.loginError && (
-					<p className="error">{formData.loginError}</p>
-				)}
-				{formData.loginSuccess && (
-					<p className="success">{formData.loginSuccess}</p>
-				)}
-				<button type="submit">Login</button>
-			</form>
-			<div>
-				<Link to="/register">Not a user? Sign up now</Link>
-				<br />
-				<Link to="/verifyOTP">
-					Click here to verify your account now!
-				</Link>
 			</div>
-			{/* <div>
-				<Link to="/forgetPassword">Forgot password? Reset here</Link>
-			</div> */}
-		</div>
+		</>
 	);
 }
 

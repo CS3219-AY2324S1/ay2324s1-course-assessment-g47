@@ -9,11 +9,9 @@ const Footer = () => {
 	const appName = "CS3219 G47 PeerPrep";
 
 	return (
-		<footer className="app-footer">
-			<div className="container">
-				<p>
-					&copy; {currentYear} {appName}
-				</p>
+		<footer className="bg-dark text-center text-lg-start d-flex flex-column justify-content-center footer">
+			<div class="text-center text-light p-3">
+				&copy; {currentYear} {appName}
 			</div>
 		</footer>
 	);

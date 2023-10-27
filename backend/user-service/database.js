@@ -47,8 +47,8 @@ module.exports = pool;
 // 		// pool.end();
 // 	});
 
-// CREATE TABLE
-// const createTblQry = `CREATE TABLE code_attempts (
+// // CREATE TABLE
+// const createCodeTblQry = `CREATE TABLE code_attempts (
 //     attempt_id serial PRIMARY KEY,
 //     user1_email VARCHAR ( 255 ) NOT NULL,
 // 	user2_email VARCHAR ( 255 ) NOT NULL,
@@ -63,7 +63,7 @@ module.exports = pool;
 // 	);
 // `;
 
-// pool.query(createTblQry)
+// pool.query(createCodeTblQry)
 // 	.then((res) => {
 // 		console.log("Table created");
 // 		console.log(res);
