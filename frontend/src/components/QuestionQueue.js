@@ -11,14 +11,14 @@ function QuestionQueue({ user }) {
 	const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
 	const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
 
-	const MATCHING_SERVICE_PORT = Constants.MATCHING_SERVICE_PORT;
+	const MATCHING_SERVICE_URL = Constants.MATCHING_SERVICE_URL;
 
 	const navigate = useNavigate();
 	const [socketID, setSocketID] = useState(null);
 
 	useEffect(() => {
-		const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
-		const socket = io.connect(`http://localhost:${IO_PORT}`); //Connect to backend socket.io server
+		const IO_URL = Constants.COLLABORATION_SERVICE_URL;
+		const socket = io.connect(`${IO_URL}`); //Connect to backend socket.io server
 		socket.on("me", (id) => {
 			console.log(
 				"Calling socket function `me` to get socketID, socketID:",
@@ -88,21 +88,18 @@ function QuestionQueue({ user }) {
 
 		try {
 			console.log(`SocketId: ${socketID}`);
-			const response = await fetch(
-				`http://localhost:${MATCHING_SERVICE_PORT}/matchmake`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						username: user.username,
-						email: user.email, // Change this to the user's email
-						difficultyLevel: selectedDifficulty,
-						socketId: socketID, // Change this to the user's socket ID
-					}),
-				}
-			);
+			const response = await fetch(`${MATCHING_SERVICE_URL}/matchmake`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					username: user.username,
+					email: user.email, // Change this to the user's email
+					difficultyLevel: selectedDifficulty,
+					socketId: socketID, // Change this to the user's socket ID
+				}),
+			});
 
 			if (response.status === 200) {
 				// User successfully enqueued
@@ -126,21 +123,18 @@ function QuestionQueue({ user }) {
 		setElapsedTime(0); // Reset elapsed time
 
 		try {
-			const response = await fetch(
-				`http://localhost:${MATCHING_SERVICE_PORT}/exitqueue`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						username: user.username,
-						email: user.email, // Change this to the user's email
-						difficultyLevel: selectedDifficulty,
-						socketId: socketID, // Change this to the user's socket ID
-					}),
-				}
-			);
+			const response = await fetch(`${MATCHING_SERVICE_URL}/exitqueue`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					username: user.username,
+					email: user.email, // Change this to the user's email
+					difficultyLevel: selectedDifficulty,
+					socketId: socketID, // Change this to the user's socket ID
+				}),
+			});
 
 			if (response.status === 200) {
 				// User successfully exited the queue

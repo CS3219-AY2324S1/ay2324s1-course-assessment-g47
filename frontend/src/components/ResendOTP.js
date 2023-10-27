@@ -16,7 +16,7 @@ function ResendOTP() {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/resendOTPVerificationCode`,
+				`${Constants.POSTGRESQL_URL}/resendOTPVerificationCode`,
 				{
 					method: "POST",
 					headers: {

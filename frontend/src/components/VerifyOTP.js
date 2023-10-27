@@ -27,7 +27,7 @@ function VerifyOTP() {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/verifyOTP`,
+				`${Constants.POSTGRESQL_URL}/verifyOTP`,
 				{
 					method: "POST",
 					headers: {

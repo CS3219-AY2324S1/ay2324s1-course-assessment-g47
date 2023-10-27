@@ -24,7 +24,7 @@ function ForgotPassword() {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/password`,
+				`${Constants.POSTGRESQL_URL}/users/update/password`,
 				{
 					method: "POST",
 					headers: {

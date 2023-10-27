@@ -12,10 +12,10 @@ import * as Constants from "../constants/constants.js";
 
 import Select, { components } from "react-select";
 
-const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
-const HISTORY_PORT = Constants.HISTORY_SERVICE_PORT;
+const IO_URL = Constants.COLLABORATION_SERVICE_URL;
+const HISTORY_URL = Constants.HISTORY_SERVICE_URL;
 
-const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
+const socket = io.connect(`${IO_URL}`); // Connect to the backend socket.io server
 
 function Room({ user }) {
 	console.log("user:", user);
@@ -48,7 +48,7 @@ function Room({ user }) {
 	const updateData = async (codeText, language, question) => {
 		try {
 			const response = await fetch(
-				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
+				`${HISTORY_URL}/history/manage-code-attempt`,
 				{
 					method: "POST",
 					headers: {

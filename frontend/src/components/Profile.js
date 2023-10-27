@@ -6,18 +6,18 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as Constants from "../constants/constants.js";
 
-const postgresqlPort = Constants.POSTGRESQL_PORT;
+const postgresqlUrl = Constants.POSTGRESQL_URL;
 
 // Function used to retrieve user's name based on email given
 async function fetchUserName(email, user) {
 	try {
 		const response = await fetch(
-			`http://localhost:${postgresqlPort}/users/fetch/${user.user.user_id}/username`,
+			`${postgresqlUrl}/users/fetch/${user.user.user_id}/username`,
 			{
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					'Authorization': `Bearer ${user.tokens.accessToken}`
+					Authorization: `Bearer ${user.tokens.accessToken}`,
 				},
 				body: JSON.stringify({ email }),
 			}
@@ -26,7 +26,7 @@ async function fetchUserName(email, user) {
 			const result = await response.json();
 			return result.user.username; // Extract the username from the result
 		} else {
-			console.error('API request failed');
+			console.error("API request failed");
 			return "User not found"; // Return an appropriate default value
 		}
 	} catch (err) {
@@ -38,9 +38,10 @@ async function fetchUserName(email, user) {
 // Manual parsing function to extract out the relevant information for category of question and date time of attempt
 function Parser(data, type) {
 	if (type === "category") {
-		const parsedData = data.replace(/[{"}]/g, '');
+		const parsedData = data.replace(/[{"}]/g, "");
 		return parsedData.replace(/,/g, ", ");
-	} else if (type === "category2") { // Used to format the categories into appropriate ones for parsing into the Room component for past code review
+	} else if (type === "category2") {
+		// Used to format the categories into appropriate ones for parsing into the Room component for past code review
 		// Define a regular expression to match the elements inside the curly braces
 		const regex = /"([^"]+)"/g;
 		const result = [];
@@ -90,12 +91,12 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		}
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/user-history/${user.user.user_id}`,
+				`${postgresqlUrl}/users/user-history/${user.user.user_id}`,
 				{
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						'Authorization': `Bearer ${user.tokens.accessToken}`
+						Authorization: `Bearer ${user.tokens.accessToken}`,
 					},
 					body: JSON.stringify({
 						email: user.user.email,
@@ -110,9 +111,10 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 				const userNamesData = {};
 				for (const historyItem of data.data.rows) {
-					const userEmail = historyItem.user1_email === user.user.email
-						? historyItem.user2_email
-						: historyItem.user1_email;
+					const userEmail =
+						historyItem.user1_email === user.user.email
+							? historyItem.user2_email
+							: historyItem.user1_email;
 
 					// Fetch the user name and store it in the state
 					const userName = await fetchUserName(userEmail, user);
@@ -164,7 +166,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		try {
 			console.log(user);
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/${user.user.user_id}`,
+				`${postgresqlUrl}/users/update/${user.user.user_id}`,
 				{
 					method: "POST",
 					headers: {
@@ -217,19 +219,16 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 		// Check if the current password is correct
 		try {
-			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/login`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						email: user.user.email,
-						password: passwordData.currentPassword,
-					}),
-				}
-			);
+			const response = await fetch(`${postgresqlUrl}/users/login`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					email: user.user.email,
+					password: passwordData.currentPassword,
+				}),
+			});
 
 			if (response.status === 200) {
 				//successful login
@@ -252,7 +251,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		// Update the password
 		try {
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update_password`,
+				`${postgresqlUrl}/users/update_password`,
 				{
 					method: "POST",
 					headers: {
@@ -292,17 +291,14 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 		if (confirmed) {
 			try {
-				const response = await fetch(
-					`http://localhost:${Constants.POSTGRESQL_PORT}/users/delete`,
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${user.tokens.accessToken}`,
-						},
-						body: JSON.stringify(user.user),
-					}
-				);
+				const response = await fetch(`${postgresqlUrl}/users/delete`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${user.tokens.accessToken}`,
+					},
+					body: JSON.stringify(user.user),
+				});
 
 				if (response.status === 200) {
 					//successful delete
@@ -349,7 +345,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 				<div className="profile-container">
 					<p>
 						{user.user.account_type === "superadmin" ||
-							user.user.account_type === "admin" ? (
+						user.user.account_type === "admin" ? (
 							<Link
 								className="button-link-change-account"
 								to="/changetype"
@@ -407,7 +403,9 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 							<div className="edit-user-button">
 								<button
 									className="profile-button"
-									onClick={(e) => handleSaveUserDetailsClick(e)}
+									onClick={(e) =>
+										handleSaveUserDetailsClick(e)
+									}
 								>
 									Save User Details
 								</button>
@@ -463,7 +461,8 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 										onChange={(e) => {
 											setPasswordData({
 												...passwordData,
-												repeatNewPassword: e.target.value,
+												repeatNewPassword:
+													e.target.value,
 											});
 										}}
 									/>
@@ -471,13 +470,17 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 								<div className="edit-password-button">
 									<button
 										className="profile-button"
-										onClick={(e) => handleSavePasswordClick(e)}
+										onClick={(e) =>
+											handleSavePasswordClick(e)
+										}
 									>
 										Save Password
 									</button>
 									<button
 										className="profile-button"
-										onClick={(e) => handleBackButtonClick(e)}
+										onClick={(e) =>
+											handleBackButtonClick(e)
+										}
 									>
 										Back
 									</button>
@@ -512,7 +515,12 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 					<h2 className="profile-label">History</h2>
 					{!historyData.data || !historyData.data.rows ? (
 						<div className="no-history">
-							<div style={{ marginTop: "2em" }}><h2 className="no-history-text">No history found. Start a new PeerPrep Session today!</h2></div>
+							<div style={{ marginTop: "2em" }}>
+								<h2 className="no-history-text">
+									No history found. Start a new PeerPrep
+									Session today!
+								</h2>
+							</div>
 						</div>
 					) : (
 						<table className="history-table">
@@ -527,40 +535,74 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 								</tr>
 							</thead>
 							<tbody>
-								{historyData.data.rows.map((historyItem, index) => (
-									<tr key={index} className="history-row">
-										<td>
-											<Link
-												to={`/room/${historyItem.room_id}`}
-												state={{
-													source: 'profile',
-													question: {
-														category: Parser(historyItem.question_category, "category2"),
-														complexity: historyItem.question_difficulty,
-														createdAt: historyItem.timestamp,
-														description: historyItem.question_description,
-														title: historyItem.question_name,
-														updatedAt: historyItem.timestamp,
-													},
-													code: historyItem.code,
-													language: JSON.parse(historyItem.language).label,
-												}}
-												className="left-align-link"
-											>
-												{historyItem.question_name}
-											</Link>
-										</td>
-										<td>{historyItem.question_difficulty}</td>
-										<td>{Parser(historyItem.question_category, "category")}</td>
-										<td>{JSON.parse(historyItem.language).label}</td>
-										<td>
-											{userNames[historyItem.user1_email === user.user.email
-												? historyItem.user2_email
-												: historyItem.user1_email] || 'Loading...'}
-										</td>
-										<td>{Parser(historyItem.timestamp, "time")}</td>
-									</tr>
-								))}
+								{historyData.data.rows.map(
+									(historyItem, index) => (
+										<tr key={index} className="history-row">
+											<td>
+												<Link
+													to={`/room/${historyItem.room_id}`}
+													state={{
+														source: "profile",
+														question: {
+															category: Parser(
+																historyItem.question_category,
+																"category2"
+															),
+															complexity:
+																historyItem.question_difficulty,
+															createdAt:
+																historyItem.timestamp,
+															description:
+																historyItem.question_description,
+															title: historyItem.question_name,
+															updatedAt:
+																historyItem.timestamp,
+														},
+														code: historyItem.code,
+														language: JSON.parse(
+															historyItem.language
+														).label,
+													}}
+													className="left-align-link"
+												>
+													{historyItem.question_name}
+												</Link>
+											</td>
+											<td>
+												{
+													historyItem.question_difficulty
+												}
+											</td>
+											<td>
+												{Parser(
+													historyItem.question_category,
+													"category"
+												)}
+											</td>
+											<td>
+												{
+													JSON.parse(
+														historyItem.language
+													).label
+												}
+											</td>
+											<td>
+												{userNames[
+													historyItem.user1_email ===
+													user.user.email
+														? historyItem.user2_email
+														: historyItem.user1_email
+												] || "Loading..."}
+											</td>
+											<td>
+												{Parser(
+													historyItem.timestamp,
+													"time"
+												)}
+											</td>
+										</tr>
+									)
+								)}
 							</tbody>
 						</table>
 					)}

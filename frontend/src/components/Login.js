@@ -28,7 +28,7 @@ function LoginPage(props) {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/login`,
+				`${Constants.POSTGRESQL_URL}/users/login`,
 				{
 					method: "POST",
 					headers: {

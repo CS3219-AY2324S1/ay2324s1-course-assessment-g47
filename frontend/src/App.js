@@ -81,7 +81,7 @@ function App() {
 		const fetchDataFromAPI = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:${Constants.POSTGRESQL_PORT}/users/fetch/${newUser.user.user_id}`,
+					`${Constants.POSTGRESQL_URL}/users/fetch/${newUser.user.user_id}`,
 					{
 						method: "POST",
 						headers: {

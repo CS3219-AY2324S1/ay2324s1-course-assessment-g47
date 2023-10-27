@@ -40,7 +40,7 @@ function Register() {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/register`,
+				`${Constants.POSTGRESQL_URL}/users/register`,
 				{
 					method: "POST",
 					headers: {
