@@ -11,7 +11,7 @@ const Layout = () => {
 				<Outlet />
 			</section>
 			{/* Footer */}
-			<Footer />
+			{/* <Footer /> */}
 		</>
 	);
 };

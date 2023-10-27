@@ -1,65 +1,59 @@
 import { Link } from "react-router-dom";
 import "./css/Navbar.css";
 import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 
 const Navbar = ({ user, handleLogout }) => {
-	const navigate = useNavigate();
+	const [isCollapsed, setIsCollapsed] = useState(false);
+
+	const toggleCollapse = () => {
+		setIsCollapsed(!isCollapsed);
+	};
+
 	return (
 		<nav className="navbar navbar-expand-lg navbar-dark bg-dark">
 			<div className="container">
-				<Link className="navbar-brand me-2" to="/">
-					<h1>PeerPrep</h1>
-				</Link>
+				<a className="navbar-brand" href="/">
+					PeerPrep
+				</a>
+				{user ? (
+					<>
+						<button
+							className="navbar-toggler"
+							type="button"
+							data-toggle="collapse"
+							onClick={toggleCollapse}
+						>
+							<span className="navbar-toggler-icon"></span>
+						</button>
 
-				<button
-					className="navbar-toggler"
-					type="button"
-					data-mdb-toggle="collapse"
-					data-mdb-target="#navbarButtonsExample"
-					aria-controls="navbarButtonsExample"
-					aria-expanded="false"
-					aria-label="Toggle navigation"
-				>
-					<i className="fas fa-bars"></i>
-				</button>
-
-				<div
-					className="collapse navbar-collapse"
-					id="navbarButtonsExample"
-				>
-					<ul className="navbar-nav me-auto mb-2 mb-lg-0">
-						<li className="nav-item">
-							{user ? (
-								<div className="navbar-brand me-2">
-									<h1>Welcome, {user.user.username}</h1>
-								</div>
-							) : null}
-						</li>
-					</ul>
-
-					<div className="d-flex align-items-center">
-						{user ? (
-							<>
-								<button
-									type="button"
-									className="btn btn-info px-3 me-2"
-									onClick={() => {
-										navigate("/profile");
-									}}
-								>
-									Profile
-								</button>
-								<button
-									type="button"
-									className="btn btn-light me-3"
-									onClick={handleLogout}
-								>
-									Logout
-								</button>
-							</>
-						) : null}
-					</div>
-				</div>
+						<div
+							className={`collapse navbar-collapse ${
+								isCollapsed ? "show" : ""
+							}`}
+						>
+							<ul className="navbar-nav mr-auto mt-2 mt-lg-0">
+								<li className="nav-item active">
+									<a className="nav-link" href="/profile">
+										Profile{" "}
+										<span className="sr-only">
+											(current)
+										</span>
+									</a>
+								</li>
+								<li className="nav-item active">
+									<a
+										className="nav-link"
+										href=""
+										onClick={handleLogout}
+									>
+										Logout
+									</a>
+								</li>
+							</ul>
+						</div>
+					</>
+				) : null}
 			</div>
 		</nav>
 	);
