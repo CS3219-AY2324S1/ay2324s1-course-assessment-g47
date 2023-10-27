@@ -8,7 +8,7 @@
         "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
         "frontend": "cd frontend && npm start",
         "backend": "cd backend && concurrently \"nodemon collaboration-service/socket-io.js\" \"nodemon question-service/server.js\" \"nodemon user-service/postgresql.js\" \"nodemon history-service/history.js\" \"nodemon matching-service/match-service.js\"",
-        "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+        "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install && cd collaboration-service && npm install && cd ../history-service && npm install && cd ../matching-service && npm install && cd ../question-service && npm install && cd ../user-service && npm install"
     },
     "keywords": [],
     "author": "",
