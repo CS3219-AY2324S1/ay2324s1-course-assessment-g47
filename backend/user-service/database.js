@@ -13,17 +13,17 @@ const pool = new Pool({
 
 module.exports = pool;
 
-// // // CREATE NEW DATABASE
-// // pool.query("CREATE DATABASE cs3219_g47;")
-// // 	.then((res) => {
-// // 		console.log("Database created");
-// // 		console.log(res);
-// // 		// pool.end();
-// // 	})
-// // 	.catch((err) => {
-// // 		console.log(err);
-// // 		// pool.end();
-// // 	});
+// // CREATE NEW DATABASE
+// pool.query("CREATE DATABASE cs3219_g47;")
+// 	.then((res) => {
+// 		console.log("Database created");
+// 		console.log(res);
+// 		// pool.end();
+// 	})
+// 	.catch((err) => {
+// 		console.log(err);
+// 		// pool.end();
+// 	});
 
 // CREATE TABLE
 // const createTblQry = `CREATE TABLE accounts (

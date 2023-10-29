@@ -12,3 +12,7 @@ export const HISTORY_SERVICE_URL =
 	process.env.ENV === "PROD"
 		? process.env.HISTORY_URL
 		: "http://localhost:8085";
+export const QUESTION_SERVICE_URL =
+	process.env.ENV === "PROD"
+		? process.env.QUESTION_URL
+		: "http://localhost:8082";
