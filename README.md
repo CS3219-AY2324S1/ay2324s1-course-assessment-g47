@@ -15,4 +15,4 @@ DB_PORT=`YOUR_POSTGRES_PORT->5432`
 DB_DATABASE=cs3219_g47   
 POSTGRESQLPORT=4001   
 PORT=4000   
-MONGO_URI = mongodb+srv://jovitaanderson:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority   
+MONGO_URI = mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority   
