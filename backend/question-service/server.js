@@ -4,7 +4,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const questionRoutes = require("./routes/questions");
 
+const { initializeQuestions } = require("./controllers/questionController");
+const defaultQuestions = require("./constants/default-questions");
+
 const app = express();
+const PORT = process.env.MONGO_PORT || 27017;
 
 //middleware
 app.use(express.json()); //Allows us to use json in the body of the request
@@ -26,9 +30,11 @@ const connectWithRetry = () => {
 		})
 		.then(() => {
 			console.log("Connected to MongoDB");
+			// Initialize the questions collection with default questions
+			initializeQuestions(defaultQuestions);
 			// Only start the application server once the database connection is established
-			app.listen(process.env.PORT, () => {
-				console.log("Listening on port", process.env.PORT);
+			app.listen(PORT, () => {
+				console.log("Listening on port", PORT);
 			});
 		})
 		.catch((error) => {
