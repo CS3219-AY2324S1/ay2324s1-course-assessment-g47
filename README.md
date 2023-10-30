@@ -2,5 +2,17 @@
 ay2324s1-course-assessment-g47 created by GitHub Classroom
 
 Steps to run:
-1. `npm run create-db`
-2. `npm run dev`
+1. ensure you have a .env file in the backend folder
+2. `npm run install-all`
+3. `npm run create-db`
+4. `npm run dev`
+
+Sample of .env file:   
+DB_USER=postgres   
+DB_HOST=localhost   
+DB_PASSWORD=`YOUR_POSTGRES_PASSWORD`   
+DB_PORT=`YOUR_POSTGRES_PORT->5432`   
+DB_DATABASE=cs3219_g47   
+POSTGRESQLPORT=4001   
+PORT=4000   
+MONGO_URI = mongodb+srv://jovitaanderson:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority   
