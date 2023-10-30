@@ -422,7 +422,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 									{user.user.account_type === "superadmin" ||
 									user.user.account_type === "admin" ? (
 										<Link
-											className="button-link-change-account mb-2"
+											className="btn btn-outline-primary ms-1 mb-2"
 											to="/changetype"
 										>
 											Change Account Type

@@ -195,95 +195,117 @@ const Home = ({ user, handleLogin }) => {
 					<QuestionDetails selectedQuestion={selectedQuestion} />
 				</div>
 			</div>
+
 			<div className="table-container" style={pageStyles}>
-				<div className="filter-container">
-					<div className="filter-option">
-						<button
-							onClick={handleSortByPopularity}
-							className={
-								asc
-									? "asc-button"
-									: desc
-									? "desc-button"
-									: "none-button"
-							}
-						>
-							{asc ? (
-								<i className="fas fa-sort-up"></i>
-							) : desc ? (
-								<i className="fas fa-sort-down"></i>
-							) : (
-								<i className="fas fa-sort"></i>
-							)}
-							Sort by Popularity
-						</button>
-					</div>
-					<div className="filter-option">
-						<label>Select Categories:</label>
-						<Select
-							options={categoryOptions}
-							isMulti
-							value={categoryOptions.filter((option) =>
-								selectedCategories.includes(option.value)
-							)}
-							onChange={handleCategoryChange}
-							styles={customStyles}
-							components={{ Option: CustomOption }}
-						/>
-					</div>
-					<div className="filter-option">
-						<label>Select Difficulty:</label>
-						<Select
-							options={difficultyOptions}
-							isMulti
-							value={difficultyOptions.filter((option) =>
-								selectedDifficulty.includes(option.value)
-							)}
-							onChange={handleDifficultyChange}
-							styles={customStyles}
-							components={{ Option: CustomOption }}
-						/>
+				<div className="container">
+					<div className="row">
+						<div className="col-12 col-sm-6 col-md-4">
+							<div className="filter-option">
+								<div className="btn-group">
+									<button
+										onClick={handleSortByPopularity}
+										className={`btn ${
+											asc
+												? "btn-success"
+												: desc
+												? "btn-danger"
+												: "btn-secondary"
+										}`}
+									>
+										{asc ? (
+											<i className="fas fa-sort-up"></i>
+										) : desc ? (
+											<i className="fas fa-sort-down"></i>
+										) : (
+											<i className="fas fa-sort"></i>
+										)}
+										Sort by Popularity
+									</button>
+								</div>
+							</div>
+						</div>
+						<div className="col-12 col-sm-6 col-md-4">
+							<div className="filter-option">
+								<label className="mb-0">
+									Select Categories:
+								</label>
+								<Select
+									options={categoryOptions}
+									isMulti
+									value={categoryOptions.filter((option) =>
+										selectedCategories.includes(
+											option.value
+										)
+									)}
+									onChange={handleCategoryChange}
+									// styles={customStyles}
+									components={{ Option: CustomOption }}
+								/>
+							</div>
+						</div>
+						<div className="col-12 col-sm-6 col-md-4">
+							<div className="filter-option">
+								<label className="mb-0">
+									Select Difficulty:
+								</label>
+								<Select
+									options={difficultyOptions}
+									isMulti
+									value={difficultyOptions.filter((option) =>
+										selectedDifficulty.includes(
+											option.value
+										)
+									)}
+									onChange={handleDifficultyChange}
+									// styles={customStyles}
+									components={{ Option: CustomOption }}
+								/>
+							</div>
+						</div>
 					</div>
 				</div>
-				<table className="table-header">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Title</th>
-							<th>Complexity</th>
-							<th>Category</th>
-							<th>Created</th>
-							<th>Upvotes</th>
-							{user.user.account_type !== "user" ? (
-								<th>Action</th>
-							) : null}
-						</tr>
-					</thead>
-					<tbody>
-						{questions &&
-							questions.map((question) => (
-								<QuestionList
-									id={rowCount++}
-									key={question._id}
-									question={question}
-									onClick={(question) => {
-										setSelectedQuestion(question);
-									}}
-									onDelete={(questionId) => {
-										if (selectedQuestion !== null) {
-											if (
-												selectedQuestion._id ===
-												questionId
-											) {
-												setSelectedQuestion(null);
+
+				<div class="table-responsive">
+					<table className="table">
+						<thead class="table-dark">
+							<tr>
+								<th>#</th>
+								<th>Title</th>
+								<th>Complexity</th>
+								<th>Category</th>
+								<th>Created</th>
+								<th>Upvotes</th>
+								{user.user.account_type !== "user" && (
+									<th>Action</th>
+								)}
+							</tr>
+						</thead>
+						<tbody>
+							{questions &&
+								questions.map((question) => (
+									<QuestionList
+										id={rowCount++}
+										key={question._id}
+										question={question}
+										onClick={(question) => {
+											setSelectedQuestion(question);
+										}}
+										onDelete={(questionId) => {
+											if (selectedQuestion !== null) {
+												if (
+													selectedQuestion._id ===
+													questionId
+												) {
+													setSelectedQuestion(null);
+												}
 											}
-										}
-									}}
-									user={user.user}
-								/>
-							))}
-					</tbody>
-				</table>
+										}}
+										user={user.user}
+									/>
+								))}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</>
 	) : (

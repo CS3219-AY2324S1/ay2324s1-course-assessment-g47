@@ -9,7 +9,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 	const { dispatch } = useQuestionsContext();
 	const { user } = useAuthContext();
 	let [upvoted, setUpvoted] = useState(false);
-  	let [upvoteCount, setUpvoteCount] = useState(question.upvotes.length);
+	let [upvoteCount, setUpvoteCount] = useState(question.upvotes.length);
 
 	useEffect(() => {
 		if (user) {
@@ -51,15 +51,18 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				if (!question.upvotes.includes(user.user.email)) {
 					question.upvotes.push(user.user.email);
 					console.log(user.user.email);
-					const response = await fetch(`/api/questions/vote/` + question._id, {
-						method: "PATCH",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${user.tokens.accessToken}`,
-						},
-						body: JSON.stringify({ upvotes: question.upvotes }),
-					});
-		
+					const response = await fetch(
+						`/api/questions/vote/` + question._id,
+						{
+							method: "PATCH",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${user.tokens.accessToken}`,
+							},
+							body: JSON.stringify({ upvotes: question.upvotes }),
+						}
+					);
+
 					const json = await response.json();
 
 					if (response.ok) {
@@ -74,19 +77,24 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				// User is undoing the upvote
 				console.log("unvoted");
 				if (question.upvotes.includes(user.user.email)) {
-					question.upvotes = question.upvotes.filter((email) => email !== user.user.email);
-				
-					const response = await fetch(`/api/questions/vote/` + question._id, {
-						method: "PATCH",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${user.tokens.accessToken}`,
-						},
-						body: JSON.stringify({ upvotes: question.upvotes}),
-					});
-				
+					question.upvotes = question.upvotes.filter(
+						(email) => email !== user.user.email
+					);
+
+					const response = await fetch(
+						`/api/questions/vote/` + question._id,
+						{
+							method: "PATCH",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${user.tokens.accessToken}`,
+							},
+							body: JSON.stringify({ upvotes: question.upvotes }),
+						}
+					);
+
 					const json = await response.json();
-				
+
 					if (response.ok) {
 						dispatch({ type: "UPDATE_QUESTION", payload: json });
 						setUpvoteCount(upvoteCount - 1);
@@ -116,23 +124,27 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 			</td>
 			<td onClick={handleUpvote}>
 				<div className="upvote-container">
-    				<button id="upvoteButton"
-						className={upvoted ? "unvote-button" : "upvote-button"}>
-							<i className="fas fa-arrow-up"></i>
-    				</button>
+					<button
+						id="upvoteButton"
+						className={upvoted ? "unvote-button" : "upvote-button"}
+					>
+						<i className="fas fa-arrow-up"></i>
+					</button>
 					<div className="mini-upvote-box">
-						<span className="popularity">Upvotes: {upvoteCount}</span>
+						<span className="popularity">
+							Upvotes: {upvoteCount}
+						</span>
 					</div>
-  				</div>
+				</div>
 			</td>
-			{user.user.account_type !== "user" ? (
+			{user.user.account_type !== "user" && (
 				<td
 					className="delete-button material-symbols-outlined"
 					onClick={handleClick}
 				>
 					delete
 				</td>
-			) : null}
+			)}
 		</tr>
 	);
 };
