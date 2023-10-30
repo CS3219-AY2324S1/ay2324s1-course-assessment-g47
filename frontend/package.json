@@ -1,5 +1,5 @@
 {
-  "proxy": "http://question-service:8082",
+  "proxy": "http://question-service:27017",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,

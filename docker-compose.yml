@@ -3,7 +3,7 @@ services:
   # PostgreSQL Database
   postgres:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:15
     restart: always # postgres up and running no matter what happens
     environment:
       POSTGRES_USER: postgres
