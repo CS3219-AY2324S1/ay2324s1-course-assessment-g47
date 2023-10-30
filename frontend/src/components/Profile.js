@@ -5,6 +5,7 @@ import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as Constants from "../constants/constants.js";
+import profileImage from "../images/profile.png";
 
 const postgresqlPort = Constants.POSTGRESQL_PORT;
 
@@ -330,6 +331,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		}
 	};
 
+	// Inspired from: https://mdbootstrap.com/docs/standard/extended/profiles/
 	return user ? (
 		<>
 			<div className="container py-5">
@@ -338,7 +340,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 						<div className="card mb-4">
 							<div className="card-body text-center">
 								<img
-									src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+									src={profileImage}
 									alt="avatar"
 									className="rounded-circle img-fluid"
 									style={{ width: "150px" }}

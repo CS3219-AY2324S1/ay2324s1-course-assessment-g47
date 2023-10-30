@@ -67,6 +67,7 @@ function LoginPage(props) {
 		}
 	};
 
+	// Inspired from: https://mdbootstrap.com/docs/standard/extended/login/
 	return (
 		<>
 			<div className="container-fluid h-custom">

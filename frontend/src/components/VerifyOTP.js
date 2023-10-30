@@ -60,6 +60,7 @@ function VerifyOTP() {
 		}
 	};
 
+	// Inspired from: https://mdbootstrap.com/docs/standard/extended/login/
 	return (
 		<>
 			<div className="container h-100 pt-5 mt-5">
