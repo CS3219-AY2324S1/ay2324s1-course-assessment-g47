@@ -68,23 +68,12 @@ const enqueueUser = async (username, email, difficultyLevel, socketId) => {
 const dequeueUserByEmail = async (email, difficultyLevel) => {
 	console.log(`Removing user ${email} from the waiting queue...`);
 	try {
-		const channel = await createMatchingChannel();
-		// Set up a consumer to check and remove the user by email
-		channel.consume("user_queue", (message) => {
-			console.log('Checking for user in the waiting queue...');
-			if (message !== null) {
-				const { username, messageEmail, difficultyLevel, socketId } = JSON.parse(message.content.toString());
-
-				if (messageEmail === email) {
-					// Dequeue the user by acknowledging the message
-					channel.ack(message);
-					console.log(`User ${email} has been dequeued from the waiting queue.`);
-					if (difficultyMap.has(difficultyLevel)) {
-						difficultyMap.delete(difficultyLevel);
-					}
-				}
-			}
-		});
+		if (difficultyMap.has(difficultyLevel)) {
+			console.log(difficultyMap);
+			difficultyMap.delete(difficultyLevel);
+			console.log(`User ${email} has been dequeued from the waiting queue.`);
+			console.log(difficultyMap);
+		}
 	} catch (error) {
 		console.error('Failed to remove user by email due to an internal issue: ', error);
 	}

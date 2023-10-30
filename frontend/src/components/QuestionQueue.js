@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "./css/QuestionQueue.css";
-
-
 import io from "socket.io-client";
-
 
 function QuestionQueue({ user }) {
   const [selectedDifficulty, setSelectedDifficulty] = useState('easy'); // Default difficulty
   const [loading, setLoading] = useState(false); // Loading state
   const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
   const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
+  const [noMatchFound, setNoMatchFound] = useState(false); // Checks if user has gotten a match within a certain time
 
   const MATCHING_SERVICE_PORT = 4004;
   const navigate = useNavigate();
@@ -44,6 +42,25 @@ function QuestionQueue({ user }) {
         const currentTime = new Date().getTime();
         const elapsed = Math.floor((currentTime - queueStartTime) / 1000);
         setElapsedTime(elapsed);
+        if (selectedDifficulty === 'easy') {
+          console.log("Time in Queue: ", elapsed);
+          if (elapsed >= 30) {
+            setNoMatchFound(true);
+            handleExitQueue();
+          }
+        } else if (selectedDifficulty === 'medium') {
+          console.log("Time in Queue: ", elapsed);
+          if (elapsed >= 45) {
+            setNoMatchFound(true);
+            handleExitQueue();
+          }
+        } else {
+          console.log("Time in Queue: ", elapsed);
+          if (elapsed >= 60) {
+            setNoMatchFound(true);
+            handleExitQueue();
+          }
+        }
       }, 1000);
     } else {
       // Clear the timer interval when not in the queue
@@ -153,8 +170,8 @@ function QuestionQueue({ user }) {
           <option value="hard">Hard</option>
         </select>
         {loading ? (
-    <p className="difficulty-prompt">Please exit the queue to change the difficulty.</p>
-  ) : null}
+          <p className="difficulty-prompt">Please exit the queue to change the difficulty.</p>
+        ) : null}
       </div>
       <div>
         {loading ? (
@@ -166,7 +183,15 @@ function QuestionQueue({ user }) {
             <button onClick={handleExitQueue}>Exit Queue</button>
           </div>
         ) : (
-          <button onClick={handleJoinQueue}>Join Queue</button>
+          !noMatchFound && <button onClick={handleJoinQueue}>Join Queue</button>
+        )}
+        {noMatchFound && (
+          <div>
+            <div className="no-match-popup">
+              <p>No match found, please requeue or select another difficulty.</p>
+            </div>
+            <button onClick={() => setNoMatchFound(false)}>Close</button>
+          </div>
         )}
       </div>
     </div>
