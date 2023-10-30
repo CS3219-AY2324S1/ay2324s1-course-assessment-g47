@@ -2,7 +2,7 @@ const defaultQuestions = [
 	{
 		title: "Reverse a String",
 		complexity: "Easy",
-		category: ["Strings", "Algorithms"],
+		category: ["String", "Algorithms"],
 		upvotes: [],
 		description:
 			'<p>Write a function that reverses a string. The input string is given as an array of characters s.</p><p>You must do this by modifying the input array in-place with O(1) extra memory.</p><h4>Example 1:</h4><p>Input: s = ["h","e","l","l","o"]</p><p>Output: ["o","l","l","e","h"]</p><h4>Example 2:</h4><p>Input: s = ["H","a","n","n","a","h"]</p><p>Output: ["h","a","n","n","a","H"]</p><h4>Constraints:</h4><ul><li>1 <= s.length <= 105</li><li>s[i] is a printable ASCII character.</li></ul>',
@@ -82,7 +82,7 @@ const defaultQuestions = [
 	{
 		title: "Longest Common Subsequence",
 		complexity: "Medium",
-		category: ["Algorithms", "Strings"],
+		category: ["Algorithms", "String"],
 		upvotes: [],
 		description:
 			'<p>Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.</p><p><br></p><p>A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.</p><ul><li>For example, "ace" is a subsequence of "abcde".</li></ul><p><br></p><p>A common subsequence of two strings is a subsequence that is common to both strings.</p><p><br></p><p>Example 1:</p><p>Input: text1 = "abcde", text2 = "ace"&nbsp;</p><p>Output: 3&nbsp;&nbsp;</p><p>Explanation: The longest common subsequence is "ace" and its length is 3.</p><p><br></p><p>Example 2:</p><p>Input: text1 = "abc", text2 = "abc"</p><p>Output: 3</p><p>Explanation: The longest common subsequence is "abc" and its length is 3.</p><p><br></p><p>Example 3:</p><p>Input: text1 = "abc", text2 = "def"</p><p>Output: 0</p><p>Explanation: There is no such common subsequence, so the result is 0.</p><p>&nbsp;</p><p>Constraints:</p><ul><li>1 &lt;= text1.length, text2.length &lt;= 1000</li><li>text1 and text2 consist of only lowercase English characters.</li></ul>',
@@ -138,7 +138,7 @@ const defaultQuestions = [
 	{
 		title: "Wildcard Matching",
 		complexity: "Hard",
-		category: ["Algorithms", "Strings"],
+		category: ["Algorithms", "String"],
 		upvotes: [],
 		description:
 			"<p>Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*' where:</p><ul><li>'?' Matches any single character.</li><li>'*' Matches any sequence of characters (including the empty sequence).</li></ul><p>The matching should cover the entire input string (not partial).</p><p><br></p><p>Example 1:</p><p>Input: s = \"aa\", p = \"a\"</p><p>Output: false</p><p>Explanation: \"a\" does not match the entire string \"aa\".</p><p><br></p><p>Example 2:</p><p>Input: s = \"aa\", p = \"*\"</p><p>Output: true</p><p>Explanation: '*' matches any sequence.</p><p><br></p><p>Example 3:</p><p>Input: s = \"cb\", p = \"?a\"</p><p>Output: false</p><p>Explanation: '?' matches 'c', but the second letter is 'a', which does not match 'b'.</p><p>&nbsp;</p><p><br></p><p>Constraints:</p><ul><li>0 &lt;= s.length, p.length &lt;= 2000</li><li>s contains only lowercase English letters.</li><li>p contains only lowercase English letters, '?' or '*'.</li></ul>",
