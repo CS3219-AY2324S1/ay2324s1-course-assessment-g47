@@ -5,10 +5,10 @@ ay2324s1-course-assessment-g47 created by GitHub Classroom
 # Assignment instructions
 ## Assignment 1:
 **Setup:** Run `start index.html` in IDE terminal
-<br > <sub>**Note**: Since the question data is stored using local storage, no questions will be shown on initial start up, you will need to add some questions manually first. </sub>
+<br > <sub>**Note**: Since the question data is stored using local storage, no questions will be shown on initial start up, you will need to add some questions manually first. </sub>   
 
 
-## Assignment 2 instrcutions:
+## Assignment 2:
 **Setup:**
 Steps to run:
 1. ensure you have a .env file in the backend folder
