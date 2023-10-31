@@ -7,7 +7,11 @@ const {
     updateQuestion,
     getRandomEasyQuestion,
     getRandomMediumQuestion,
-    getRandomHardQuestion
+    getRandomHardQuestion,
+    getQuestionsByEasy,
+    getQuestionsByMedium,
+    getQuestionsByHard,
+    getQuestionByTitle
 } = require('../controllers/questionController')
 
 const router = express.Router()
@@ -19,6 +23,10 @@ router.get('/', getQuestions)
 router.get('/random-easy', getRandomEasyQuestion)
 router.get('/random-medium', getRandomMediumQuestion)
 router.get('/random-hard',getRandomHardQuestion)
+router.get('/all-easy', getQuestionsByEasy)
+router.get('/all-medium', getQuestionsByMedium)
+router.get('/all-hard', getQuestionsByHard)
+router.get('/title/:title', getQuestionByTitle)
 // GET a single question
 // All authenticated can access this route
 router.get('/:id',authenticateToken(['user', 'superuser', 'admin', 'superadmin']), getQuestion)
@@ -39,7 +47,5 @@ router.patch('/:id',authenticateToken(['superuser', 'admin', 'superadmin']), upd
 // UPDATE vote value of a question
 // All authenticated can access this route
 router.patch('/vote/:id',authenticateToken(['user','superuser', 'admin', 'superadmin']), updateQuestion)
-
-
 
 module.exports = router

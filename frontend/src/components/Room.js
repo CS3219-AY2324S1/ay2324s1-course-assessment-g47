@@ -42,6 +42,8 @@ function Room({ user }) {
     const [peer, setPeer] = useState(null);
     const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
     const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
+    const [questions, setQuestions] = useState([]); // Stores the questions
+    const [selectedQuestionTitle, setSelectedQuestionTitle] = useState(null); // Stores the selected question title
 
     const updateData = async (codeText, language, question) => {
         try {
@@ -89,6 +91,52 @@ function Room({ user }) {
         }
     };
 
+    //Get question by title
+    const fetchQuestionByTitle = async (title) => {
+        if (user) {
+            try {
+                const response = await fetch(`/api/questions/title/${title}`, {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
+
+                if (response.ok) {
+                    setRandomQuestion(json);
+                    socket.emit('newRandomQuestion', { roomId, randomQuestion: json, user: user.user });
+                }
+            } catch (error) {
+                console.error(`Error fetching ${title} question:`, error);
+            }
+        }
+    };
+
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+
+        if (selectedQuestionTitle) {    
+            // Call fetchQuestionByTitle when "Change Question" button is clicked
+            fetchQuestionByTitle(selectedQuestionTitle); // Use async and await so that randomQuestion will be updated FIRST!
+    
+        }
+    };
+
+    const fetchQuestionsByDifficulty = async () => {
+        if (user) {
+            try {
+                const response = await fetch(`/api/questions/all-${difficultyLevel}`, {
+                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+                });
+                const json = await response.json();
+
+                if (response.ok) {
+                    setQuestions(json);
+                }
+            } catch (error) {
+                console.error(`Error fetching ${difficultyLevel} questions:`, error);
+            }
+        }
+    };
+
     const fetchRandomEasyQuestion = async () => {
         if (user) {
             try {
@@ -113,6 +161,22 @@ function Room({ user }) {
 
     const connectionRef = useRef();
 
+    // Update the options for the dropdown list
+    const dropdownOptions = [
+        <option key="default" value="" disabled hidden>Select a question</option>,
+        ...questions.map((question, index) => (
+        <option key={index} value={question.title}>
+            {question.title}
+        </option>
+    ))
+    ];
+
+    useEffect(() => {
+        if (questions.length > 0) {
+            setSelectedQuestionTitle(questions[0].title);
+        }
+    }, [questions]);
+
     useEffect(() => {
         if (source === 'profile' && question && code && language) {
             setIsFromProfile(true);
@@ -123,6 +187,7 @@ function Room({ user }) {
             setIsFromProfile(false);
             fetchInitialRandomEasyQuestion();
         }
+        fetchQuestionsByDifficulty();
         socket.on('updateRandomQuestion', (newRandomQuestion) => {
             console.log("newRandomQuestion:", newRandomQuestion)
             setRandomQuestion(newRandomQuestion);
@@ -409,6 +474,15 @@ function Room({ user }) {
                     <button className="exit-button" onClick={handleExit}>
                         Exit
                     </button>
+                    <form onSubmit={handleFormSubmit}>
+                        <div>
+                            <label>Select Question: </label>
+                            <select onChange={(e) => setSelectedQuestionTitle(e.target.value)}>
+                                {dropdownOptions}
+                            </select>
+                        </div>
+                        <button type="submit" onClick={handleFormSubmit} >Change Question</button>
+                    </form>
                     <DisplayRandomQuestion
                         user={user}
                         randomQuestion={randomQuestion}

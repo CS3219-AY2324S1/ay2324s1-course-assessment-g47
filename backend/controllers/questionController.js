@@ -13,6 +13,24 @@ const getQuestions = async (req, res) => {
     res.status(200).json(questions)
 }
 
+const getQuestionByTitle = async (req, res) => {
+    const { title } = req.params
+
+    if (!title) {
+        return res.status(404).json({ error: 'No such question' })
+    }
+
+    try {
+        const question = await Question.findOne({ title }); // Assuming 'title' is the field in your database for question titles
+        if (!question) {
+            return res.status(404).json({ error: 'Question not found' });
+        }
+        res.status(200).json(question);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 // get a single question
 const getQuestion = async (req, res) => {
     const { id } = req.params
@@ -174,6 +192,33 @@ const updateQuestion = async (req, res) => {
     res.status(200).json(question)
 }
 
+const getQuestionsByEasy = async (req, res) => {
+    try {
+        const questions = await Question.find({ complexity: 'Easy' }).sort({ createdAt: 1 });
+        res.status(200).json(questions);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+const getQuestionsByMedium = async (req, res) => {
+    try {
+        const questions = await Question.find({ complexity: 'Medium' }).sort({ createdAt: 1 });
+        res.status(200).json(questions);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+const getQuestionsByHard = async (req, res) => {
+    try {
+        const questions = await Question.find({ complexity: 'Hard' }).sort({ createdAt: 1 });
+        res.status(200).json(questions);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 module.exports = {
     getQuestions,
     getQuestion,
@@ -183,4 +228,8 @@ module.exports = {
     getRandomEasyQuestion,
     getRandomMediumQuestion,
     getRandomHardQuestion,
+    getQuestionsByEasy,
+    getQuestionsByMedium,
+    getQuestionsByHard,
+    getQuestionByTitle
 }
