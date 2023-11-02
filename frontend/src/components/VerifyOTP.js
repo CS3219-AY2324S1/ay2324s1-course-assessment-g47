@@ -162,7 +162,7 @@ function VerifyOTP() {
 										<img
 											src={otpImage}
 											className="img-fluid"
-											alt="Sample image"
+											alt="Verifying OTP background"
 										/>
 									</div>
 								</div>

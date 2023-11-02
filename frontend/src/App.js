@@ -12,7 +12,6 @@ import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from "./hooks/useAuthContext";
 import Room from "./components/Room";
 import Navbar from "./components/Navbar";
-import * as Constants from "./constants/constants.js";
 import RoomUserExit from "./components/RoomUserExit";
 
 function App() {

@@ -19,3 +19,10 @@ h1 {
     display: flex;
     gap: 20px; /* Adjust the spacing between buttons */
   }
+
+  .button-rounded {
+    border-radius: 10px; /* Adjust the value as needed for the desired level of rounding */
+  }
+  .button-rounded:hover {
+    border-radius: 10px; /* Adjust the value as needed for the desired level of rounding */
+  }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useQuestionsContext } from "../hooks/useQuestionsContext";
-import { Link } from "react-router-dom";
 import "./Home.css";
 import Select from "react-select";
 
@@ -10,7 +9,7 @@ import QuestionForm from "../components/QuestionForm";
 import QuestionDetails from "../components/QuestionDetails";
 import LoginPage from "../components/Login";
 import QuestionQueue from "../components/QuestionQueue";
-import { set } from "date-fns";
+// import { set } from "date-fns";
 
 const Home = ({ user, handleLogin }) => {
 	const { questions, dispatch } = useQuestionsContext();
@@ -146,24 +145,24 @@ const Home = ({ user, handleLogin }) => {
 		dispatch({ type: "SET_QUESTIONS", payload: sortedQuestions });
 	};
 
-	const customStyles = {
-		control: (styles) => ({
-			...styles,
-			width: "400px",
-		}),
-		valueContainer: (provided) => ({
-			...provided,
-			maxHeight: "30px", // Adjust the max height as per your needs
-			overflowY: "auto",
-		}),
-		menu: (provided) => ({
-			...provided,
-			width: "400px",
-			maxHeight: "150px", // Adjust the max height as per your needs
-			overflowY: "auto",
-			zIndex: 999,
-		}),
-	};
+	// const customStyles = {
+	// 	control: (styles) => ({
+	// 		...styles,
+	// 		width: "400px",
+	// 	}),
+	// 	valueContainer: (provided) => ({
+	// 		...provided,
+	// 		maxHeight: "30px", // Adjust the max height as per your needs
+	// 		overflowY: "auto",
+	// 	}),
+	// 	menu: (provided) => ({
+	// 		...provided,
+	// 		width: "400px",
+	// 		maxHeight: "150px", // Adjust the max height as per your needs
+	// 		overflowY: "auto",
+	// 		zIndex: 999,
+	// 	}),
+	// };
 
 	// CSS for the entire page
 	const pageStyles = {

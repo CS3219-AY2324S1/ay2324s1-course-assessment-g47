@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "./css/Login.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import * as Constants from "../constants/constants.js";
 import registerImage from "../images/register.jpg";
 import { useNavigate } from "react-router-dom";
 
@@ -189,7 +186,7 @@ function Register() {
 										<img
 											src={registerImage}
 											className="img-fluid"
-											alt="Sample image"
+											alt="Register background"
 										/>
 									</div>
 								</div>

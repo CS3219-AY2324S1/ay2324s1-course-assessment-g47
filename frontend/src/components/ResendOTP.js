@@ -123,7 +123,7 @@ function ResendOTP() {
 										<img
 											src={otpImage}
 											className="img-fluid"
-											alt="Sample image"
+											alt="ResendOTP background"
 										/>
 									</div>
 								</div>

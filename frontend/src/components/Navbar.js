@@ -1,22 +1,28 @@
-import { Link } from "react-router-dom";
 import "./css/Navbar.css";
-import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = ({ user, handleLogout }) => {
+	const navigate = useNavigate();
+	const location = useLocation();
+	const isRoomRoute = location.pathname.includes("/room");
 	const [isCollapsed, setIsCollapsed] = useState(false);
 
 	const toggleCollapse = () => {
 		setIsCollapsed(!isCollapsed);
 	};
 
+	const handleProfileClick = () => {
+		navigate("/profile");
+	};
+
 	return (
 		<nav className="navbar navbar-expand-lg navbar-dark bg-dark">
 			<div className="container">
-				<a className="navbar-brand" href="/">
+				<a className="navbar-brand" href={isRoomRoute ? "#" : "/"}>
 					PeerPrep
 				</a>
-				{user ? (
+				{user && !isRoomRoute ? (
 					<>
 						<button
 							className="navbar-toggler"
@@ -34,21 +40,20 @@ const Navbar = ({ user, handleLogout }) => {
 						>
 							<ul className="navbar-nav mr-auto mt-2 mt-lg-0">
 								<li className="nav-item active">
-									<a className="nav-link" href="/profile">
-										Profile{" "}
-										<span className="sr-only">
-											(current)
-										</span>
-									</a>
+									<button
+										className="nav-link button-rounded"
+										onClick={handleProfileClick}
+									>
+										Profile
+									</button>
 								</li>
 								<li className="nav-item active">
-									<a
-										className="nav-link"
-										href=""
+									<button
+										className="nav-link button-rounded"
 										onClick={handleLogout}
 									>
 										Logout
-									</a>
+									</button>
 								</li>
 							</ul>
 						</div>

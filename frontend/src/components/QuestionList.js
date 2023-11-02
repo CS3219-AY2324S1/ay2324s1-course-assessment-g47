@@ -17,7 +17,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				setUpvoted(true);
 			}
 		}
-	}, [user]);
+	}, [user, question.upvotes]);
 
 	const handleClick = async () => {
 		if (!user) {

@@ -195,28 +195,31 @@ const QuestionForm = () => {
 		}
 	};
 
-	const wrapperRef = useCallback((wrapper) => {
-		if (wrapper == null) return;
+	const wrapperRef = useCallback(
+		(wrapper) => {
+			if (wrapper == null) return;
 
-		wrapper.innerHTML = "";
-		const editor = document.createElement("div");
-		wrapper.append(editor);
-		const q = new Quill(editor, {
-			theme: "snow",
-			modules: { toolbar: TOOLBAR_OPTIONS },
-			trimWhitespace: true,
-		});
+			wrapper.innerHTML = "";
+			const editor = document.createElement("div");
+			wrapper.append(editor);
+			const q = new Quill(editor, {
+				theme: "snow",
+				modules: { toolbar: TOOLBAR_OPTIONS },
+				trimWhitespace: true,
+			});
 
-		q.root.addEventListener("paste", handlePaste);
+			q.root.addEventListener("paste", handlePaste);
 
-		q.on("text-change", (delta, oldDelta, source) => {
-			if (source === "user") {
-				setQuill(q);
-			}
-		});
+			q.on("text-change", (delta, oldDelta, source) => {
+				if (source === "user") {
+					setQuill(q);
+				}
+			});
 
-		setQuill(q);
-	}, []);
+			setQuill(q);
+		},
+		[handlePaste]
+	);
 
 	return (
 		<form className="create" onSubmit={handleSubmit}>

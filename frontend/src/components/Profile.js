@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom"; //useLocation
 import LoginPage from "./Login";
 import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -81,7 +81,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	});
 	const [userNames, setUserNames] = useState({}); // Store user names
 
-	let location = useLocation();
+	// let location = useLocation();
 
 	const fetchUserHistory = async () => {
 		if (!user.user.email) {
@@ -703,7 +703,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 			</div>
 		</>
 	) : (
-		<LoginPage handleLogin={handleLogin} />
+		<LoginPage onSuccessLogin={handleLogin} />
 	);
 }
 
