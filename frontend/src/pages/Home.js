@@ -265,9 +265,9 @@ const Home = ({ user, handleLogin }) => {
 					</div>
 				</div>
 
-				<div class="table-responsive">
+				<div className="table-responsive">
 					<table className="table">
-						<thead class="table-dark">
+						<thead className="table-dark">
 							<tr>
 								<th>#</th>
 								<th>Title</th>

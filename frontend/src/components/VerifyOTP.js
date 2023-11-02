@@ -102,10 +102,10 @@ function VerifyOTP() {
 												</div>
 											</div>
 
-											<div class="d-flex align-items-center justify-content-center">
+											<div className="d-flex align-items-center justify-content-center">
 												<button
 													type="button"
-													class="btn btn-dark btn-lg w-100"
+													className="btn btn-dark btn-lg w-100"
 													onClick={handleSubmit}
 												>
 													Submit

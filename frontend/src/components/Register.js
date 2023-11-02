@@ -156,10 +156,10 @@ function Register() {
 													{formData.createError}
 												</p>
 											)}
-											<div class="d-flex align-items-center justify-content-center pt-4">
+											<div className="d-flex align-items-center justify-content-center pt-4">
 												<button
 													type="button"
-													class="btn btn-dark btn-lg w-100"
+													className="btn btn-dark btn-lg w-100"
 													onClick={handleSubmit}
 												>
 													Create Account

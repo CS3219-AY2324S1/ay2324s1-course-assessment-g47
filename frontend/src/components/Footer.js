@@ -10,7 +10,7 @@ const Footer = () => {
 
 	return (
 		<footer className="bg-dark text-center text-lg-start d-flex flex-column justify-content-center footer">
-			<div class="text-center text-light p-2">
+			<div className="text-center text-light p-2">
 				&copy; {currentYear} {appName}
 			</div>
 		</footer>

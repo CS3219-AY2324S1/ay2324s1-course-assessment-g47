@@ -79,7 +79,7 @@ function LoginPage(props) {
 							<div className="form-outline mb-4">
 								<label
 									className="form-label"
-									for="form3Example3"
+									htmlFor="form3Example3"
 								>
 									Email address
 								</label>
@@ -98,7 +98,7 @@ function LoginPage(props) {
 							<div className="form-outline mb-3">
 								<label
 									className="form-label"
-									for="form3Example4"
+									htmlFor="form3Example4"
 								>
 									Password
 								</label>
@@ -122,18 +122,20 @@ function LoginPage(props) {
 									{formData.loginSuccess}
 								</p>
 							)}
-							<div class="d-flex align-items-center justify-content-center pt-4">
+							<div className="d-flex align-items-center justify-content-center pt-4">
 								<button
 									type="button"
-									class="btn btn-dark btn-lg w-100"
+									className="btn btn-dark btn-lg w-100"
 									onClick={handleSubmit}
 								>
 									Login
 								</button>
 							</div>
 
-							<div class="d-flex align-items-center justify-content-center pt-4">
-								<p class="mb-0 me-2">Don't have an account?</p>
+							<div className="d-flex align-items-center justify-content-center pt-4">
+								<p className="mb-0 me-2">
+									Don't have an account?
+								</p>
 
 								<button
 									type="button"
@@ -146,8 +148,8 @@ function LoginPage(props) {
 								</button>
 							</div>
 
-							<div class="d-flex align-items-center justify-content-center pt-4">
-								<p class="mb-0 me-2">
+							<div className="d-flex align-items-center justify-content-center pt-4">
+								<p className="mb-0 me-2">
 									Haven't verified your account
 								</p>
 
