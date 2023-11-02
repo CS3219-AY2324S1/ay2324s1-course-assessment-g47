@@ -20,6 +20,7 @@ function Room({ user }) {
     console.log("user:", user);
     const location = useLocation();
     console.log(location);
+    let currDateTime = location.state?.currDateTime;
     const source = location.state?.source;
     const question = location.state?.question;
     const code = location.state?.code;
@@ -43,8 +44,31 @@ function Room({ user }) {
     const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
     const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
 
+    const getCurrentDateTime = async () => {
+        const currentDateTime = new Date();
+
+        const year = currentDateTime.getFullYear();
+        const month = (currentDateTime.getMonth() + 1).toString().padStart(2, '0');
+        const day = currentDateTime.getDate().toString().padStart(2, '0');
+        const hour = currentDateTime.getHours().toString().padStart(2, '0');
+        const minutes = currentDateTime.getMinutes().toString().padStart(2, '0');
+        
+        const timezoneOffsetMinutes = currentDateTime.getTimezoneOffset();
+        const timezoneOffsetHours = Math.abs(timezoneOffsetMinutes) / 60;
+        const timezoneSign = timezoneOffsetMinutes > 0 ? "-" : "+";
+        const timezone = `${timezoneSign}${timezoneOffsetHours.toString().padStart(2, '0')}:${Math.abs(timezoneOffsetMinutes % 60).toString().padStart(2, '0')}`;
+        
+        const dateTimeString = `${year}-${month}-${day} ${hour}:${minutes} (UTC${timezone})`;
+        
+        console.log(dateTimeString);
+        currDateTime = dateTimeString;
+        return dateTimeString;
+    };
+
     const updateData = async (codeText, language, question) => {
         try {
+            getCurrentDateTime();
+            console.log(currDateTime);
             const response = await fetch(
                 `http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
                 {
@@ -52,7 +76,7 @@ function Room({ user }) {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ currUsername, matchedEmail, question, roomId, codeText, language }),
+                    body: JSON.stringify({ currUsername, matchedEmail, question, roomId, codeText, language, currDateTime }),
                 }
             );
 

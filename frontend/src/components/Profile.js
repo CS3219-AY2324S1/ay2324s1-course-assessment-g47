@@ -49,19 +49,7 @@ function Parser(data, type) {
 		}
 		return result;
 	} else {
-		const date = new Date(data);
-
-		// Extract date and time components
-		const year = date.getFullYear();
-		const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed, so we add 1
-		const day = date.getDate().toString().padStart(2, "0");
-		const hours = date.getHours().toString().padStart(2, "0");
-		const minutes = date.getMinutes().toString().padStart(2, "0");
-		const seconds = date.getSeconds().toString().padStart(2, "0");
-
-		// Create a formatted date and time string
-		const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-		return formattedDateTime;
+		return data;	// No use of Parser() if it ever reaches this line
 	}
 }
 
@@ -106,6 +94,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 				const data = await response.json();
 				setHistoryData(data);
 				console.log("Fetched user's history successfully");
+				console.log(data);
 
 				const userNamesData = {};
 				for (const historyItem of data.data.rows) {
@@ -522,7 +511,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 									<th>Question Category</th>
 									<th>Language</th>
 									<th>Matched User</th>
-									<th>Date & Time</th>
+									<th>Last Edited (Date & Time)</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -536,10 +525,10 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 													question: {
 														category: Parser(historyItem.question_category, "category2"),
 														complexity: historyItem.question_difficulty,
-														createdAt: historyItem.timestamp,
+														createdAt: historyItem.question_created_timestamp,
 														description: historyItem.question_description,
 														title: historyItem.question_name,
-														updatedAt: historyItem.timestamp,
+														updatedAt: historyItem.question_updated_timestamp,
 													},
 													code: historyItem.code,
 													language: JSON.parse(historyItem.language).label,
@@ -557,7 +546,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 												? historyItem.user2_email
 												: historyItem.user1_email] || 'Loading...'}
 										</td>
-										<td>{Parser(historyItem.timestamp, "time")}</td>
+										<td>{historyItem.timestamp}</td>
 									</tr>
 								))}
 							</tbody>
