@@ -5,6 +5,7 @@ const http = require("http");
 const amqp = require("amqplib");
 const app = express();
 const { v4: uuidv4 } = require("uuid");
+const cors = require("cors"); // Import the cors middleware
 
 const IO_PORT = process.env.COLLABORATION_SERVICE_PORT || 8084;
 
@@ -14,6 +15,21 @@ const io = require("socket.io")(server, {
 		origin: "http://localhost:3000",
 		methods: ["GET", "POST"],
 	},
+	path: "/api/collaboration/socket.io",
+});
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors()); // config cors so that front-end can use
+app.options("*", cors());
+// Set the Access-Control-Allow-Origin header
+app.use((req, res, next) => {
+	res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+	next();
+});
+
+app.get("/api/collaboration/", (req, res) => {
+	res.send("In collaboration-service");
 });
 
 io.on("connection", (socket) => {

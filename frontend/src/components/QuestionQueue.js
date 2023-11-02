@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/QuestionQueue.css";
-import * as Constants from "../constants/constants.js";
 
 import io from "socket.io-client";
 
@@ -11,14 +10,14 @@ function QuestionQueue({ user }) {
 	const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
 	const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
 
-	const MATCHING_SERVICE_PORT = Constants.MATCHING_SERVICE_PORT;
-
 	const navigate = useNavigate();
 	const [socketID, setSocketID] = useState(null);
 
 	useEffect(() => {
-		const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
-		const socket = io.connect(`http://localhost:${IO_PORT}`); //Connect to backend socket.io server
+		const socket = io({
+			path: "/api/collaboration/socket.io",
+		});
+		console.log("Socket connected to:", socket.io.uri);
 		socket.on("me", (id) => {
 			console.log(
 				"Calling socket function `me` to get socketID, socketID:",
@@ -88,21 +87,18 @@ function QuestionQueue({ user }) {
 
 		try {
 			console.log(`SocketId: ${socketID}`);
-			const response = await fetch(
-				`http://localhost:${MATCHING_SERVICE_PORT}/matchmake`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						username: user.username,
-						email: user.email, // Change this to the user's email
-						difficultyLevel: selectedDifficulty,
-						socketId: socketID, // Change this to the user's socket ID
-					}),
-				}
-			);
+			const response = await fetch(`/api/matching/matchmake`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					username: user.username,
+					email: user.email, // Change this to the user's email
+					difficultyLevel: selectedDifficulty,
+					socketId: socketID, // Change this to the user's socket ID
+				}),
+			});
 
 			if (response.status === 200) {
 				// User successfully enqueued
@@ -126,21 +122,18 @@ function QuestionQueue({ user }) {
 		setElapsedTime(0); // Reset elapsed time
 
 		try {
-			const response = await fetch(
-				`http://localhost:${MATCHING_SERVICE_PORT}/exitqueue`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						username: user.username,
-						email: user.email, // Change this to the user's email
-						difficultyLevel: selectedDifficulty,
-						socketId: socketID, // Change this to the user's socket ID
-					}),
-				}
-			);
+			const response = await fetch(`/api/matching/exitqueue`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					username: user.username,
+					email: user.email, // Change this to the user's email
+					difficultyLevel: selectedDifficulty,
+					socketId: socketID, // Change this to the user's socket ID
+				}),
+			});
 
 			if (response.status === 200) {
 				// User successfully exited the queue

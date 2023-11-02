@@ -39,21 +39,19 @@ function Register() {
 		}
 
 		try {
-			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/register`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						username,
-						email,
-						password,
-						account_type: "user",
-					}),
-				}
-			);
+			const response = await fetch(`/api/users/register`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					username,
+					email,
+					password,
+					account_type: "user",
+				}),
+			});
+
 			const data = await response.json();
 			if (response.status === 200) {
 				// Successful registration

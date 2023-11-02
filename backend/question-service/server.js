@@ -8,7 +8,7 @@ const { initializeQuestions } = require("./controllers/questionController");
 const defaultQuestions = require("./constants/default-questions");
 
 const app = express();
-const port = process.env.MONGO_PORT || 27017;
+const port = process.env.MONGO_PORT || 8082;
 
 //middleware
 app.use(express.json()); //Allows us to use json in the body of the request
@@ -31,7 +31,8 @@ app.use(
 // Connect to mongodb
 const connectWithRetry = () => {
 	mongoose
-		.connect(process.env.MONGO_URI, { // Changed from URL to URI
+		.connect(process.env.MONGO_URI, {
+			// Changed from URL to URI
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			serverSelectionTimeoutMS: 5000, // Timeout in milliseconds for server selection

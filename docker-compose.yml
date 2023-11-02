@@ -1,9 +1,28 @@
 version: '3.8'
 services:
+  # nginx
+  nginx:
+    container_name: nginx
+    restart: always
+    build:
+      context: ./backend/nginx
+      dockerfile: Dockerfile
+    depends_on:
+      - frontend
+      - user-service
+      - question-service
+      - matching-service
+      - collaboration-service
+      - history-service
+    ports:
+      - 80:80
+    networks:
+      - app-network
+
   # PostgreSQL Database
   postgres:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:15
     restart: always # postgres up and running no matter what happens
     environment:
       POSTGRES_USER: postgres
@@ -112,19 +131,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
-    environment:
-      - USER_SERVICE_PORT=8081
-      - QUESTION_SERVICE_PORT=8082
     stdin_open: true
     tty: true
     volumes:
       - ./frontend:/app
-    depends_on:
-      - user-service
-      - question-service
-      - matching-service
-      - collaboration-service
-      - history-service
     networks:
       - app-network
 

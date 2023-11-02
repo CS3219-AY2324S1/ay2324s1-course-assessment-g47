@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "./css/room.css";
 import Editor from "@monaco-editor/react";
 import Peer from "simple-peer";
@@ -8,15 +8,13 @@ import { codeLanguages } from "./constants";
 import { FaCheck } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import DisplayRandomQuestion from "./DisplayRandomQuestion";
-import * as Constants from "../constants/constants.js";
 
 import Select, { components } from "react-select";
 
-const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
-const HISTORY_PORT = Constants.HISTORY_SERVICE_PORT;
-
-const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
-
+// const socket = io.connect(`/api/collaboration`); // Connect to the backend socket.io server
+const socket = io({
+	path: "/api/collaboration/socket.io",
+});
 function Room({ user }) {
 	console.log("user:", user);
 	const location = useLocation();
@@ -47,23 +45,20 @@ function Room({ user }) {
 
 	const updateData = async (codeText, language, question) => {
 		try {
-			const response = await fetch(
-				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						currUsername,
-						matchedEmail,
-						question,
-						roomId,
-						codeText,
-						language,
-					}),
-				}
-			);
+			const response = await fetch(`/api/history/manage-code-attempt`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					currUsername,
+					matchedEmail,
+					question,
+					roomId,
+					codeText,
+					language,
+				}),
+			});
 
 			if (response.status === 200) {
 				// Successful update of Code Attempt History

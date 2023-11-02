@@ -11,7 +11,7 @@ const pool = new Pool({
 	database: process.env.DB_DATABASE, //Comment out when creating a new database
 });
 
-module.exports = pool;
+// module.exports = pool;
 
 // // // CREATE NEW DATABASE
 // // pool.query("CREATE DATABASE cs3219_g47;")
@@ -25,53 +25,49 @@ module.exports = pool;
 // // 		// pool.end();
 // // 	});
 
-// CREATE TABLE
-// const createTblQry = `CREATE TABLE accounts (
-//     user_id serial PRIMARY KEY,
-//     username VARCHAR ( 255 ) NOT NULL,
-// 	   email VARCHAR ( 255 ) UNIQUE NOT NULL,
-//     password VARCHAR ( 255 ) NOT NULL,
-// 	   account_type VARCHAR ( 255 ) NOT NULL,
-//     authentication_stats BOOLEAN DEFAULT false
-// 	   );
-// `;
+// Create the accounts table if it doesn't exist
+const createAccountsTableQuery = `
+  CREATE TABLE IF NOT EXISTS accounts (
+    user_id serial PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    account_type VARCHAR(255) NOT NULL,
+    authentication_stats BOOLEAN DEFAULT false
+  );
+`;
 
-// pool.query(createTblQry)
-// 	.then((res) => {
-// 		console.log("Table created");
-// 		console.log(res);
-// 		// pool.end();
-// 	})
-// 	.catch((err) => {
-// 		console.log(err);
-// 		// pool.end();
-// 	});
+pool.query(createAccountsTableQuery)
+	.then((res) => {
+		console.log("Accounts table created or already exists.");
+	})
+	.catch((err) => {
+		console.error("Error creating accounts table:", err);
+	});
 
-// // CREATE TABLE
-// const createCodeTblQry = `CREATE TABLE code_attempts (
-//     attempt_id serial PRIMARY KEY,
-//     user1_email VARCHAR ( 255 ) NOT NULL,
-// 	user2_email VARCHAR ( 255 ) NOT NULL,
-// 	room_id VARCHAR ( 255 ) NOT NULL,
-//     timestamp TIMESTAMP NOT NULL,
-// 	   language VARCHAR ( 255 ) NOT NULL,
-//     question_name VARCHAR ( 255 ) NOT NULL,
-// 	question_difficulty VARCHAR ( 255 ) NOT NULL,
-// 	question_category VARCHAR ( 255 ) NOT NULL,
-//     code TEXT NOT NULL,
-// 	question_description TEXT NOT NULL
-// 	);
-// `;
+// Create the code_attempts table if it doesn't exist
+const createCodeAttemptsTableQuery = `
+  CREATE TABLE IF NOT EXISTS code_attempts (
+    attempt_id serial PRIMARY KEY,
+    user1_email VARCHAR(255) NOT NULL,
+    user2_email VARCHAR(255) NOT NULL,
+    room_id VARCHAR(255) NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    language VARCHAR(255) NOT NULL,
+    question_name VARCHAR(255) NOT NULL,
+    question_difficulty VARCHAR(255) NOT NULL,
+    question_category VARCHAR(255) NOT NULL,
+    code TEXT NOT NULL,
+    question_description TEXT NOT NULL
+  );
+`;
 
-// pool.query(createCodeTblQry)
-// 	.then((res) => {
-// 		console.log("Table created");
-// 		console.log(res);
-// 		// pool.end();
-// 	})
-// 	.catch((err) => {
-// 		console.log(err);
-// 		// pool.end();
-// 	});
+pool.query(createCodeAttemptsTableQuery)
+	.then((res) => {
+		console.log("Code attempts table created or already exists.");
+	})
+	.catch((err) => {
+		console.error("Error creating code attempts table:", err);
+	});
 
-// module.exports = pool;
+module.exports = pool;

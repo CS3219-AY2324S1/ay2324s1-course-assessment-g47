@@ -4,16 +4,13 @@ import LoginPage from "./Login";
 import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import * as Constants from "../constants/constants.js";
 import profileImage from "../images/profile.png";
-
-const postgresqlPort = Constants.POSTGRESQL_PORT;
 
 // Function used to retrieve user's name based on email given
 async function fetchUserName(email, user) {
 	try {
 		const response = await fetch(
-			`http://localhost:${postgresqlPort}/users/fetch/${user.user.user_id}/username`,
+			`/api/users/fetch/${user.user.user_id}/username`,
 			{
 				method: "POST",
 				headers: {
@@ -23,6 +20,7 @@ async function fetchUserName(email, user) {
 				body: JSON.stringify({ email }),
 			}
 		);
+
 		if (response.ok) {
 			const result = await response.json();
 			return result.user.username; // Extract the username from the result
@@ -92,7 +90,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		}
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/user-history/${user.user.user_id}`,
+				`/api/users/user-history/${user.user.user_id}`,
 				{
 					method: "POST",
 					headers: {
@@ -104,6 +102,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 					}),
 				}
 			);
+
 			if (response.status === 200) {
 				// Successful update
 				const data = await response.json();
@@ -172,7 +171,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		try {
 			console.log(user);
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/${user.user.user_id}`,
+				`/api/users/update/${user.user.user_id}`,
 				{
 					method: "POST",
 					headers: {
@@ -225,19 +224,16 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 		// Check if the current password is correct
 		try {
-			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/login`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						email: user.user.email,
-						password: passwordData.currentPassword,
-					}),
-				}
-			);
+			const response = await fetch(`/api/users/login`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					email: user.user.email,
+					password: passwordData.currentPassword,
+				}),
+			});
 
 			if (response.status === 200) {
 				//successful login
@@ -259,20 +255,17 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 		// Update the password
 		try {
-			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update_password`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${user.tokens.accessToken}`,
-					},
-					body: JSON.stringify({
-						email: user.user.email,
-						password: passwordData.newPassword,
-					}),
-				}
-			);
+			const response = await fetch(`/api/users/update_password`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${user.tokens.accessToken}`,
+				},
+				body: JSON.stringify({
+					email: user.user.email,
+					password: passwordData.newPassword,
+				}),
+			});
 
 			if (response.status === 200) {
 				//successful update
@@ -300,17 +293,14 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 
 		if (confirmed) {
 			try {
-				const response = await fetch(
-					`http://localhost:${Constants.POSTGRESQL_PORT}/users/delete`,
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${user.tokens.accessToken}`,
-						},
-						body: JSON.stringify(user.user),
-					}
-				);
+				const response = await fetch(`/api/users/delete`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${user.tokens.accessToken}`,
+					},
+					body: JSON.stringify(user.user),
+				});
 
 				if (response.status === 200) {
 					//successful delete

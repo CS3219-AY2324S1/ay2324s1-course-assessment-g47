@@ -23,6 +23,12 @@ const app = express(); //Start up express app
 app.use(express.json()); // Body parser middleware
 app.use(cors({ origin: "http://localhost:3000" })); // CORS middleware (allows requests from other domains)
 
+// Set the Access-Control-Allow-Origin header
+app.use((req, res, next) => {
+	res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+	next();
+});
+
 // Establish a RabbitMQ connection if it is not already
 const createRabbitMQConnection = async () => {
 	try {
@@ -200,11 +206,15 @@ const matchUsers = async () => {
 };
 
 // Queuing feature to match users that chose the same difficulty level
-app.post("/matchmake", async (req, res) => {
+app.post("/api/matching/matchmake", async (req, res) => {
 	console.log("Matchmake request received");
 	// Upon every matching request, user sends his/her 'email' and 'difficultyLevel' to the waiting queue
 	const { username, email, difficultyLevel, socketId } = req.body;
 
+	// console.log(username);
+	// console.log(email);
+	// console.log(difficultyLevel);
+	// console.log(socketId);
 	try {
 		// Checks for missing email address or difficulty level of the question
 		if (!email || !difficultyLevel || !socketId) {
@@ -223,7 +233,7 @@ app.post("/matchmake", async (req, res) => {
 });
 
 // Endpoint for users to exit the queue
-app.post("/exitqueue", async (req, res) => {
+app.post("/api/matching/exitqueue", async (req, res) => {
 	console.log("Exit queue request received");
 	const { username, difficultyLevel, email, socketId } = req.body;
 

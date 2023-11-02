@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import "./css/Login.css";
-import * as Constants from "../constants/constants.js";
 import otpImage from "../images/otp.jpg";
 import { useNavigate } from "react-router-dom";
 
@@ -26,16 +24,13 @@ function VerifyOTP() {
 		e.preventDefault();
 
 		try {
-			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/verifyOTP`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(formData),
-				}
-			);
+			const response = await fetch(`/api/users/verifyOTP`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(formData),
+			});
 
 			if (response.status === 200) {
 				// OTP verification successful

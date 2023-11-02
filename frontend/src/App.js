@@ -1,32 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import './App.css';
-
-// import {BrowserRouter, Routes, Route} from 'react-router-dom'
-
-// // pages & components
-// import Home from './pages/Home'
-// import Navbar from './components/Navbar'
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <BrowserRouter>
-//       <Navbar />
-//       <div className="pages">
-//         <Routes>
-//           <Route
-//            path="/"
-//            element={<Home />}
-//           />
-//         </Routes>
-//       </div>
-//       </BrowserRouter>
-//     </div>
-//   );
-// }
-
-// export default App;
-
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Layout from "./components/Layout";
@@ -81,7 +52,7 @@ function App() {
 		const fetchDataFromAPI = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:${Constants.POSTGRESQL_PORT}/users/fetch/${newUser.user.user_id}`,
+					`/api/users/fetch/${newUser.user.user_id}`,
 					{
 						method: "POST",
 						headers: {
@@ -91,6 +62,7 @@ function App() {
 						body: JSON.stringify(newUser), // Send user data directly
 					}
 				);
+
 				if (response.ok) {
 					const user = await response.json();
 

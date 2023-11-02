@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./css/Login.css";
 import "./css/ChangeTypeHome.css";
 import LoginPage from "./Login";
 import "./css/Login.css";
-import * as Constants from "../constants/constants.js";
 
 function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 	const navigate = useNavigate();
@@ -42,7 +41,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 		try {
 			console.log(user.user);
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/type/${user.user_id}`,
+				`/api/users/update/type/${user.user_id}`,
 				{
 					method: "POST",
 					headers: {
