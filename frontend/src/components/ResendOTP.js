@@ -81,10 +81,10 @@ function ResendOTP() {
 												</div>
 											</div>
 
-											<div class="d-flex align-items-center justify-content-center">
+											<div className="d-flex align-items-center justify-content-center">
 												<button
 													type="button"
-													class="btn btn-dark btn-lg w-100"
+													className="btn btn-dark btn-lg w-100"
 													onClick={handleSubmit}
 												>
 													Generate a new OTP
@@ -105,8 +105,10 @@ function ResendOTP() {
 											</p>
 										)}
 
-										<div class="d-flex align-items-center justify-content-center pb-4">
-											<p class="mb-0 me-2">Verified?</p>
+										<div className="d-flex align-items-center justify-content-center pb-4">
+											<p className="mb-0 me-2">
+												Verified?
+											</p>
 
 											<button
 												type="button"
