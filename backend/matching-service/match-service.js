@@ -96,15 +96,16 @@ const dequeueUserByEmail = async (email, difficultyLevel) => {
 				if (messageEmail === email) {
 					// Dequeue the user by acknowledging the message
 					channel.ack(message);
-					console.log(
-						`User ${email} has been dequeued from the waiting queue.`
-					);
 					if (difficultyMap.has(difficultyLevel)) {
+						console.log(difficultyMap);
 						difficultyMap.delete(difficultyLevel);
+						console.log(`User ${email} has been dequeued from the waiting queue.`);
+						console.log(difficultyMap);
 					}
 				}
 			}
 		});
+
 	} catch (error) {
 		console.error(
 			"Failed to remove user by email due to an internal issue: ",

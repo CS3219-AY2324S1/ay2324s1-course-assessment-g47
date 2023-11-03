@@ -14,14 +14,16 @@ appForHistory.use(cors());
 appForHistory.post("/history/manage-code-attempt", async (req, res) => {
     res.setHeader("Content-Type", "application/json");
 
-    const { currUsername, matchedEmail, question, roomId, codeText, language } = req.body;
+    const { currUsername, matchedEmail, question, roomId, codeText, language, currDateTime } = req.body;
 
     // Extract out relevant information about the question
     const questionName = question.title;
     const questionDifficulty = question.complexity;
     const questionCategory = question.category;
-    const time_of_creation = question.updatedAt;
+    const dateTimeInfo = currDateTime;
     const questionDescription = question.description;
+    const questionCreatedTime = question.createdAt;
+    const questionUpdatedTime = question.updatedAt;
 
 	try {
 		// Check if the code attempt exists in the database already
@@ -47,14 +49,14 @@ appForHistory.post("/history/manage-code-attempt", async (req, res) => {
                     AND room_id = $9
                 );
             `;
-            await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, currUsername, matchedEmail, roomId, language]);
+            await pool.query(updateQuery, [questionName, questionDifficulty, questionCategory, questionDescription, codeText, dateTimeInfo, currUsername, matchedEmail, roomId, language]);
             return res.status(200).json({ message: "Code attempt updated successfully into the database for storage.", data: req.body });
 		} else { // Else add the code attempt into the database as a new entry
             const insertQuery = `
-                INSERT INTO code_attempts (user1_email, user2_email, room_id, question_name, question_difficulty, question_category, question_description, code, timestamp, language)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                INSERT INTO code_attempts (user1_email, user2_email, room_id, question_name, question_difficulty, question_category, question_description, code, timestamp, language, question_created_timestamp, question_updated_timestamp)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             `;
-            await pool.query(insertQuery, [currUsername, matchedEmail, roomId, questionName, questionDifficulty, questionCategory, questionDescription, codeText, time_of_creation, language]);
+            await pool.query(insertQuery, [currUsername, matchedEmail, roomId, questionName, questionDifficulty, questionCategory, questionDescription, codeText, dateTimeInfo, language, questionCreatedTime, questionUpdatedTime]);
             return res.status(200).json({ message: "Code attempt inserted successfully into the database for storage." });
         }
 	} catch (err) {

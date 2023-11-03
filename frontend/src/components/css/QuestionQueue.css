@@ -61,6 +61,16 @@
     text-align: center;
   }
 
+  .no-match-popup {
+    font-size: 16px; /* Increase the font size to make it bigger */
+    font-weight: bold; /* Make the font thicker */
+    color: var(--text-color);
+    margin-top: 10px;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
   .difficulty-select:hover + .difficulty-prompt {
     background-color: #666; /* Darker background color on hover */
     display: block;
