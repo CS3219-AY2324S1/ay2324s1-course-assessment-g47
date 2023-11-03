@@ -110,7 +110,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 	};
 
 	return (
-		<tr className="table-row">
+		<tr className={`table-row ${question.complexity.toLowerCase()}`}>
 			<td>{id}</td>
 			<td className="clickable-cell" onClick={() => onClick(question)}>
 				{question.title}
@@ -123,7 +123,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				})}
 			</td>
 			<td onClick={handleUpvote}>
-				<div className="upvote-container">
+				<div className={`upvote-container ${question.complexity.toLowerCase()}`}>
 					<button
 						id="upvoteButton"
 						className={upvoted ? "unvote-button" : "upvote-button"}

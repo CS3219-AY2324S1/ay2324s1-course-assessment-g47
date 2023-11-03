@@ -17,6 +17,9 @@ function QuestionQueue({ user }) {
 	const navigate = useNavigate();
 	const [socketID, setSocketID] = useState(null);
 
+	// Handle timer queue
+	let timerInterval;
+
 	useEffect(() => {
 		const IO_PORT = Constants.COLLABORATION_SERVICE_PORT;
 		const socket = io.connect(`http://localhost:${IO_PORT}`); //Connect to backend socket.io server
@@ -47,48 +50,36 @@ function QuestionQueue({ user }) {
 		// Attach the event listener for successful matches
 		socket.on("matched-successfully", handleMatchedSuccessfully);
 
-		// Handle timer queue
-		let timerInterval;
-
-    if (queueStartTime && loading) {
-      // Start a timer to update elapsed time while in the queue
-      timerInterval = setInterval(() => {
-        const currentTime = new Date().getTime();
-        const elapsed = Math.floor((currentTime - queueStartTime) / 1000);
-        setElapsedTime(elapsed);
-        if (selectedDifficulty === 'easy') {
-          console.log("Time in Queue: ", elapsed);
-          if (elapsed >= 30) {
-            setNoMatchFound(true);
-            handleExitQueue();
-          }
-        } else if (selectedDifficulty === 'medium') {
-          console.log("Time in Queue: ", elapsed);
-          if (elapsed >= 45) {
-            setNoMatchFound(true);
-            handleExitQueue();
-          }
-        } else {
-          console.log("Time in Queue: ", elapsed);
-          if (elapsed >= 60) {
-            setNoMatchFound(true);
-            handleExitQueue();
-          }
-        }
-      }, 1000);
-    } else {
-      // Clear the timer interval when not in the queue
-      clearInterval(timerInterval);
-    }
 
 		if (queueStartTime && loading) {
 			// Start a timer to update elapsed time while in the queue
 			timerInterval = setInterval(() => {
 				const currentTime = new Date().getTime();
-				const elapsed = Math.floor(
-					(currentTime - queueStartTime) / 1000
-				);
+				const elapsed = Math.floor((currentTime - queueStartTime) / 1000);
 				setElapsedTime(elapsed);
+				if (selectedDifficulty === 'easy') {
+					console.log("Time in Queue: ", elapsed);
+					if (elapsed >= 30) {
+						setNoMatchFound(true);
+						handleExitQueue();
+						clearInterval(timerInterval);
+					}
+				} else if (selectedDifficulty === 'medium') {
+					console.log("Time in Queue: ", elapsed);
+					if (elapsed >= 45) {
+						setNoMatchFound(true);
+						handleExitQueue();
+						clearInterval(timerInterval);
+					}
+				} else {
+					console.log("Time in Queue: ", elapsed);
+					if (elapsed >= 60) {
+						setNoMatchFound(true);
+						handleExitQueue();
+						clearInterval(timerInterval);
+					}
+				}
+				
 			}, 1000);
 		} else {
 			// Clear the timer interval when not in the queue
@@ -156,6 +147,7 @@ function QuestionQueue({ user }) {
 		setLoading(false); // Stop loading
 		setQueueStartTime(null); // Reset queue start time
 		setElapsedTime(0); // Reset elapsed time
+		clearInterval(timerInterval);
 
 		try {
 			const response = await fetch(
@@ -188,51 +180,64 @@ function QuestionQueue({ user }) {
 	};
 
 	return (
-		<div className="question-queue">
-			<h2>Question Queue</h2>
-			<div>
-				<label>Select Difficulty:</label>
-				<select
-					value={selectedDifficulty}
-					onChange={handleDifficultyChange}
-					disabled={loading}
-					className="difficulty-select"
-				>
-					<option value="easy">Easy</option>
-					<option value="medium">Medium</option>
-					<option value="hard">Hard</option>
-				</select>
-				{loading ? (
-					<p className="difficulty-prompt">
-						Please exit the queue to change the difficulty.
-					</p>
-				) : null}
-			</div>
-			<div>
-				{loading ? (
-					<div>
-						<div className="timer">
-							<p className="timer-text">
-								{formatElapsedTime(elapsedTime)}
-							</p>
-							<p className="waiting-text">
-								Waiting in queue for {selectedDifficulty}{" "}
-								difficulty...
-							</p>
+		<div className="container-fluid" style={{ minWidth: '200px' }}>
+			<div className="card m-1 rounded-4">
+				<div className="card-body bg-dark rounded-4">
+					<h2 className="card-title text-light">Question Queue</h2>
+					<form>
+						<div className="mb-3">
+							<label htmlFor="difficulty-select" className="form-label">Select Difficulty:</label>
+							<select
+								id="difficulty-select"
+								className="form-select"
+								value={selectedDifficulty}
+								onChange={handleDifficultyChange}
+								disabled={loading}
+							>
+								<option value="easy">Easy</option>
+								<option value="medium">Medium</option>
+								<option value="hard">Hard</option>
+							</select>
+
 						</div>
-						<button onClick={handleExitQueue}>Exit Queue</button>
-					</div>
-				) : (
-					!noMatchFound && <button onClick={handleJoinQueue}>Join Queue</button>
-				)}
-				{noMatchFound && (
-          <div>
-            <div className="no-match-popup">
-              <p>No match found, please requeue or select another difficulty.</p>
-            </div>
-            <button onClick={() => setNoMatchFound(false)}>Close</button>
-          </div>
-        )}
+						<div>
+							{loading ? (
+								<div>
+									<div className="timer mb-3">
+										<p className="timer-text fs-2">
+											{formatElapsedTime(elapsedTime)}
+										</p>
+										<p className="waiting-text">
+											Waiting in queue for {selectedDifficulty} difficulty...
+										</p>
+									</div>
+									<button
+										type="button"
+										className="btn btn-danger"
+										onClick={handleExitQueue}
+									>
+										Exit Queue
+									</button>
+								</div>
+							) : (
+								!noMatchFound && <button
+									type="button"
+									className="btn btn-primary bg-success"
+									onClick={handleJoinQueue}
+								>
+									Join Queue
+								</button>
+							)}{noMatchFound && (
+								<div>
+									<div className="no-match-popup">
+										<p>No match found, please requeue or select another difficulty.</p>
+									</div>
+									<button onClick={() => setNoMatchFound(false)}>Close</button>
+								</div>
+							)}
+						</div>
+					</form>
+				</div>
 			</div>
 		</div>
 	);

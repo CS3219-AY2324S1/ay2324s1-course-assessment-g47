@@ -18,22 +18,22 @@ const HISTORY_PORT = Constants.HISTORY_SERVICE_PORT;
 const socket = io.connect(`http://localhost:${IO_PORT}`); // Connect to the backend socket.io server
 
 function Room({ user }) {
-    console.log("user:", user);
-    const location = useLocation();
-    console.log(location);
-    let currDateTime = location.state?.currDateTime;
-    const source = location.state?.source;
-    const question = location.state?.question;
-    const code = location.state?.code;
-    const language = location.state?.language;
-    const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
-    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's username
-    const matchedEmail = location.state?.matchedEmail || "peerplan@peerplan.com" // Stores the matched user's email
-    const currUsername = user.user.email; // Stores current user's email
-    // Code language settings 
-    const [selectedLanguage, setSelectedLanguage] = useState(
-        codeLanguages.find((language) => language.value === "python")
-    );
+	console.log("user:", user);
+	const location = useLocation();
+	console.log(location);
+	let currDateTime = location.state?.currDateTime;
+	const source = location.state?.source;
+	const question = location.state?.question;
+	const code = location.state?.code;
+	const language = location.state?.language;
+	const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
+	const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's username
+	const matchedEmail = location.state?.matchedEmail || "peerplan@peerplan.com" // Stores the matched user's email
+	const currUsername = user.user.email; // Stores current user's email
+	// Code language settings 
+	const [selectedLanguage, setSelectedLanguage] = useState(
+		codeLanguages.find((language) => language.value === "python")
+	);
 
 	const { roomId } = useParams(); // Stores the Room ID
 	const [me, setMe] = useState("");
@@ -45,41 +45,41 @@ function Room({ user }) {
 	const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
 	const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
 
-    const getCurrentDateTime = async () => {
-        const currentDateTime = new Date();
+	const getCurrentDateTime = async () => {
+		const currentDateTime = new Date();
 
-        const year = currentDateTime.getFullYear();
-        const month = (currentDateTime.getMonth() + 1).toString().padStart(2, '0');
-        const day = currentDateTime.getDate().toString().padStart(2, '0');
-        const hour = currentDateTime.getHours().toString().padStart(2, '0');
-        const minutes = currentDateTime.getMinutes().toString().padStart(2, '0');
-        
-        const timezoneOffsetMinutes = currentDateTime.getTimezoneOffset();
-        const timezoneOffsetHours = Math.abs(timezoneOffsetMinutes) / 60;
-        const timezoneSign = timezoneOffsetMinutes > 0 ? "-" : "+";
-        const timezone = `${timezoneSign}${timezoneOffsetHours.toString().padStart(2, '0')}:${Math.abs(timezoneOffsetMinutes % 60).toString().padStart(2, '0')}`;
-        
-        const dateTimeString = `${year}-${month}-${day} ${hour}:${minutes} (UTC${timezone})`;
-        
-        console.log(dateTimeString);
-        currDateTime = dateTimeString;
-        return dateTimeString;
-    };
+		const year = currentDateTime.getFullYear();
+		const month = (currentDateTime.getMonth() + 1).toString().padStart(2, '0');
+		const day = currentDateTime.getDate().toString().padStart(2, '0');
+		const hour = currentDateTime.getHours().toString().padStart(2, '0');
+		const minutes = currentDateTime.getMinutes().toString().padStart(2, '0');
 
-    const updateData = async (codeText, language, question) => {
-        try {
-            getCurrentDateTime();
-            console.log(currDateTime);
-            const response = await fetch(
-                `http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ currUsername, matchedEmail, question, roomId, codeText, language, currDateTime }),
-                }
-            );
+		const timezoneOffsetMinutes = currentDateTime.getTimezoneOffset();
+		const timezoneOffsetHours = Math.abs(timezoneOffsetMinutes) / 60;
+		const timezoneSign = timezoneOffsetMinutes > 0 ? "-" : "+";
+		const timezone = `${timezoneSign}${timezoneOffsetHours.toString().padStart(2, '0')}:${Math.abs(timezoneOffsetMinutes % 60).toString().padStart(2, '0')}`;
+
+		const dateTimeString = `${year}-${month}-${day} ${hour}:${minutes} (UTC${timezone})`;
+
+		console.log(dateTimeString);
+		currDateTime = dateTimeString;
+		return dateTimeString;
+	};
+
+	const updateData = async (codeText, language, question) => {
+		try {
+			getCurrentDateTime();
+			console.log(currDateTime);
+			const response = await fetch(
+				`http://localhost:${HISTORY_PORT}/history/manage-code-attempt`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ currUsername, matchedEmail, question, roomId, codeText, language, currDateTime }),
+				}
+			);
 
 			if (response.status === 200) {
 				// Successful update of Code Attempt History
@@ -320,16 +320,16 @@ function Room({ user }) {
 			console.log("Destroyed user media stream");
 		};
 	}, []);
-	
-        function myBeforeUnloadListener(event) {
-            const confirmationMessage = 'Are you sure you want to leave?';
-            event.returnValue = confirmationMessage;
 
-            window.addEventListener('unload', () => {
-                socket.emit("disconnected", { roomId: roomId });
-                socket.disconnect();
-            });
-        }
+	function myBeforeUnloadListener(event) {
+		const confirmationMessage = 'Are you sure you want to leave?';
+		event.returnValue = confirmationMessage;
+
+		window.addEventListener('unload', () => {
+			socket.emit("disconnected", { roomId: roomId });
+			socket.disconnect();
+		});
+	}
 
 	const handleRefreshQuestion = async () => {
 		if (!isFromProfile) {
@@ -365,7 +365,7 @@ function Room({ user }) {
 	// wait for DOM to load before getting elements
 	useEffect(() => {
 		const chatForm = document.getElementById("chat-form");
-		const chatMessages = document.querySelector(".chat-messages");
+		const chatMessages = document.querySelector(".chat-main");
 
 		//Message submit
 		chatForm.addEventListener("submit", async (e) => {
@@ -464,69 +464,80 @@ function Room({ user }) {
 	};
 
 	return (
-		<div className="container">
-			<div className="right-panel">
-				<div className="editor-container-room">
-					<div className="editor">
-						<Editor
-							height="100%"
-							width="100%"
-							theme="vs-dark"
-							language={selectedLanguage.value}
-							value={editorText}
-							onChange={handleEditorChange}
+		<div className="container-fluid">
+			<div className="row mt-4">
+				<div className="col-lg-3 col-md-6 order-lg-1 order-md-1 order-1">
+					<div className="question-container m-2">
+						<DisplayRandomQuestion
+							user={user}
+							randomQuestion={randomQuestion}
+							handleRefreshQuestion={handleRefreshQuestion}
 						/>
 					</div>
-					<div className="language-dropdown">
-						<label>Select Language:</label>
-						<Select
-							value={selectedLanguage}
-							onChange={handleLanguageChange}
-							options={codeLanguages}
-							isSearchable={true}
-							placeholder="Search for a language..."
-							className="select-language"
-							styles={customSelectStyles}
-							components={{
-								Option: CustomSelectOption, // Use the custom component to render options
-							}}
-						/>
+
+				</div>
+				<div className="col-lg-6 col-md-6 order-lg-2 order-md-2 order-2">
+					<div className="editor-container-room m-2 d-flex flex-column">
+						<div className="language-dropdown mb-2">
+							<label>Select Language:</label>
+							<Select
+								value={selectedLanguage}
+								onChange={handleLanguageChange}
+								options={codeLanguages}
+								isSearchable={true}
+								placeholder="Search for a language..."
+								className="select-language"
+								styles={customSelectStyles}
+								components={{
+									Option: CustomSelectOption, // Use the custom component to render options
+								}}
+							/>
+						</div>
+						<div className="editor flex-grow-1">
+							<Editor
+								height="100%"
+								width="100%"
+								theme="vs-dark"
+								language={selectedLanguage.value}
+								value={editorText}
+								onChange={handleEditorChange}
+								options={{
+									minimap: { enabled: false }
+							  }}
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="middle-panel">
-				<div className="question-container">
-					<button className="exit-button" onClick={handleExit}>
-						Exit
-					</button>
-					<DisplayRandomQuestion
-						user={user}
-						randomQuestion={randomQuestion}
-						handleRefreshQuestion={handleRefreshQuestion}
-					/>
+				<div className="col-lg-3 col-md-12 order-lg-3 order-md-3 order-3">
+					<div className="chat-container bg-dark d-flex flex-column m-2 rounded-4">
+						<div className="chat-name d-flex align-items-center mb-2">
+							<div className="flex-grow-1 text-center">
+								<p className="room-id h5 text-light mb-0">Chat with: {matchedUsername}</p>
+							</div>
+							<button className="btn btn-danger exit-button m-2" onClick={handleExit}>
+								Exit
+							</button>
+						</div>
+						<main className="chat-main flex-grow-1 mb-2" style={{ overflowY: 'auto' }}>
+							<div className="chat-messages"></div>
+						</main>
+						<div className="chat-form-container d-flex justify-content-between align-items-center m-2">
+							<form id="chat-form" className="chat-form flex-grow-1 mb-1 mt-1">
+								<input
+									id="msg"
+									type="text"
+									placeholder="Enter Message"
+									required
+									autoComplete="off"
+								/>
+							</form>
+							<button className="btn btn-success rounded-circle ">
+								<i className="fas fa-paper-plane"></i>
+							</button>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div className="left-panel">
-				<div>
-					<p className="room-id">In a chat with: {matchedUsername}</p>
-				</div>
-				<main class="chat-main">
-					<div class="chat-messages"></div>
-				</main>
-				<div class="chat-form-container">
-					<form id="chat-form" class="chat-form">
-						<input
-							id="msg"
-							type="text"
-							placeholder="Enter Message"
-							required
-							autocomplete="off"
-						/>
-						<button class="btn">
-							<i class="fas fa-paper-plane"></i>
-						</button>
-					</form>
-				</div>
+
 			</div>
 		</div>
 	);
@@ -578,6 +589,8 @@ const customSelectStyles = {
 		},
 	}),
 };
+
+
 
 const CustomSelectOption = (props) => (
 	<components.Option {...props}>

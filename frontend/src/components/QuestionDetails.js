@@ -30,36 +30,34 @@ const parseDescription = (description) => {
 const QuestionDetails = ({ selectedQuestion }) => {
 	if (!selectedQuestion) {
 		return (
-			<div className="question-details">
-				<h4 className="question-header">Click a question to view</h4>
+			<div className="container-fluid" style={{ minWidth: '200px'}}>
+				<div className="card m-1 rounded-4">
+					<div className="card-body bg-dark rounded-4 d-flex flex-column justify-content-center align-items-center">
+						<h4 className="card-title text-light">Click a question to view</h4>
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="question-details">
-			<h4 className="question-header">{selectedQuestion.title}</h4>
-			<p>
-				<strong>Complexity:</strong> {selectedQuestion.complexity}
-			</p>
-			<p>
-				<strong>Category:</strong>{" "}
-				{selectedQuestion.category.join(", ")}
-			</p>
-			<p>
-				<strong>Description:</strong>
-			</p>
-			<div className="card-description">
-				{parseDescription(selectedQuestion.description)}
+		<div className="container-fluid" style={{ minWidth: '200px'}}>
+			<div className="card m-1 rounded-4">
+				<div className="card-body bg-dark rounded-4">
+					<h4 className="card-title text-light">{selectedQuestion.title}</h4>
+					<p className="mb-1 text-light"><strong>Complexity:</strong> {selectedQuestion.complexity}</p>
+					<p className="mb-1 text-light"><strong>Category:</strong> {selectedQuestion.category.join(", ")}</p>
+					<p className="mb-1 text-light"><strong>Description:</strong></p>
+					<div className="description-box mb-3 p-2 rounded-2 text-light" style={{ border: '1px solid #ccc' }}>
+						{parseDescription(selectedQuestion.description)}
+					</div>
+					<p className="card-text d-flex justify-content-center text-light">
+						Created at: {format(new Date(selectedQuestion.createdAt), "dd MMM yyyy HH:mm:ss")}
+					</p>
+				</div>
 			</div>
-			<p className="question-btm-subtext">
-				Created at:{" "}
-				{format(
-					new Date(selectedQuestion.createdAt),
-					"dd MMM yyyy HH:mm:ss"
-				)}
-			</p>
 		</div>
+
 	);
 };
 
