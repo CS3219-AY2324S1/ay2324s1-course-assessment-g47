@@ -50,7 +50,7 @@ function Parser(data, type) {
 		}
 		return result;
 	} else {
-		return data;	// No use of Parser() if it ever reaches this line
+		return data; // No use of Parser() if it ever reaches this line
 	}
 }
 
@@ -602,8 +602,9 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 												<th>Question Category</th>
 												<th>Language</th>
 												<th>Matched User</th>
-												<th>Date & Time</th>
-												<th>Last Edited (Date & Time)</th>
+												<th>
+													Last Edited (Date & Time)
+												</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -674,7 +675,9 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 															] || "Loading..."}
 														</td>
 														<td>
-															{historyItem.timestamp}
+															{
+																historyItem.timestamp
+															}
 														</td>
 													</tr>
 												)
