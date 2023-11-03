@@ -53,11 +53,13 @@ module.exports = pool;
 //     user1_email VARCHAR ( 255 ) NOT NULL,
 // 	user2_email VARCHAR ( 255 ) NOT NULL,
 // 	room_id VARCHAR ( 255 ) NOT NULL,
-//     timestamp TIMESTAMP NOT NULL,
+//     timestamp VARCHAR ( 255 ) NOT NULL,
 // 	   language VARCHAR ( 255 ) NOT NULL,
 //     question_name VARCHAR ( 255 ) NOT NULL,
 // 	question_difficulty VARCHAR ( 255 ) NOT NULL,
 // 	question_category VARCHAR ( 255 ) NOT NULL,
+// 	question_created_timestamp TIMESTAMP NOT NULL,
+//  question_updated_timestamp TIMESTAMP NOT NULL,
 //     code TEXT NOT NULL,
 // 	question_description TEXT NOT NULL
 // 	);

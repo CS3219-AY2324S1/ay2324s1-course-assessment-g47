@@ -16,22 +16,22 @@ const socket = io({
 	path: "/api/collaboration/socket.io",
 });
 function Room({ user }) {
-	console.log("user:", user);
-	const location = useLocation();
-	console.log(location);
-	const source = location.state?.source;
-	const question = location.state?.question;
-	const code = location.state?.code;
-	const language = location.state?.language;
-	const difficultyLevel = location.state?.difficultyLevel || "easy"; // Get the difficultyLevel from location state
-	const matchedUsername = location.state?.matchedUsername || "Peer2"; // Stores the matched user's username
-	const matchedEmail =
-		location.state?.matchedEmail || "peerplan@peerplan.com"; // Stores the matched user's email
-	const currUsername = user.user.email; // Stores current user's email
-	// Code language settings
-	const [selectedLanguage, setSelectedLanguage] = useState(
-		codeLanguages.find((language) => language.value === "python")
-	);
+    console.log("user:", user);
+    const location = useLocation();
+    console.log(location);
+    let currDateTime = location.state?.currDateTime;
+    const source = location.state?.source;
+    const question = location.state?.question;
+    const code = location.state?.code;
+    const language = location.state?.language;
+    const difficultyLevel = location.state?.difficultyLevel || 'easy'; // Get the difficultyLevel from location state
+    const matchedUsername = location.state?.matchedUsername || 'Peer2'; // Stores the matched user's username
+    const matchedEmail = location.state?.matchedEmail || "peerplan@peerplan.com" // Stores the matched user's email
+    const currUsername = user.user.email; // Stores current user's email
+    // Code language settings 
+    const [selectedLanguage, setSelectedLanguage] = useState(
+        codeLanguages.find((language) => language.value === "python")
+    );
 
 	const { roomId } = useParams(); // Stores the Room ID
 	const [me, setMe] = useState("");
@@ -43,22 +43,41 @@ function Room({ user }) {
 	const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
 	const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
 
-	const updateData = async (codeText, language, question) => {
-		try {
-			const response = await fetch(`/api/history/manage-code-attempt`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					currUsername,
-					matchedEmail,
-					question,
-					roomId,
-					codeText,
-					language,
-				}),
-			});
+    const getCurrentDateTime = async () => {
+        const currentDateTime = new Date();
+
+        const year = currentDateTime.getFullYear();
+        const month = (currentDateTime.getMonth() + 1).toString().padStart(2, '0');
+        const day = currentDateTime.getDate().toString().padStart(2, '0');
+        const hour = currentDateTime.getHours().toString().padStart(2, '0');
+        const minutes = currentDateTime.getMinutes().toString().padStart(2, '0');
+        
+        const timezoneOffsetMinutes = currentDateTime.getTimezoneOffset();
+        const timezoneOffsetHours = Math.abs(timezoneOffsetMinutes) / 60;
+        const timezoneSign = timezoneOffsetMinutes > 0 ? "-" : "+";
+        const timezone = `${timezoneSign}${timezoneOffsetHours.toString().padStart(2, '0')}:${Math.abs(timezoneOffsetMinutes % 60).toString().padStart(2, '0')}`;
+        
+        const dateTimeString = `${year}-${month}-${day} ${hour}:${minutes} (UTC${timezone})`;
+        
+        console.log(dateTimeString);
+        currDateTime = dateTimeString;
+        return dateTimeString;
+    };
+
+    const updateData = async (codeText, language, question) => {
+        try {
+            getCurrentDateTime();
+            console.log(currDateTime);
+            const response = await fetch(
+				`/api/history/manage-code-attempt`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ currUsername, matchedEmail, question, roomId, codeText, language, currDateTime }),
+                }
+            );
 
 			if (response.status === 200) {
 				// Successful update of Code Attempt History
