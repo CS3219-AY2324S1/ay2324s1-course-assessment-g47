@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cd question-service && npm test",
+    "test-ci": "cd question-service && npm run test-ci",
     "start": "concurrently \"node server.js\" \"node postgresql.js\"",
     "dev": "concurrently \"nodemon server.js\" \"nodemon postgresql.js\""
   },
