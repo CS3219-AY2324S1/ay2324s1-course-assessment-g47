@@ -4,12 +4,16 @@ import "../App.css";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import "./css/QuestionList.css";
 import { useEffect, useState } from "react";
+import ConfirmModal from './ConfirmModal';
+import ErrorMessage from './ErrorMessage';
 
 const QuestionList = ({ id, question, onClick, onDelete }) => {
 	const { dispatch } = useQuestionsContext();
 	const { user } = useAuthContext();
 	let [upvoted, setUpvoted] = useState(false);
 	let [upvoteCount, setUpvoteCount] = useState(question.upvotes.length);
+	const [showConfirmModal, setShowConfirmModal] = useState(false);
+	const [errorMessage, setErrorMessage] = useState('');
 
 	useEffect(() => {
 		if (user) {
@@ -19,11 +23,11 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 		}
 	}, [user]);
 
-	const handleClick = async () => {
-		if (!user) {
-			return;
-		}
+	const handleClick = () => {
+		setShowConfirmModal(true);
+	};
 
+	const handleDelete = async () => {
 		let questionId = question._id;
 		const response = await fetch(`/api/questions/` + question._id, {
 			method: "DELETE",
@@ -31,13 +35,20 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				Authorization: `Bearer ${user.tokens.accessToken}`,
 			},
 		});
-		const json = await response.json();
 
 		if (response.ok) {
+			const json = await response.json();
 			dispatch({ type: "DELETE_QUESTION", payload: json });
 			onDelete(questionId);
+			setShowConfirmModal(false);
+		} else {
+			// Show error message
+			setErrorMessage('Failed to delete the question. Please try again later.');
 		}
 	};
+
+	const clearErrorMessage = () => setErrorMessage('');
+
 
 	const handleUpvote = async () => {
 		if (!user) {
@@ -145,6 +156,17 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 					delete
 				</td>
 			)}
+			<ConfirmModal
+				show={showConfirmModal}
+				handleClose={() => setShowConfirmModal(false)}
+				handleConfirm={handleDelete}
+				title="Confirm Deletion"
+				body="Are you sure you want to delete this question?"
+			/>
+			<ErrorMessage
+				errorMessage={errorMessage}
+				clearError={clearErrorMessage}
+			/>
 		</tr>
 	);
 };
