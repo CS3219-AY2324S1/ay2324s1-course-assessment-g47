@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - CI-Docker
+      - nginx-CI
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,4 +30,3 @@ jobs:
         run: npm run test-ci
         env:
           ACCESS_TOKEN_SECRET: ${{ secrets.AUTH_TOKEN }}
-          
