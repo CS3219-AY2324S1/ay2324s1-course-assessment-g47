@@ -1,16 +1,14 @@
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 
-const ErrorMessage = ({ errorMessage, clearError }) => {
-  if (!errorMessage) return null;
-
+const ErrorMessage = ({ show, errorMessage, onHide }) => {
   return (
-    <Alert variant="danger" onClose={clearError} dismissible>
-      <Alert.Heading>Error!</Alert.Heading>
-      <p>
-        {errorMessage}
-      </p>
-    </Alert>
+    <Modal show={show} onHide={onHide} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Error</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{errorMessage}</Modal.Body>
+    </Modal>
   );
 };
 

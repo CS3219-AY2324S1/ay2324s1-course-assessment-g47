@@ -13,7 +13,8 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 	let [upvoted, setUpvoted] = useState(false);
 	let [upvoteCount, setUpvoteCount] = useState(question.upvotes.length);
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
-	const [errorMessage, setErrorMessage] = useState('');
+	const [error, setError] = useState('');
+	const [showErrorModal, setShowErrorModal] = useState(false);
 
 	useEffect(() => {
 		if (user) {
@@ -43,11 +44,15 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 			setShowConfirmModal(false);
 		} else {
 			// Show error message
-			setErrorMessage('Failed to delete the question. Please try again later.');
+			setError('Failed to delete the question. Please try again later.');
+			setShowErrorModal(true); // Show the modal
 		}
 	};
 
-	const clearErrorMessage = () => setErrorMessage('');
+	const hideErrorModal = () => {
+		setError('');
+		setShowErrorModal(false);
+	  };
 
 
 	const handleUpvote = async () => {
@@ -163,10 +168,11 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				title="Confirm Deletion"
 				body="Are you sure you want to delete this question?"
 			/>
-			<ErrorMessage
-				errorMessage={errorMessage}
-				clearError={clearErrorMessage}
-			/>
+      <ErrorMessage
+        show={showErrorModal}
+        errorMessage={error}
+        onHide={hideErrorModal}
+      />
 		</tr>
 	);
 };

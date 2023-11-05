@@ -503,7 +503,7 @@ function Room({ user }) {
 								onChange={handleEditorChange}
 								options={{
 									minimap: { enabled: false }
-							  }}
+								}}
 							/>
 						</div>
 					</div>
