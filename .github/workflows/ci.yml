@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - master
-      - CI
+      - CI-Docker
 jobs:
   build:
     runs-on: ubuntu-latest
