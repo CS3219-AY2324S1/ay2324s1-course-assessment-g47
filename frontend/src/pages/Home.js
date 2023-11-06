@@ -85,7 +85,7 @@ const Home = ({ user, handleLogin }) => {
 		}
 		try {
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/user-history/${user.user.user_id}`,
+				`/api/users/user-history/${user.user.user_id}`,
 				{
 					method: "POST",
 					headers: {

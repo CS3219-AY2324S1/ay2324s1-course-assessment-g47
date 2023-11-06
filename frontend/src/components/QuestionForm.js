@@ -7,9 +7,9 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import "../App.css";
 import * as Constants from "../constants/constants.js";
 
-const complexityOptions = Constants.complexityOptions
-const categoryOptions = Constants.categoryOptions
-const TOOLBAR_OPTIONS = Constants.TOOLBAR_OPTIONS
+const complexityOptions = Constants.complexityOptions;
+const categoryOptions = Constants.categoryOptions;
+const TOOLBAR_OPTIONS = Constants.TOOLBAR_OPTIONS;
 
 const QuestionForm = () => {
 	const { dispatch } = useQuestionsContext();
@@ -203,76 +203,102 @@ const QuestionForm = () => {
 	);
 
 	return (
-		<div className="container-fluid" style={{ minWidth: '200px' }}>
-			  <form className="create d-flex flex-column p-3 m-1 bg-dark rounded-4 shadow-sm" onSubmit={handleSubmit}>
-			  <h2 className="text-center mb-4 text-accent-color">Add a New Question</h2>
-	  
+		<div className="container-fluid" style={{ minWidth: "200px" }}>
+			<form
+				className="create d-flex flex-column p-3 m-1 bg-dark rounded-4 shadow-sm"
+				onSubmit={handleSubmit}
+			>
+				<h2 className="text-center mb-4 text-accent-color">
+					Add a New Question
+				</h2>
+
 				<div className="form-outline mb-4">
-				  <label className="form-label" htmlFor="title">Question title:</label>
-				  <input
-					type="text"
-					id="title"
-					placeholder="Question Title"
-					onChange={(e) => setTitle(e.target.value)}
-					value={title}
-					className={`form-control form-control-lg fs-6 ${emptyFields.includes("title") ? "is-invalid" : ""}`}
-				  />
+					<label className="form-label" htmlFor="title">
+						Question title:
+					</label>
+					<input
+						type="text"
+						id="title"
+						placeholder="Question Title"
+						onChange={(e) => setTitle(e.target.value)}
+						value={title}
+						className={`form-control form-control-lg fs-6 ${
+							emptyFields.includes("title") ? "is-invalid" : ""
+						}`}
+					/>
 				</div>
-	  
+
 				<div className="form-outline mb-4">
-				  <label className="form-label" htmlFor="complexity">Complexity:</label>
-				  <select
-					id="complexity"
-					value={complexity}
-					onChange={(e) => setComplexity(e.target.value)}
-					className={`form-select form-control-lg ${emptyFields.includes("complexity") ? "is-invalid" : ""}`}
-				  >
-					<option value="">Select Complexity</option>
-					{complexityOptions.map((option) => (
-					  <option key={option.value} value={option.value}>
-						{option.label}
-					  </option>
-					))}
-				  </select>
+					<label className="form-label" htmlFor="complexity">
+						Complexity:
+					</label>
+					<select
+						id="complexity"
+						value={complexity}
+						onChange={(e) => setComplexity(e.target.value)}
+						className={`form-select form-control-lg ${
+							emptyFields.includes("complexity")
+								? "is-invalid"
+								: ""
+						}`}
+					>
+						<option value="">Select Complexity</option>
+						{complexityOptions.map((option) => (
+							<option key={option.value} value={option.value}>
+								{option.label}
+							</option>
+						))}
+					</select>
 				</div>
-	  
+
 				<div className="form-outline mb-4">
-				  <label className="form-label" htmlFor="category">Category:</label>
-				  <MultiSelect
-					id="category"
-					isObject={false}
-					options={categoryOptions}
-					onRemove={(e) => {
-					  setSelectedCategories(e);
-					}}
-					onSelect={(e) => {
-					  setSelectedCategories(e);
-					}}
-					selectedValues={selectedCategories}
-					placeholder="Select Category"
-					showCheckbox
-					showArrow
-					style={
-					  emptyFields.includes("category")
-						? multiselectErrorStyle
-						: multiselectStyle
-					}
-				  />
+					<label className="form-label" htmlFor="category">
+						Category:
+					</label>
+					<MultiSelect
+						id="category"
+						isObject={false}
+						options={categoryOptions}
+						onRemove={(e) => {
+							setSelectedCategories(e);
+						}}
+						onSelect={(e) => {
+							setSelectedCategories(e);
+						}}
+						selectedValues={selectedCategories}
+						placeholder="Select Category"
+						showCheckbox
+						showArrow
+						style={
+							emptyFields.includes("category")
+								? multiselectErrorStyle
+								: multiselectStyle
+						}
+					/>
 				</div>
-	  
+
 				<div className="form mb-4">
-				  <label className="form-label" htmlFor="description">Description:</label>
-				  <div className={`editor-container ${emptyFields.includes("description") ? "is-invalid" : ""}`} ref={wrapperRef}></div>
+					<label className="form-label" htmlFor="description">
+						Description:
+					</label>
+					{/* <div className={`editor-container ${emptyFields.includes("description") ? "is-invalid" : ""}`} ref={wrapperRef}></div> */}
 				</div>
-	  
+
 				<div className="d-flex justify-content-center">
-				  <button type="submit" className="btn btn-primary btn-lg bg-success">Add Question</button>
+					<button
+						type="submit"
+						className="btn btn-primary btn-lg bg-success"
+					>
+						Add Question
+					</button>
 				</div>
-	  
-				{error && <div className="alert alert-danger mt-3">{error}</div>}
-			  </form>
-			</div>
-	  );
-	};
+
+				{error && (
+					<div className="alert alert-danger mt-3">{error}</div>
+				)}
+			</form>
+		</div>
+	);
+};
 
 export default QuestionForm;
