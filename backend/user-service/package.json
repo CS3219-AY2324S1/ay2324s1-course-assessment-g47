@@ -4,6 +4,8 @@
   "description": "",
   "main": "postgresql.js",
   "scripts": {
+    "test": "cross-env NODE_ENV=test mocha --timeout 0 --exit",
+    "test-ci": "cross-env NODE_ENV=ci mocha --timeout 0 --exit",
     "start": "node postgresql.js",
     "dev": "nodemon postgresql.js"
   },
@@ -15,10 +17,12 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "knex": "^3.0.1",
     "mongoose": "^7.5.0",
     "nodemailer": "^6.9.5",
     "nodemon": "^3.0.1",
     "pg": "^8.11.3",
+    "pg-mem": "^2.7.1",
     "sequelize": "^6.33.0"
   }
 }

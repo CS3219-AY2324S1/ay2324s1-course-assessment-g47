@@ -62,15 +62,15 @@ async function startServer() {
 			const mongoServer = await MongoMemoryServer.create();
 			await mongoose.connect(mongoServer.getUri(), { dbName: "test-db" });
 			// Start the Express app after successful connection
-			app.listen(process.env.PORT, () => {
-				console.log("Listening on port", process.env.PORT);
+			app.listen(8091, () => {
+				console.log("Listening on port", 8091);
 				});
 		} else if (process.env.NODE_ENV === 'ci') {
 			console.log('Using MongoDB with GitHub Actions!');
 			await mongoose.connect('mongodb://127.0.0.1:27017/test-db');
 			// Start the Express app after successful connection
-			app.listen(process.env.PORT, () => {
-				console.log("Listening on port", process.env.PORT);
+			app.listen(8092, () => {
+				console.log("Listening on port", 8092);
 				});
 		} else {
 			// Call the connection function to initiate the connection process
