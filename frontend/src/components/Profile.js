@@ -4,6 +4,7 @@ import LoginPage from "./Login";
 import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Navigate } from "react-router-dom";
 
 function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 	const postgresqlPort = 4001;
@@ -18,6 +19,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		newPassword: "",
 		repeatNewPassword: "",
 	});
+	// const navigate = N();
 
 	// When user click on edit user details button
 	const handleEditUserDetailsClick = () => {
