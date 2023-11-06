@@ -334,6 +334,16 @@ function Room({ user }) {
 		};
 	}, []);
 
+	function myBeforeUnloadListener(event) {
+		const confirmationMessage = "Are you sure you want to leave?";
+		event.returnValue = confirmationMessage;
+
+		window.addEventListener("unload", () => {
+			socket.emit("disconnected", { roomId: roomId });
+			socket.disconnect();
+		});
+	}
+
 	const handleRefreshQuestion = async () => {
 		if (!isFromProfile) {
 			// Call fetchRandomEasyQuestion when "Change Question" button is clicked
@@ -368,7 +378,7 @@ function Room({ user }) {
 	// wait for DOM to load before getting elements
 	useEffect(() => {
 		const chatForm = document.getElementById("chat-form");
-		const chatMessages = document.querySelector(".chat-messages");
+		const chatMessages = document.querySelector(".chat-main");
 
 		//Message submit
 		chatForm.addEventListener("submit", async (e) => {
@@ -467,68 +477,88 @@ function Room({ user }) {
 	};
 
 	return (
-		<div className="container">
-			<div className="right-panel">
-				<div className="editor-container-room">
-					<div className="editor">
-						<Editor
-							height="100%"
-							width="100%"
-							theme="vs-dark"
-							language={selectedLanguage.value}
-							value={editorText}
-							onChange={handleEditorChange}
-						/>
-					</div>
-					<div className="language-dropdown">
-						<label>Select Language:</label>
-						<Select
-							value={selectedLanguage}
-							onChange={handleLanguageChange}
-							options={codeLanguages}
-							isSearchable={true}
-							placeholder="Search for a language..."
-							className="select-language"
-							styles={customSelectStyles}
-							components={{
-								Option: CustomSelectOption, // Use the custom component to render options
-							}}
+		<div className="container-fluid">
+			<div className="row mt-4">
+				<div className="col-lg-3 col-md-6 order-lg-1 order-md-1 order-1">
+					<div className="question-container m-2">
+						<DisplayRandomQuestion
+							user={user}
+							randomQuestion={randomQuestion}
+							handleRefreshQuestion={handleRefreshQuestion}
 						/>
 					</div>
 				</div>
-			</div>
-			<div className="middle-panel">
-				<div className="question-container">
-					<button className="exit-button" onClick={handleExit}>
-						Exit
-					</button>
-					<DisplayRandomQuestion
-						user={user}
-						randomQuestion={randomQuestion}
-						handleRefreshQuestion={handleRefreshQuestion}
-					/>
+				<div className="col-lg-6 col-md-6 order-lg-2 order-md-2 order-2">
+					<div className="editor-container-room m-2 d-flex flex-column">
+						<div className="language-dropdown mb-2">
+							<label>Select Language:</label>
+							<Select
+								value={selectedLanguage}
+								onChange={handleLanguageChange}
+								options={codeLanguages}
+								isSearchable={true}
+								placeholder="Search for a language..."
+								className="select-language"
+								styles={customSelectStyles}
+								components={{
+									Option: CustomSelectOption, // Use the custom component to render options
+								}}
+							/>
+						</div>
+						<div className="editor flex-grow-1">
+							<Editor
+								height="100%"
+								width="100%"
+								theme="vs-dark"
+								language={selectedLanguage.value}
+								value={editorText}
+								onChange={handleEditorChange}
+								options={{
+									minimap: { enabled: false },
+								}}
+							/>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div className="left-panel">
-				<div>
-					<p className="room-id">In a chat with: {matchedUsername}</p>
-				</div>
-				<main class="chat-main">
-					<div class="chat-messages"></div>
-				</main>
-				<div class="chat-form-container">
-					<form id="chat-form" class="chat-form">
-						<input
-							id="msg"
-							type="text"
-							placeholder="Enter Message"
-							required
-							autocomplete="off"
-						/>
-						<button class="btn">
-							<i class="fas fa-paper-plane"></i>
-						</button>
-					</form>
+				<div className="col-lg-3 col-md-12 order-lg-3 order-md-3 order-3">
+					<div className="chat-container bg-dark d-flex flex-column m-2 rounded-4">
+						<div className="chat-name d-flex align-items-center mb-2">
+							<div className="flex-grow-1 text-center">
+								<p className="room-id h5 text-light mb-0">
+									Chat with: {matchedUsername}
+								</p>
+							</div>
+							<button
+								className="btn btn-danger exit-button m-2"
+								onClick={handleExit}
+							>
+								Exit
+							</button>
+						</div>
+						<main
+							className="chat-main flex-grow-1 mb-2"
+							style={{ overflowY: "auto" }}
+						>
+							<div className="chat-messages"></div>
+						</main>
+						<div className="chat-form-container d-flex justify-content-between align-items-center m-2">
+							<form
+								id="chat-form"
+								className="chat-form flex-grow-1 mb-1 mt-1"
+							>
+								<input
+									id="msg"
+									type="text"
+									placeholder="Enter Message"
+									required
+									autoComplete="off"
+								/>
+							</form>
+							<button className="btn btn-success rounded-circle ">
+								<i className="fas fa-paper-plane"></i>
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

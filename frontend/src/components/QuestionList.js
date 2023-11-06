@@ -4,12 +4,17 @@ import "../App.css";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import "./css/QuestionList.css";
 import { useEffect, useState } from "react";
+import ConfirmModal from './ConfirmModal';
+import ErrorMessage from './ErrorMessage';
 
 const QuestionList = ({ id, question, onClick, onDelete }) => {
 	const { dispatch } = useQuestionsContext();
 	const { user } = useAuthContext();
 	let [upvoted, setUpvoted] = useState(false);
 	let [upvoteCount, setUpvoteCount] = useState(question.upvotes.length);
+	const [showConfirmModal, setShowConfirmModal] = useState(false);
+	const [error, setError] = useState('');
+	const [showErrorModal, setShowErrorModal] = useState(false);
 
 	useEffect(() => {
 		if (user) {
@@ -19,11 +24,11 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 		}
 	}, [user, question.upvotes]);
 
-	const handleClick = async () => {
-		if (!user) {
-			return;
-		}
+	const handleClick = () => {
+		setShowConfirmModal(true);
+	};
 
+	const handleDelete = async () => {
 		let questionId = question._id;
 		const response = await fetch(`/api/questions/` + question._id, {
 			method: "DELETE",
@@ -31,13 +36,24 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				Authorization: `Bearer ${user.tokens.accessToken}`,
 			},
 		});
-		const json = await response.json();
 
 		if (response.ok) {
+			const json = await response.json();
 			dispatch({ type: "DELETE_QUESTION", payload: json });
 			onDelete(questionId);
+			setShowConfirmModal(false);
+		} else {
+			// Show error message
+			setError('Failed to delete the question. Please try again later.');
+			setShowErrorModal(true); // Show the modal
 		}
 	};
+
+	const hideErrorModal = () => {
+		setError('');
+		setShowErrorModal(false);
+	  };
+
 
 	const handleUpvote = async () => {
 		if (!user) {
@@ -110,7 +126,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 	};
 
 	return (
-		<tr className="table-row">
+		<tr className={`table-row ${question.complexity.toLowerCase()}`}>
 			<td>{id}</td>
 			<td className="clickable-cell" onClick={() => onClick(question)}>
 				{question.title}
@@ -123,7 +139,7 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 				})}
 			</td>
 			<td onClick={handleUpvote}>
-				<div className="upvote-container">
+				<div className={`upvote-container ${question.complexity.toLowerCase()}`}>
 					<button
 						id="upvoteButton"
 						className={upvoted ? "unvote-button" : "upvote-button"}
@@ -145,6 +161,18 @@ const QuestionList = ({ id, question, onClick, onDelete }) => {
 					delete
 				</td>
 			)}
+			<ConfirmModal
+				show={showConfirmModal}
+				handleClose={() => setShowConfirmModal(false)}
+				handleConfirm={handleDelete}
+				title="Confirm Deletion"
+				body="Are you sure you want to delete this question?"
+			/>
+      <ErrorMessage
+        show={showErrorModal}
+        errorMessage={error}
+        onHide={hideErrorModal}
+      />
 		</tr>
 	);
 };

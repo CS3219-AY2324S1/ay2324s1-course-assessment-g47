@@ -94,7 +94,9 @@ const dequeueUserByEmail = async (email, difficultyLevel) => {
 		if (difficultyMap.has(difficultyLevel)) {
 			console.log(difficultyMap);
 			difficultyMap.delete(difficultyLevel);
-			console.log(`User ${email} has been dequeued from the waiting queue.`);
+			console.log(
+				`User ${email} has been dequeued from the waiting queue.`
+			);
 			console.log(difficultyMap);
 		}
 	} catch (error) {

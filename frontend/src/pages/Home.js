@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuestionsContext } from "../hooks/useQuestionsContext";
 import "./Home.css";
 import Select from "react-select";
+import * as Constants from "../constants/constants.js";
 
 // components
 import QuestionList from "../components/QuestionList";
@@ -12,6 +13,9 @@ import QuestionQueue from "../components/QuestionQueue";
 // import { set } from "date-fns";
 
 const Home = ({ user, handleLogin }) => {
+	const [historyData, setHistoryData] = useState([]);
+	const [timestamps, setTimestamps] = useState({}); // Store user names
+
 	const { questions, dispatch } = useQuestionsContext();
 	const [selectedQuestion, setSelectedQuestion] = useState(null); // State to store the selected question
 	const [selectedCategories, setSelectedCategories] = useState([]); // State to store the selected category
@@ -51,6 +55,7 @@ const Home = ({ user, handleLogin }) => {
 
 		if (user) {
 			fetchQuestions();
+			fetchUserHistory();
 		}
 	}, [dispatch, user]);
 
@@ -72,6 +77,47 @@ const Home = ({ user, handleLogin }) => {
 		{ label: "Medium", value: "Medium" },
 		{ label: "Hard", value: "Hard" },
 	];
+
+	const fetchUserHistory = async () => {
+		if (!user.user.email) {
+			console.log("Email cannot be empty");
+			return;
+		}
+		try {
+			const response = await fetch(
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/user-history/${user.user.user_id}`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${user.tokens.accessToken}`,
+					},
+					body: JSON.stringify({
+						email: user.user.email,
+					}),
+				}
+			);
+			if (response.status === 200) {
+				// Successful update
+				const data = await response.json();
+				setHistoryData(data);
+				console.log("Fetched user's history successfully");
+
+				const timestamps = []; // Create an array to store timestamps
+				for (const historyItem of data.data.rows) {
+					const timestamp = historyItem.timestamp;
+					timestamps.push(timestamp);
+				}
+				setTimestamps(timestamps);
+				console.log(timestamps);
+			} else {
+				// Handle other error cases
+				console.log("Server error");
+			}
+		} catch (error) {
+			console.error("Error:", error);
+		}
+	};
 
 	// Define the handleDifficultyChange function
 	const handleDifficultyChange = (selectedOptions) => {
@@ -191,7 +237,12 @@ const Home = ({ user, handleLogin }) => {
 				) : null}
 				<QuestionQueue user={user.user} />
 				<div className="QuestionDetails">
-					<QuestionDetails selectedQuestion={selectedQuestion} />
+					<QuestionDetails
+						selectedQuestion={selectedQuestion}
+						onUpdate={(questionId, updatedQuestion) => {
+							setSelectedQuestion(updatedQuestion);
+						}}
+					/>
 				</div>
 			</div>
 

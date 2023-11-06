@@ -1,3 +1,33 @@
+.easy {
+  background-color: #d4edda; /* pastel green */
+}
+
+.medium {
+  background-color: #fff3cd; /* yellow */
+}
+
+.hard {
+  background-color: #f8d7da; /* red */
+}
+
+.clickable-cell {
+  cursor: pointer;
+  color: #007bff;
+  transition: color 0.3s; /* Add a smooth transition effect */
+
+  /* Add hover styles */
+  &:hover {
+      background-color: black; /* Set the background color on hover */
+      color: var(--primary-color); /* Change the text color on hover */
+  }
+}
+
+.clickable-cell:hover {
+  color: #0056b3;
+}
+
+
+
 /* Define styles for the mini upvote box */
 .mini-upvote-box {
   display: grid;

@@ -19,6 +19,11 @@
   font-weight: bold;
 }
 
+.table tbody , 
+.table tbody td {
+    background-color: transparent !important;
+}
+
 .table-container {
   margin-bottom: 50px;
 }
