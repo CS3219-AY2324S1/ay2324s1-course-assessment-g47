@@ -112,6 +112,16 @@ function Room({ user }) {
                 if (response.ok) {
                     setRandomQuestion(json);
                     socket.emit('newRandomQuestion', { roomId, randomQuestion: json, user: user.user });
+					const msg = `${user.user.username} changed to question to ${json.title}`;
+					socket.emit("chatNotifcationMessage", {
+						message: msg,
+						roomId: roomId,
+						senderInfo: user.user,
+						time: new Date().toLocaleTimeString([], {
+							hour: "2-digit",
+							minute: "2-digit",
+						}),
+					});
                 }
             } catch (error) {
                 console.error(`Error fetching ${title} question:`, error);
@@ -125,7 +135,7 @@ function Room({ user }) {
         if (selectedQuestionTitle) {    
             // Call fetchQuestionByTitle when "Change Question" button is clicked
             fetchQuestionByTitle(selectedQuestionTitle); // Use async and await so that randomQuestion will be updated FIRST!
-    
+			updateData(editorText, selectedLanguage, randomQuestion);
         }
     };
 
