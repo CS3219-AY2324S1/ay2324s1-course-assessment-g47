@@ -42,10 +42,10 @@ DB_PORT=`YOUR_POSTGRES_PORT->5432`
 DB_DATABASE=cs3219_g47   
 POSTGRESQLPORT=4001   
 PORT=4000   
-MONGO_URI = mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority
-ACCESS_TOKEN_SECRET =`YOUR_ACCESS_TOKEN_SECRET`
-AUTH_EMAIL=cs3219OTPsender@hotmail.com
-AUTH_PASS=cs3219grp47 
+MONGO_URI = mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority   
+ACCESS_TOKEN_SECRET =`YOUR_ACCESS_TOKEN_SECRET`   
+AUTH_EMAIL=cs3219OTPsender@hotmail.com   
+AUTH_PASS=cs3219grp47    
 <br > <sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` can be a random string </sub> 
 
 ## Setting up PostgreSQL Permissions
