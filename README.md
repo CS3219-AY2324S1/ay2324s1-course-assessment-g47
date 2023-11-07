@@ -71,6 +71,20 @@ Follow these steps to run the project:
     npm run create-db
     npm run dev
     ```
+3. The following are the roles and their access:
+
+| Role         | View Question | Add Question | Delete Question | Edit Role |
+|--------------|---------------|--------------|------------------|-----------|
+| Unauthenticated user | No  | No  | No  | No  |
+| User         | Yes | No  | No  | No  |
+| SuperUser    | Yes | Yes | Yes | No  |
+| Admin/SuperAdmin    | Yes | Yes | Yes | Yes | 
+
+Login Information for testing:
+- User: user@example.com, PW: 123456
+- SuperUser: superuser@example.com, PW: 123456     
+- Admin: admin@example.com, PW: 123456 
+- SuperAdmin: superadmin@example.com, PW: 123456
 
 ## Setting up PostgreSQL Permissions
 
