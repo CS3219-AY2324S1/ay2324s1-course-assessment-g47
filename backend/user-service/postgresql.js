@@ -44,7 +44,6 @@ function errorHandler(err, req, res, next) {
 app.use(
     "/api/users",
     (req, res, next) => {
-        console.log("MANAGED TO CONNECT TO QUESTIONS"); // Log "test" when a request reaches this middleware
         next(); // Continue to the next middleware or route handler
     },
     userRoutes

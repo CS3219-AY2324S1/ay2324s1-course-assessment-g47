@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "concurrently \"cd question-service && npm test\" \"cd user-service && npm test\"",
-    "test-ci": "concurrently \"cd question-service && npm run test-ci\" \"cd user-service && npm run test-ci\"",
+    "test": "concurrently \"cd question-service && npm test\" \"cd user-service && npm test\" \"cd history-service && npm test\"",
+    "test-ci": "concurrently \"cd question-service && npm run test-ci\" \"cd user-service && npm run test-ci\" \"cd history-service && npm run test-ci\"",
     "start": "concurrently \"node server.js\" \"node postgresql.js\" \"node history.js\" \"node matching-service.js\"",
     "dev": "concurrently \"nodemon socket-io.js\" \"nodemon server.js\" \"nodemon postgresql.js\" \"nodemon history.js\" \"nodemon matching-service.js\""
   },

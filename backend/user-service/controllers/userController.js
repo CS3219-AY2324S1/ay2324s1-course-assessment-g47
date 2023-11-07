@@ -16,11 +16,6 @@ let transporter = nodemailer.createTransport({
 	},
 });
 
-const testUser = async function (req, res) {
-	console.log("Test user");
-	return res.status(200).json("Welcome to Address Book!")
-};
-
 const registerUser = async function (req, res) {
 	res.setHeader("Content-Type", "application/json");
 
@@ -476,6 +471,5 @@ module.exports = {
 	resendOTPVerificationCode,
 	fetchUserInfo,
 	fetchUserEmail,
-	fetchUserHistory,
-	testUser
+	fetchUserHistory
 };
