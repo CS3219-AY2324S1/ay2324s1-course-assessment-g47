@@ -2,6 +2,15 @@
 ay2324s1-course-assessment-g47 created by GitHub Classroom
 
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/6BOvYMwN)
+
+# Table of Contents
+
+1. [Assignment 1](#assignment-1)    
+2. [Assignment 2](#assignment-2)   
+3. [Assignment 3](#assignment-3)   
+4. [Setting up PostgreSQL Permissions](#setting-up-postgresql-permissions)
+
+
 # Assignment instructions
 ## Assignment 1:
 **Setup:** Run `start index.html` in IDE terminal
