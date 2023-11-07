@@ -18,44 +18,59 @@ ay2324s1-course-assessment-g47 created by GitHub Classroom
 
 
 ## Assignment 2:
-**Setup:**
-Steps to run:
-1. ensure you have a .env file in the backend folder
-2. `npm run install-all` in main directory
-3. `npm run create-db` in main directory
-4. `npm run dev` in main directory
+Follow these steps to run the project:
 
-Sample of .env file in the backend folder:   
-DB_USER=postgres   
-DB_HOST=localhost   
-DB_PASSWORD=`YOUR_POSTGRES_PASSWORD`   
-DB_PORT=`YOUR_POSTGRES_PORT->5432`   
-DB_DATABASE=cs3219_g47   
-POSTGRESQLPORT=4001   
-PORT=4000   
-MONGO_URI = mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority
+1. Ensure you have a `.env` file in the `backend` folder.
+
+    Sample `.env` file content in the `backend` folder:
+    ```env
+    DB_USER=postgres
+    DB_HOST=localhost
+    DB_PASSWORD=YOUR_POSTGRES_PASSWORD
+    DB_PORT=YOUR_POSTGRES_PORT->5432
+    DB_DATABASE=cs3219_g47
+    POSTGRESQLPORT=4001
+    PORT=4000
+    MONGO_URI=mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority
+    ```
+
+2. Run the following commands in the main directory:
+
+    ```bash
+    npm run install-all
+    npm run create-db
+    npm run dev
+    ```
 
 ## Assignment 3:
 **Setup:**
-Steps to run:
-1. ensure you have a .env file in the backend folder
-2. `npm run install-all` in main directory
-3. `npm run create-db` in main directory
-4. `npm run dev` in main directory
+Follow these steps to run the project:
 
-Sample of .env file in the backend folder:   
-DB_USER=postgres   
-DB_HOST=localhost   
-DB_PASSWORD=`YOUR_POSTGRES_PASSWORD`   
-DB_PORT=`YOUR_POSTGRES_PORT->5432`   
-DB_DATABASE=cs3219_g47   
-POSTGRESQLPORT=4001   
-PORT=4000   
-MONGO_URI = mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority   
-ACCESS_TOKEN_SECRET =`YOUR_ACCESS_TOKEN_SECRET`   
-AUTH_EMAIL=cs3219OTPsender@hotmail.com   
-AUTH_PASS=cs3219grp47    
-<br > <sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` can be a random string </sub> 
+1. Ensure you have a `.env` file in the `backend` folder.
+
+    Sample `.env` file content in the `backend` folder:
+    ```env
+    DB_USER=postgres
+    DB_HOST=localhost
+    DB_PASSWORD=YOUR_POSTGRES_PASSWORD
+    DB_PORT=YOUR_POSTGRES_PORT->5432
+    DB_DATABASE=cs3219_g47
+    POSTGRESQLPORT=4001
+    PORT=4000
+    MONGO_URI=mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority
+    ACCESS_TOKEN_SECRET=YOUR_ACCESS_TOKEN_SECRET
+    AUTH_EMAIL=cs3219OTPsender@hotmail.com
+    AUTH_PASS=cs3219grp47
+    ```
+<sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` can be a random string </sub> 
+
+2. Run the following commands in the main directory:
+
+    ```bash
+    npm run install-all
+    npm run create-db
+    npm run dev
+    ```
 
 ## Setting up PostgreSQL Permissions
 
