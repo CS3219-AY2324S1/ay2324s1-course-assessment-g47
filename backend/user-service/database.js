@@ -3,11 +3,11 @@ const bcrypt = require("bcrypt");
 require("dotenv").config(); // Load environment variables from .env file
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  database: process.env.DB_DATABASE,
+	user: process.env.DB_USER,
+	host: process.env.DB_HOST,
+	password: process.env.DB_PASSWORD,
+	port: process.env.DB_PORT,
+	database: process.env.DB_DATABASE,
 });
 
 // CREATE TABLE IF NOT EXISTS
@@ -23,14 +23,14 @@ const createTableQuery = `
 `;
 
 pool.query(createTableQuery)
-  .then((res) => {
-    console.log("Table created or already exists");
-    // Add multiple rows to the table after the table is created
-    addMultipleRowsToAccountsTable();
-  })
-  .catch((err) => {
-    console.error("Error creating table:", err);
-  });
+	.then((res) => {
+		console.log("Table created or already exists");
+		// Add multiple rows to the table after the table is created
+		addMultipleRowsToAccountsTable();
+	})
+	.catch((err) => {
+		console.error("Error creating table:", err);
+	});
 
 // Function to add multiple rows to the "accounts" table
 async function addMultipleRowsToAccountsTable() {
@@ -44,35 +44,52 @@ async function addMultipleRowsToAccountsTable() {
     RETURNING *;
   `;
 
-  const hashedPasswords = await Promise.all([
-    bcrypt.hash('123456', 10),
-    bcrypt.hash('123456', 10),
-    bcrypt.hash('123456', 10),
-    bcrypt.hash('123456', 10),
-  ]);
+	const hashedPasswords = await Promise.all([
+		bcrypt.hash("123456", 10),
+		bcrypt.hash("123456", 10),
+		bcrypt.hash("123456", 10),
+		bcrypt.hash("123456", 10),
+	]);
 
-  const values = [
-    'User', 'user@example.com', hashedPasswords[0], 'user', true,
-    'Superuser', 'superuser@example.com', hashedPasswords[1], 'superuser', true,
-    'Admin', 'admin@example.com', hashedPasswords[2], 'admin', true,
-    'Superadmin', 'superadmin@example.com', hashedPasswords[3], 'superadmin', true,
-  ];
+	const values = [
+		"User",
+		"user@example.com",
+		hashedPasswords[0],
+		"user",
+		true,
+		"Superuser",
+		"superuser@example.com",
+		hashedPasswords[1],
+		"superuser",
+		true,
+		"Admin",
+		"admin@example.com",
+		hashedPasswords[2],
+		"admin",
+		true,
+		"Superadmin",
+		"superadmin@example.com",
+		hashedPasswords[3],
+		"superadmin",
+		true,
+	];
 
-  pool.query(insertRowsQuery, values)
-  .then((res) => {
-	console.log(`${res.rowCount} rows added to the accounts table`);
-	console.log("Added rows:", res.rows);
-  })
-  .catch((err) => {
-	if (err.code === '23505' && err.constraint === 'accounts_email_key') {
-	  console.error("Email created or already exists");
-	} else {
-	  console.error("Error adding rows to the accounts table:", err);
-	}
-  })
-  .finally(() => {
-
-  });
+	pool.query(insertRowsQuery, values)
+		.then((res) => {
+			console.log(`${res.rowCount} rows added to the accounts table`);
+			console.log("Added rows:", res.rows);
+		})
+		.catch((err) => {
+			if (
+				err.code === "23505" &&
+				err.constraint === "accounts_email_key"
+			) {
+				console.error("Email created or already exists");
+			} else {
+				console.error("Error adding rows to the accounts table:", err);
+			}
+		})
+		.finally(() => {});
 }
 
-// module.exports = pool;
+module.exports = pool;
