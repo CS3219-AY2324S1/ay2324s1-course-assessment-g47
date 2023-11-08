@@ -38,7 +38,10 @@ const Home = ({ user, handleLogin }) => {
 			<div className="home">
 				{user.user.account_type !== "user" ? <QuestionForm /> : null}
 				<div className="QuestionDetails">
-					<QuestionDetails selectedQuestion={selectedQuestion} />
+					<QuestionDetails 
+					selectedQuestion={selectedQuestion}
+					onUpdate={(questionId, updatedQuestion) => {
+						setSelectedQuestion(updatedQuestion);}}/>
 				</div>
 			</div>
 			<div className="table-container">
