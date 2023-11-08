@@ -7,8 +7,9 @@ ay2324s1-course-assessment-g47 created by GitHub Classroom
 
 1. [Assignment 1](#assignment-1)    
 2. [Assignment 2](#assignment-2)   
-3. [Assignment 3](#assignment-3)   
-4. [Setting up PostgreSQL Permissions](#setting-up-postgresql-permissions)
+3. [Assignment 3](#assignment-3)
+4. [Assignment 4](#assignment-4)
+5. [Setting up PostgreSQL Permissions](#setting-up-postgresql-permissions)
 
 
 # Assignment instructions
@@ -85,6 +86,51 @@ Login Information for testing:
 - SuperUser: superuser@example.com, PW: 123456     
 - Admin: admin@example.com, PW: 123456 
 - SuperAdmin: superadmin@example.com, PW: 123456
+
+## Assignment 4:
+**Setup:**
+Follow these steps to run the project:   
+
+1. Ensure you have installed Docker Desktop
+2. Ensure you have 2 .env files:
+   -  Sample `.env` file content in the `question-service` folder:
+        ```env
+        MONGO_PORT = 8082 
+        MONGO_URI = mongodb://mongo:1234@mongodb:27017
+        ACCESS_TOKEN_SECRET = YOUR_ACCESS_TOKEN_SECRET
+        REFRESH_TOKEN_SECRET = YOUR_REFRESH_TOKEN_SECRET
+        AUTH_EMAIL=cs3219OTPsender@hotmail.com
+        AUTH_PASS=cs3219grp47
+        ```
+        <sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` and `YOUR_REFRESH_TOKEN_SECRET` can be a random string </sub>
+   - Sample `.env` file content in the `user-service` folder:
+        ```env
+        DB_USER=postgres
+        DB_HOST=postgres
+        DB_PASSWORD=root
+        DB_PORT=5432
+        DB_DATABASE=cs3219_g47 
+        POSTGRESQLPORT =  8081 
+        MONGO_URI = mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority
+        ACCESS_TOKEN_SECRET = YOUR_ACCESS_TOKEN_SECRET
+        REFRESH_TOKEN_SECRET = YOUR_REFRESH_TOKEN_SECRET
+        AUTH_EMAIL=cs3219OTPsender@hotmail.com
+        AUTH_PASS=cs3219grp47
+        ```
+        <sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` and `YOUR_REFRESH_TOKEN_SECRET` can be a random string </sub>
+3. Run the following commands in the main directory:
+    ```bash
+    docker-compose down
+    docker-compose up --build
+    ```
+4. Wait for the docker to fully initialise and connect to all databases before testing
+5. Login Information for testing:
+    - User: user@example.com, PW: 123456
+    - SuperUser: superuser@example.com, PW: 123456     
+    - Admin: admin@example.com, PW: 123456 
+    - SuperAdmin: superadmin@example.com, PW: 123456
+
+
 
 ## Setting up PostgreSQL Permissions
 
