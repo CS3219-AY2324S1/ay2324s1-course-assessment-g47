@@ -140,6 +140,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8085:8085'
+    environment:
+      - HISTORYPORT=8085
+      - DB_USER=postgres
+      - DB_HOST=postgres
+      - DB_PASSWORD=root
+      - DB_PORT=5432
+      - DB_DATABASE=cs3219_g47
     networks:
       - app-network
     depends_on:
