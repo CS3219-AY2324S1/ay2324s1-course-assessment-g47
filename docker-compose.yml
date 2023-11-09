@@ -88,12 +88,16 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8083:8083'
+    environment:
+      - MATCHING_SERVICE_PORT=8083
+      - AMQP_URL=amqps://zgwixtic:FVykfsbOIymPvAOiH3LOZ6xMRxetTjbj@armadillo.rmq.cloudamqp.com/zgwixtic
+      - SOCKET_IO_URL=http://collaboration-service:8084    
     depends_on:
       - collaboration-service
     networks:
       - app-network
 
-  # Colaboration Service
+  # Collaboration Service
   collaboration-service:
     container_name: collaboration-service
     restart: always
@@ -102,6 +106,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8084:8084'
+    environment:
+      - COLLABORATION_SERVICE_PORT=8084
+      - AMQP_URL=amqps://zgwixtic:FVykfsbOIymPvAOiH3LOZ6xMRxetTjbj@armadillo.rmq.cloudamqp.com/zgwixtic
     networks:
       - app-network
 
