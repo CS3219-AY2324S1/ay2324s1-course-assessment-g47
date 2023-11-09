@@ -120,7 +120,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 										User
 									</option>
 									<option value="superuser">SuperUser</option>
-									{user.account_type === "superadmin" ? (
+									{user.user.account_type === "superadmin" ? (
 										<option value="admin">Admin</option>
 									) : null}
 								</select>
