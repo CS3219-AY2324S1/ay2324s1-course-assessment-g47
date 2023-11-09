@@ -77,9 +77,6 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 
 	return user ? (
 		<>
-			<div className="header">
-				{}
-			</div>{" "}
 			<div className="changetypehome">
 				<div className="changetypehome-container">
 					<h1 className="changetypehome-label">
