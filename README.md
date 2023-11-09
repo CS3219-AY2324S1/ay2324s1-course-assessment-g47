@@ -93,7 +93,7 @@ Follow these steps to run the project:
 
 1. Ensure you have installed Docker Desktop
 2. Ensure you have 2 .env files:
-   -  Sample `.env` file content in the `question-service` folder:
+   -  Sample `.env` file content in the `backend`/`question-service` folder:
         ```env
         MONGO_PORT = 8082 
         MONGO_URI = mongodb://mongo:1234@mongodb:27017
@@ -103,7 +103,7 @@ Follow these steps to run the project:
         AUTH_PASS=cs3219grp47
         ```
         <sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` and `YOUR_REFRESH_TOKEN_SECRET` can be a random string </sub>
-   - Sample `.env` file content in the `user-service` folder:
+   - Sample `.env` file content in the `backend`/`user-service` folder:
         ```env
         DB_USER=postgres
         DB_HOST=postgres
