@@ -59,10 +59,11 @@ Follow these steps to run the project:
     PORT=4000
     MONGO_URI=mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority
     ACCESS_TOKEN_SECRET=YOUR_ACCESS_TOKEN_SECRET
+    REFRESH_TOKEN_SECRET =YOUR_REFRESH_TOKEN_SECRET
     AUTH_EMAIL=cs3219OTPsender@hotmail.com
     AUTH_PASS=cs3219grp47
     ```
-<sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` can be a random string </sub> 
+<sub>**Note**: `YOUR_ACCESS_TOKEN_SECRET` and `YOUR_REFRESH_TOKEN_SECRET` can be a random string </sub> 
 
 2. Run the following commands in the main directory:
 
