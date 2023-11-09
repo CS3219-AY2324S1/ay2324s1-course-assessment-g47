@@ -18,6 +18,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 		newPassword: "",
 		repeatNewPassword: "",
 	});
+	// const navigate = N();
 
 	// When user click on edit user details button
 	const handleEditUserDetailsClick = () => {
