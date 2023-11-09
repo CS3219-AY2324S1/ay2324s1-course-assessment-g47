@@ -28,8 +28,13 @@ function Dashboard() {
 		saveData();
 	}, [questions]);
 
-	const addQuestion = (e) => {
+	const addQuestion = (e, accountType) => {
 		e.preventDefault();
+
+		if (accountType !== "admin") {
+			alert("You are not authorised to add this question.");
+			return;
+		}
 
 		if (title.trim() === "" || description.trim() === "") {
 			alert("Please enter a title and description.");
@@ -65,7 +70,13 @@ function Dashboard() {
 		setSelectedCategories([]);
 	};
 
-	const deleteQuestion = (id) => {
+	// Change the deleteQuestion function to delete only with authorised account type
+
+	const deleteQuestion = (id, accountType) => {
+		if (accountType !== "admin") {
+			alert("You are not authorised to delete this question.");
+			return;
+		}
 		const updatedQuestions = questions.filter(
 			(question) => question.id !== id
 		);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./css/Login.css";
 
 function LoginPage(props) {
 	const postgresqlPort = 4001;
@@ -37,12 +37,12 @@ function LoginPage(props) {
 
 			if (response.status === 200) {
 				// Successful login
-				const data = await response.json();
+				const json = await response.json();
 				// Set isSignIn to true
-				props.onSuccessLogin(data.user);
+				props.onSuccessLogin(json);
 				setFormData({
 					...formData,
-					loginSuccess: data.message,
+					loginSuccess: json.message,
 					loginError: "",
 				});
 				console.log("Login successful");
@@ -66,12 +66,11 @@ function LoginPage(props) {
 
 	return (
 		<div className="login-container">
-			<h1>Login</h1>
+			<h1 className="login-label">Login</h1>
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label htmlFor="email">Email:</label>
 					<input
-						className="login-input"
 						type="email"
 						id="email"
 						name="email"
@@ -83,7 +82,6 @@ function LoginPage(props) {
 				<div className="form-group">
 					<label htmlFor="password">Password:</label>
 					<input
-						className="login-input"
 						type="password"
 						id="password"
 						name="password"
@@ -98,12 +96,14 @@ function LoginPage(props) {
 				{formData.loginSuccess && (
 					<p className="success">{formData.loginSuccess}</p>
 				)}
-				<button className="login-button" type="submit">
-					Login
-				</button>
+				<button type="submit">Login</button>
 			</form>
 			<div>
 				<Link to="/register">Not a user? Sign up now</Link>
+				<br />
+				<Link to="/verifyOTP">
+					Click here to verify your account now!
+				</Link>
 			</div>
 			{/* <div>
 				<Link to="/forgetPassword">Forgot password? Reset here</Link>

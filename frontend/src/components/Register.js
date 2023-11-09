@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./css/Login.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -43,7 +43,12 @@ function Register() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ username, email, password }),
+					body: JSON.stringify({
+						username,
+						email,
+						password,
+						account_type: "user",
+					}),
 				}
 			);
 			const data = await response.json();
@@ -72,7 +77,7 @@ function Register() {
 
 	return (
 		<div className="login-container">
-			<h1>Create Account</h1>
+			<h1 className="login-label">Create Account</h1>
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label htmlFor="username">Username:</label>

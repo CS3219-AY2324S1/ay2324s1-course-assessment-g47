@@ -1,0 +1,18 @@
+.changetypehome-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    min-height: 50vh;
+    margin: 8% auto;
+    padding: 20px 40px;
+    border-radius: 20px;
+    background-color: var(--secondary-color);
+    white-space: normal; /* Allow text to wrap */
+}
+
+select {
+    background-color: var(--input-color);
+    border: none;
+    outline: none;
+}

@@ -5,6 +5,8 @@
     color: #333;
     padding: 10px 20px;
   }
+
+
   
   .left,
   .right {
@@ -18,22 +20,11 @@
     font-size: 24px;
     font-weight: bold;
   }
+
+
+.table-container {
+  margin-bottom: 50px;
+}
+
   
-  .left a {
-    color: #333;
-    text-decoration: none;
-    font-size: 18px;
-  }
-  
-  .right button {
-    background-color: transparent;
-    color: #333;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .right button:hover {
-    text-decoration: underline;
-  }
   
