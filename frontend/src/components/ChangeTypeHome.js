@@ -77,21 +77,6 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 
 	return user ? (
 		<>
-			<div className="header">
-				{/* <div className="left">
-                        <p>
-                            <Link className="button-link" to="/">Dashboard</Link>
-                        </p>
-                    </div>
-                    <div className="center">
-                        <h1>Change Account Type</h1>
-                    </div>
-                    <div className="right">
-                        <p>
-                            <button className="button-link" onClick={() => handleLogout()}>Logout</button>
-                        </p>
-                    </div> */}
-			</div>{" "}
 			<div className="changetypehome">
 				<div className="changetypehome-container">
 					<h1 className="changetypehome-label">
@@ -120,7 +105,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 										User
 									</option>
 									<option value="superuser">SuperUser</option>
-									{user.account_type === "superadmin" ? (
+									{user.user.account_type === "superadmin" ? (
 										<option value="admin">Admin</option>
 									) : null}
 								</select>

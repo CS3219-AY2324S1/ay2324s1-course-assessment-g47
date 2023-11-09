@@ -192,7 +192,10 @@ const Home = ({ user, handleLogin }) => {
 				) : null}
 				<QuestionQueue user={user.user} />
 				<div className="QuestionDetails">
-					<QuestionDetails selectedQuestion={selectedQuestion} />
+					<QuestionDetails 
+					selectedQuestion={selectedQuestion}
+					onUpdate={(questionId, updatedQuestion) => {
+						setSelectedQuestion(updatedQuestion);}}/>
 				</div>
 			</div>
 			<div className="table-container" style={pageStyles}>
