@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as Constants from "../constants/constants.js";
 import profileImage from "../images/profile.png";
+import { useNavigate } from 'react-router-dom';
 
 const postgresqlPort = Constants.POSTGRESQL_PORT;
 
@@ -57,6 +58,7 @@ function Parser(data, type) {
 }
 
 function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
+	const navigate = useNavigate();
 	const [historyData, setHistoryData] = useState([]);
 	const [isEditingUserDetails, setIsEditingUserDetails] = useState(false);
 	const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -620,41 +622,30 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 												(historyItem, index) => (
 													<tr
 														key={index}
-														className="history-row"
+														className={`history-row ${historyItem.question_difficulty.toLowerCase()}`}
+														onClick={() => navigate(`/room/${historyItem.room_id}`, {
+															state: {
+															  source: "profile",
+															  question: {
+																category: Parser(historyItem.question_category, "category2"),
+																complexity: historyItem.question_difficulty,
+																createdAt: historyItem.timestamp,
+																description: historyItem.question_description,
+																title: historyItem.question_name,
+																updatedAt: historyItem.timestamp,
+															  },
+															  code: historyItem.code,
+															  language: JSON.parse(historyItem.language).label,
+															}
+														  })}
+														  style={{ cursor: 'pointer' }}
 													>
 														<td>
-															<Link
-																to={`/room/${historyItem.room_id}`}
-																state={{
-																	source: "profile",
-																	question: {
-																		category:
-																			Parser(
-																				historyItem.question_category,
-																				"category2"
-																			),
-																		complexity:
-																			historyItem.question_difficulty,
-																		createdAt:
-																			historyItem.timestamp,
-																		description:
-																			historyItem.question_description,
-																		title: historyItem.question_name,
-																		updatedAt:
-																			historyItem.timestamp,
-																	},
-																	code: historyItem.code,
-																	language:
-																		JSON.parse(
-																			historyItem.language
-																		).label,
-																}}
-																className="left-align-link"
-															>
+														
 																{
 																	historyItem.question_name
 																}
-															</Link>
+															
 														</td>
 														<td>
 															{
