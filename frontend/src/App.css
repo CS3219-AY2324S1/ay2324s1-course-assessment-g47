@@ -139,7 +139,8 @@ form {
   border: None !important;
   background-color: white !important;
   height: auto;
-  border-radius: 20px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 /* CSS for the Quill editor toolbar */

@@ -222,7 +222,7 @@ function QuestionQueue({ user }) {
 							) : (
 								!noMatchFound && <button
 									type="button"
-									className="btn btn-primary bg-success"
+									className="btn btn-success"
 									onClick={handleJoinQueue}
 								>
 									Join Queue
