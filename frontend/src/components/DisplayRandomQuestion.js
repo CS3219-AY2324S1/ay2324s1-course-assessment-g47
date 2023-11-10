@@ -5,7 +5,7 @@ import "./css/DisplayRandomQuestion.css";
 
 function DisplayRandomQuestion({ randomQuestion, handleRefreshQuestion, hideRefresh = false }) {
   return (
-    <div style={{height: '87%'}}>
+    <div style={{height: '79%'}}>
       {randomQuestion && (
         <div className="col" style={{height: '100%'}}>
             <div className="card m-1 rounded-4" style={{height: '100%', display: 'flex', flexDirection: 'column'}}>

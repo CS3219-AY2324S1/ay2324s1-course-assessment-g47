@@ -9,6 +9,7 @@ import { FaCheck } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import DisplayRandomQuestion from "./DisplayRandomQuestion";
 import * as Constants from "../constants/constants.js";
+import ConfirmModal from './ConfirmModal';
 
 import Select, { components } from "react-select";
 
@@ -46,6 +47,8 @@ function Room({ user }) {
 	const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
 	const [questions, setQuestions] = useState([]); // Stores the questions
 	const [selectedQuestionTitle, setSelectedQuestionTitle] = useState(null); // Stores the selected question title
+
+	const [showConfirmModal, setShowConfirmModal] = useState(false); // State to manage the visibility of the confirmation modal
 
 	const getCurrentDateTime = async () => {
 		const currentDateTime = new Date();
@@ -528,8 +531,11 @@ function Room({ user }) {
 		}
 	};
 
-	const handleExit = () => {
-		leaveCall();
+	const handleShowConfirmModal = () => setShowConfirmModal(true); // Handler to show the modal
+	const handleCloseConfirmModal = () => setShowConfirmModal(false); // Handler to close the modal
+
+	const handleConfirmExit = () => {
+		leaveCall(); 
 		window.location.href = "/";
 	};
 
@@ -601,7 +607,7 @@ function Room({ user }) {
 							<div className="flex-grow-1 text-center">
 								<p className="room-id h5 text-light mb-0">Chat with: {matchedUsername}</p>
 							</div>
-							<button className="btn btn-danger exit-button m-2" onClick={handleExit}>
+							<button className="btn btn-danger exit-button m-2" onClick={handleShowConfirmModal}>
 								Exit
 							</button>
 						</div>
@@ -625,7 +631,14 @@ function Room({ user }) {
 						</div>
 					</div>
 				</div>
-
+				<ConfirmModal
+					show={showConfirmModal}
+					handleClose={handleCloseConfirmModal}
+					handleConfirm={handleConfirmExit}
+					title="Confirm Exit"
+					body="Are you sure you want to exit the room?"
+					rightBtn="Exit"
+				/>
 			</div>
 		</div>
 	);
