@@ -35,17 +35,17 @@ function Room({ user }) {
 		codeLanguages.find((language) => language.value === "python")
 	);
 
-    const { roomId } = useParams(); // Stores the Room ID
-    const [me, setMe] = useState("");
-    const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
-    const [callerSignal, setCallerSignal] = useState();
-    const [peerSocketId, setPeerSocketId] = useState(null);
-    const [editorText, setEditorText] = useState(""); // Stores the code
-    const [peer, setPeer] = useState(null);
-    const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
-    const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
-    const [questions, setQuestions] = useState([]); // Stores the questions
-    const [selectedQuestionTitle, setSelectedQuestionTitle] = useState(null); // Stores the selected question title
+	const { roomId } = useParams(); // Stores the Room ID
+	const [me, setMe] = useState("");
+	const [connectedUsers, setConnectedUsers] = useState([]); //no use for now
+	const [callerSignal, setCallerSignal] = useState();
+	const [peerSocketId, setPeerSocketId] = useState(null);
+	const [editorText, setEditorText] = useState(""); // Stores the code
+	const [peer, setPeer] = useState(null);
+	const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
+	const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
+	const [questions, setQuestions] = useState([]); // Stores the questions
+	const [selectedQuestionTitle, setSelectedQuestionTitle] = useState(null); // Stores the selected question title
 
 	const getCurrentDateTime = async () => {
 		const currentDateTime = new Date();
@@ -100,18 +100,18 @@ function Room({ user }) {
 			);
 		}
 	};
-    //Get question by title
-    const fetchQuestionByTitle = async (title) => {
-        if (user) {
-            try {
-                const response = await fetch(`/api/questions/title/${title}`, {
-                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
-                });
-                const json = await response.json();
+	//Get question by title
+	const fetchQuestionByTitle = async (title) => {
+		if (user) {
+			try {
+				const response = await fetch(`/api/questions/title/${title}`, {
+					headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+				});
+				const json = await response.json();
 
-                if (response.ok) {
-                    setRandomQuestion(json);
-                    socket.emit('newRandomQuestion', { roomId, randomQuestion: json, user: user.user });
+				if (response.ok) {
+					setRandomQuestion(json);
+					socket.emit('newRandomQuestion', { roomId, randomQuestion: json, user: user.user });
 					const msg = `${user.user.username} changed to question to ${json.title}`;
 					socket.emit("chatNotifcationMessage", {
 						message: msg,
@@ -122,39 +122,39 @@ function Room({ user }) {
 							minute: "2-digit",
 						}),
 					});
-                }
-            } catch (error) {
-                console.error(`Error fetching ${title} question:`, error);
-            }
-        }
-    };
+				}
+			} catch (error) {
+				console.error(`Error fetching ${title} question:`, error);
+			}
+		}
+	};
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
+	const handleFormSubmit = (e) => {
+		e.preventDefault();
 
-        if (selectedQuestionTitle) {    
-            // Call fetchQuestionByTitle when "Change Question" button is clicked
-            fetchQuestionByTitle(selectedQuestionTitle); // Use async and await so that randomQuestion will be updated FIRST!
+		if (selectedQuestionTitle) {
+			// Call fetchQuestionByTitle when "Change Question" button is clicked
+			fetchQuestionByTitle(selectedQuestionTitle); // Use async and await so that randomQuestion will be updated FIRST!
 			updateData(editorText, selectedLanguage, randomQuestion);
-        }
-    };
+		}
+	};
 
-    const fetchQuestionsByDifficulty = async () => {
-        if (user) {
-            try {
-                const response = await fetch(`/api/questions/all-${difficultyLevel}`, {
-                    headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
-                });
-                const json = await response.json();
+	const fetchQuestionsByDifficulty = async () => {
+		if (user) {
+			try {
+				const response = await fetch(`/api/questions/all-${difficultyLevel}`, {
+					headers: { Authorization: `Bearer ${user.tokens.accessToken}` },
+				});
+				const json = await response.json();
 
-                if (response.ok) {
-                    setQuestions(json);
-                }
-            } catch (error) {
-                console.error(`Error fetching ${difficultyLevel} questions:`, error);
-            }
-        }
-    };
+				if (response.ok) {
+					setQuestions(json);
+				}
+			} catch (error) {
+				console.error(`Error fetching ${difficultyLevel} questions:`, error);
+			}
+		}
+	};
 
 	const fetchInitialRandomEasyQuestion = async () => {
 		if (user) {
@@ -184,21 +184,21 @@ function Room({ user }) {
 			}
 		}
 	};
-    // Update the options for the dropdown list
-    const dropdownOptions = [
-        <option key="default" value="" disabled hidden>Select a question</option>,
-        ...questions.map((question, index) => (
-        <option key={index} value={question.title}>
-            {question.title}
-        </option>
-    ))
-    ];
+	// Update the options for the dropdown list
+	const dropdownOptions = [
+		<option key="default" value="" disabled hidden>Select a question</option>,
+		...questions.map((question, index) => (
+			<option key={index} value={question.title}>
+				{question.title}
+			</option>
+		))
+	];
 
-    useEffect(() => {
-        if (questions.length > 0) {
-            setSelectedQuestionTitle(questions[0].title);
-        }
-    }, [questions]);
+	useEffect(() => {
+		if (questions.length > 0) {
+			setSelectedQuestionTitle(questions[0].title);
+		}
+	}, [questions]);
 
 	const fetchRandomEasyQuestion = async () => {
 		if (user) {
@@ -445,7 +445,6 @@ function Room({ user }) {
 
 			// Get message text
 			const msg = e.target.elements.msg.value;
-
 			// Emit message to server and the current time
 			socket.emit(
 				"chatMessage",
@@ -538,16 +537,24 @@ function Room({ user }) {
 		<div className="container-fluid">
 			<div className="row mt-4">
 				<div className="col-lg-3 col-md-6 order-lg-1 order-md-1 order-1">
-					<div className="question-container m-2">
-					<form onSubmit={handleFormSubmit}>
-                        <div>
-                            <label>Select Question: </label>
-                            <select onChange={(e) => setSelectedQuestionTitle(e.target.value)}>
-                                {dropdownOptions}
-                            </select>
-                        </div>
-                        <button type="submit" onClick={handleFormSubmit} >Change Question</button>
-                    </form>
+					<div className="question-container m-2 d-flex flex-column">
+						<div className="card bg-dark text-white rounded-4">
+							<div className="card-body">
+								<form onSubmit={handleFormSubmit} className="m-2">
+									<div className="mb-3">
+										<label htmlFor="questionSelect" className="form-label">Select Question:</label>
+										<select
+											className="form-select"
+											id="questionSelect"
+											onChange={(e) => setSelectedQuestionTitle(e.target.value)}
+										>
+											{dropdownOptions}
+										</select>
+									</div>
+									<button type="submit" className="btn btn-light" onClick={handleFormSubmit}>Change Question</button>
+								</form>
+							</div>
+						</div>
 						<DisplayRandomQuestion
 							user={user}
 							randomQuestion={randomQuestion}
@@ -583,7 +590,7 @@ function Room({ user }) {
 								onChange={handleEditorChange}
 								options={{
 									minimap: { enabled: false }
-							  }}
+								}}
 							/>
 						</div>
 					</div>
@@ -610,10 +617,11 @@ function Room({ user }) {
 									required
 									autoComplete="off"
 								/>
+								<button type="submit" className="btn btn-success rounded-circle ">
+									<i className="fas fa-paper-plane"></i>
+								</button>
 							</form>
-							<button className="btn btn-success rounded-circle ">
-								<i className="fas fa-paper-plane"></i>
-							</button>
+
 						</div>
 					</div>
 				</div>
