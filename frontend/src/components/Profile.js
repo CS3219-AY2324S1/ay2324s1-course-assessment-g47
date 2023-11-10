@@ -623,7 +623,7 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 													<tr
 														key={index}
 														className={`history-row ${historyItem.question_difficulty.toLowerCase()}`}
-														onClick={() => navigate(`/room/${historyItem.room_id}`, {
+														onClick={() => navigate(`/history/${historyItem.room_id}`, {
 															state: {
 															  source: "profile",
 															  question: {
@@ -636,6 +636,12 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 															  },
 															  code: historyItem.code,
 															  language: JSON.parse(historyItem.language).label,
+															  partner: userNames[
+																historyItem.user1_email ===
+																user.user.email
+																	? historyItem.user2_email
+																	: historyItem.user1_email
+															] || " "
 															}
 														  })}
 														  style={{ cursor: 'pointer' }}

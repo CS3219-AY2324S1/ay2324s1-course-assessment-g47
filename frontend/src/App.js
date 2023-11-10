@@ -40,6 +40,7 @@ import VerifyOTP from "./components/VerifyOTP";
 import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from "./hooks/useAuthContext";
 import Room from "./components/Room";
+import History from "./components/History";
 import Navbar from "./components/Navbar";
 import * as Constants from "./constants/constants.js";
 import RoomUserExit from "./components/RoomUserExit";
@@ -164,6 +165,13 @@ function App() {
 					</Route>
 					<Route path="/room/:roomId" element={user ? (
 						<Room user={user} />
+					) : (
+						<div>Loading...</div>
+					)}>
+						{" "}
+					</Route>
+					<Route path="/history/:historyId" element={user ? (
+						<History user={user} />
 					) : (
 						<div>Loading...</div>
 					)}>
