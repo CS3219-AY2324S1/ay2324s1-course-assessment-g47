@@ -162,7 +162,11 @@ function App() {
 					>
 						{" "}
 					</Route>
-					<Route path="/room/:roomId" element={<Room user={user} />}>
+					<Route path="/room/:roomId" element={user ? (
+						<Room user={user} />
+					) : (
+						<div>Loading...</div>
+					)}>
 						{" "}
 					</Route>
 					<Route path="/roomexit" element={<RoomUserExit />}>
