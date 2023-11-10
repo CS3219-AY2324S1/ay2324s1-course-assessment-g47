@@ -200,27 +200,25 @@ const QuestionForm = () => {
 	};
 
 	const wrapperRef = useCallback((wrapper) => {
-		if (wrapper == null) return;
-
+		if (wrapper == null || quill) return; // Prevent setting quill again
+	
 		wrapper.innerHTML = "";
 		const editor = document.createElement("div");
 		wrapper.append(editor);
 		const q = new Quill(editor, {
-			theme: "snow",
-			modules: { toolbar: TOOLBAR_OPTIONS },
-			trimWhitespace: true,
+		  theme: "snow",
+		  modules: { toolbar: TOOLBAR_OPTIONS },
+		  trimWhitespace: true,
 		});
-
+	
 		q.root.addEventListener("paste", handlePaste);
-
+	
 		q.on("text-change", (delta, oldDelta, source) => {
-			if (source === "user") {
-				setQuill(q);
-			}
+		  if (source === "user") {
+			setQuill(q); // Set the state here
+		  }
 		});
-
-		setQuill(q);
-	}, []);
+	  }, [quill, handlePaste]);
 
 	return (
 		<div className="container-fluid" style={{ minWidth: '200px' }}>
