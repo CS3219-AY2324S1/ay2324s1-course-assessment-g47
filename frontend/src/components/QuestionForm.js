@@ -5,34 +5,11 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { useAuthContext } from "../hooks/useAuthContext";
 import "../App.css";
+import * as Constants from "../constants/constants.js";
 
-const complexityOptions = [
-	{ value: "Easy", label: "Easy" },
-	{ value: "Medium", label: "Medium" },
-	{ value: "Hard", label: "Hard" }
-  ];
-const categoryOptions = [
-	"String",
-	"Algorithms",
-	"Data Structures",
-	"Bit Manipulation",
-	"Recursion",
-	"Databases",
-	"Arrays",
-	"Brainteaser",
-]; // Define your category options here
-
-const TOOLBAR_OPTIONS = [
-	[{ header: [1, 2, 3, 4, 5, 6, false] }],
-	[{ font: [] }],
-	[{ list: "ordered" }, { list: "bullet" }],
-	["bold", "italic", "underline"],
-	[{ color: [] }, { background: [] }],
-	[{ script: "sub" }, { script: "super" }],
-	[{ align: [] }],
-	["image", "blockquote", "code-block"],
-	["clean"],
-];
+const complexityOptions = Constants.complexityOptions
+const categoryOptions = Constants.categoryOptions
+const TOOLBAR_OPTIONS = Constants.TOOLBAR_OPTIONS
 
 const QuestionForm = () => {
 	const { dispatch } = useQuestionsContext();
