@@ -75,12 +75,14 @@ Follow these steps to run the project:
     ```
 3. The following are the roles and their access:
 
-| Role         | View Question | Add Question | Delete Question | Edit Role |
-|--------------|---------------|--------------|------------------|-----------|
-| Unauthenticated user | No  | No  | No  | No  |
-| User         | Yes | No  | No  | No  |
-| SuperUser    | Yes | Yes | Yes | No  |
-| Admin/SuperAdmin    | Yes | Yes | Yes | Yes | 
+
+| Role                | View Question | Add Question | Delete Question | Edit Role (User and SuperUser) | Edit Role (Admin) |
+|---------------------|---------------|--------------|------------------|--------------------------------|-------------------|
+| Unauthenticated user | No            | No           | No               | No                             | No                |
+| User                | Yes           | No           | No               | No                             | No                |
+| SuperUser           | Yes           | Yes          | Yes              | No                             | No                |
+| Admin               | Yes           | Yes          | Yes              | Yes                            | No                |
+| SuperAdmin          | Yes           | Yes          | Yes              | Yes                            | Yes               |
 
 Login Information for testing:
 - User: user@example.com, PW: 123456
