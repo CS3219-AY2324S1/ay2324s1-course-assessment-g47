@@ -134,6 +134,7 @@ function Room({ user }) {
 						roomId,
 						randomQuestion: json,
 						user: user.user,
+						initial: false,
 					});
 					const msg = `${user.user.username} changed to question to ${json.title}`;
 					socket.emit("chatNotifcationMessage", {
@@ -205,6 +206,7 @@ function Room({ user }) {
 						roomId: roomId,
 						randomQuestion: json,
 						user: user.user,
+						initial: true,
 					});
 				}
 			} catch (error) {
@@ -252,6 +254,7 @@ function Room({ user }) {
 						roomId: roomId,
 						randomQuestion: json,
 						user: user.user,
+						initial: false,
 					});
 					//const roomName = roomId;
 					const msg = `${user.user.username} changed to question to ${json.title}`;
@@ -288,9 +291,15 @@ function Room({ user }) {
 			fetchInitialRandomEasyQuestion();
 		}
 		fetchQuestionsByDifficulty();
-		socket.on("updateRandomQuestion", (newRandomQuestion) => {
+		socket.on("updateRandomQuestion", (newRandomQuestion, email, initial) => {
 			console.log("newRandomQuestion:", newRandomQuestion);
-			setRandomQuestion(newRandomQuestion);
+			if (initial) {
+				if (email.localeCompare(user.user.email, undefined, { sensitivity: 'base' }) < 0) {
+					setRandomQuestion(newRandomQuestion);
+				}
+			}  else {
+				setRandomQuestion(newRandomQuestion);
+			}
 		});
 		socket.on("set-caller-signal", (data) => {
 			setCallerSignal(data.signal);
@@ -424,16 +433,6 @@ function Room({ user }) {
 			console.log("Destroyed user media stream");
 		};
 	}, []);
-
-	function myBeforeUnloadListener(event) {
-		const confirmationMessage = "Are you sure you want to leave?";
-		event.returnValue = confirmationMessage;
-
-		window.addEventListener("unload", () => {
-			socket.emit("disconnected", { roomId: roomId });
-			socket.disconnect();
-		});
-	}
 
 	const handleRefreshQuestion = async () => {
 		if (!isFromProfile) {

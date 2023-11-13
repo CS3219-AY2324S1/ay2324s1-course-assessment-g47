@@ -35,10 +35,7 @@ app.get("/api/collaboration/", (req, res) => {
 io.on("connection", (socket) => {
 	socket.emit("me", socket.id);
 
-	// socket.emit("message", "Welcome to the chat!");
-
 	socket.on("matchUser", (data) => {
-		//socket.join(data.roomName)
 		socket.to(data.socketId).emit("matched-successfully", {
 			roomId: data.roomName,
 			difficultyLevel: data.difficultyLevel,
@@ -55,7 +52,6 @@ io.on("connection", (socket) => {
 
 		// Notify other users in the room that a new user has connected
 		socket.to(roomName).emit("user-connected", socket.id);
-		//io.to(data.roomId).emit("chatNotifcationMessage", { message: `${data.user.username} joined the room`, roomId: data.roomId});
 		socket.broadcast.to(roomName).emit("messageNotification", {
 			message: `User ${data.user.username} joined room ${roomName}`,
 			senderInfo: data.user,
@@ -111,11 +107,10 @@ io.on("connection", (socket) => {
 
 	socket.on("newRandomQuestion", (data) => {
 		// Emit the updated random question to the room
-		socket
+			socket
 			.to(data.roomId)
-			.emit("updateRandomQuestion", data.randomQuestion);
-		console.log("Question changed by", data.user.username);
-		//socket.to(data.roomId).emit("messageNotification", { message: `${data.user.username} changed to question to ${data.randomQuestion.title}`, senderInfo: data.user, time: new Date().toLocaleTimeString([], { }) });
+			.emit("updateRandomQuestion", data.randomQuestion, data.user.email, data.initial);
+		console.log("Question changed by", data.randomQuestion.title, data.user.email, data.initial);
 	});
 
 	// Handle user disconnection
