@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
 export default function LineChart({ data }) {
-    console.log("data", data);
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -33,7 +32,7 @@ export default function LineChart({ data }) {
     }, [data])
 
     return (
-        <div style={{ width: "250px", height: "250px" }}>
+        <div className="d-flex align-items-center"  style={{ height: "100%"}}>
             <canvas ref={chartRef} />
         </div>
     );

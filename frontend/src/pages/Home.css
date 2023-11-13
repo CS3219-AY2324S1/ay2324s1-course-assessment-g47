@@ -1,3 +1,10 @@
+@media (min-width: 992px) { /* Bootstrap's breakpoint for 'lg' size */
+  .fixed-height-lg {
+    max-height: 300px;
+    overflow: auto;
+  }
+}
+
 .header {
   display: flex;
   justify-content: space-between;

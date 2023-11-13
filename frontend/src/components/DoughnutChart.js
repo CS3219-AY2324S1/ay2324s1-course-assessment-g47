@@ -22,7 +22,13 @@ export default function DoughnutChart({ data }) {
                         'rgb(255, 205, 86)',
                         'rgb(255, 99, 132)'
                     ],
-                }]
+                },]
+            },options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Position the legend at the bottom of the chart
+                    }
+                }
             }
         });
         return () => {
@@ -33,7 +39,7 @@ export default function DoughnutChart({ data }) {
     }, [data])
 
     return (
-        <div style={{ width: "250px", height: "250px" }}>
+        <div className="d-flex align-items-center" style={{ width: "100%", height:"100%"}}>
             <canvas ref={chartRef}/>
         </div>
     );
