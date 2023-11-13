@@ -1,0 +1,106 @@
+version: '3.8'
+services:
+  # PostgreSQL Database
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    restart: always # postgres up and running no matter what happens
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: cs3219_g47
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+    volumes: # bind data inside server to outside container
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./backend/user-service/init-scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # MongoDB Database
+  mongodb:
+    container_name: mongodb
+    restart: always
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./mongo-data:/data/db
+    networks:
+      - app-network
+
+  # User Service
+  user-service:
+    container_name: user-service
+    restart: always
+    build:
+      context: ./backend/user-service
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8081'
+    environment:
+      - DB_USER=postgres
+      - DB_HOST=postgres
+      - DB_PASSWORD=root
+      - DB_PORT=5432
+      - DB_DATABASE=cs3219_g47 
+      - POSTGRESQLPORT=8081 
+      - MONGO_URI=mongodb+srv://default:1234@g47-assignment-cluster.6vxd6vb.mongodb.net/?retryWrites=true&w=majority
+      - ACCESS_TOKEN_SECRET=jndenfdecndjcn3298newcqdencwip943nce
+      - REFRESH_TOKEN_SECRET=ucnerjiqwlwe4389fudcner3984jenq3fji
+      - AUTH_EMAIL=cs3219OTPsender@hotmail.com
+      - AUTH_PASS=cs3219grp47
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+
+  # Question Service
+  question-service:
+    container_name: question-service
+    restart: always
+    build:
+      context: ./backend/question-service
+      dockerfile: Dockerfile
+    ports:
+      - '8082:8082'
+    environment:
+      - MONGO_PORT=8082
+      - MONGO_URI=mongodb://mongo:1234@mongodb:27017
+      - ACCESS_TOKEN_SECRET=jndenfdecndjcn3298newcqdencwip943nce
+      - REFRESH_TOKEN_SECRET=ucnerjiqwlwe4389fudcner3984jenq3fji
+      - AUTH_EMAIL=cs3219OTPsender@hotmail.com
+      - AUTH_PASS=cs3219grp47
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+
+  # Frontend React App
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - USER_SERVICE_PORT=8081
+      - QUESTION_SERVICE_PORT=8082
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - user-service
+      - question-service
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+

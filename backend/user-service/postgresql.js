@@ -40,9 +40,23 @@ let transporter = nodemailer.createTransport({
 
 const app = express(); //Start up express app
 
+function errorHandler(err, req, res, next) {
+	res.status(500);
+
+	console.log(err);
+
+	res.json({ error: err.message });
+}
+
 // For postgresql
 app.use(express.json()); // Body parser middleware
-app.use(cors()); // CORS middleware (allows requests from other domains)
+app.use(cors({ origin: "http://localhost:3000" })); // CORS middleware (allows requests from other domains)
+
+// Set the Access-Control-Allow-Origin header
+app.use((req, res, next) => {
+	res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+	next();
+});
 
 // Register User
 let id_counter;
@@ -91,6 +105,8 @@ app.post("/users/register", async (req, res) => {
 		console.log(req.body);
 		res.json({ message: "Account Created!", data: req.body });
 		sendOTPVerificationEmail({ _id: id_counter, email, res });
+
+		res.end();
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ message: err.message });
@@ -226,9 +242,13 @@ app.post(
 			const response = await pool.query(updateSTMT);
 			console.log("User updated");
 			console.log(response);
-			return res
+			return_res = res
 				.status(200)
 				.json({ message: "User updated successful", data: req.body });
+
+			res.end();
+
+			return return_res;
 		} catch (err) {
 			console.error(err);
 			return res.status(500).json({ error: "Internal server error" });
@@ -255,12 +275,14 @@ app.post(
 			const response = await pool.query(updateSTMT);
 			console.log("User updated");
 			console.log(response);
-			return res
-				.status(200)
-				.json({
-					message: "Update password successful",
-					data: req.body,
-				});
+			return_res = res.status(200).json({
+				message: "Update password successful",
+				data: req.body,
+			});
+
+			res.end();
+
+			return return_res;
 		} catch (err) {
 			console.error(err);
 			return res.status(500).json({ error: "Internal server error" });
@@ -330,10 +352,6 @@ app.post(
 			return res.status(500).json({ error: "Internal server error" });
 		}
 	}
-);
-
-app.listen(port, () =>
-	console.log(`PostgreSQL server running on port ${port}`)
 );
 
 // Verify OTP email
@@ -463,3 +481,9 @@ app.post(
 		}
 	}
 );
+
+app.listen(port, () =>
+	console.log(`PostgreSQL server running on port ${port}`)
+);
+
+app.use(errorHandler);

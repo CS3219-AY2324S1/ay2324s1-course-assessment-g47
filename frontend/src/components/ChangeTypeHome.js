@@ -4,9 +4,9 @@ import "./css/Login.css";
 import "./css/ChangeTypeHome.css";
 import LoginPage from "./Login";
 import "./css/Login.css";
+import * as Constants from "../constants/constants.js";
 
 function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
-	const postgresqlPort = 4001;
 	const [formData, setFormData] = useState({
 		email: "",
 		account_type: "user",
@@ -41,7 +41,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 		try {
 			console.log(user.user);
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/update/type/${user.user.user_id}`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/type/${user.user_id}`,
 				{
 					method: "POST",
 					headers: {
@@ -77,21 +77,6 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 
 	return user ? (
 		<>
-			<div className="header">
-				{/* <div className="left">
-                        <p>
-                            <Link className="button-link" to="/">Dashboard</Link>
-                        </p>
-                    </div>
-                    <div className="center">
-                        <h1>Change Account Type</h1>
-                    </div>
-                    <div className="right">
-                        <p>
-                            <button className="button-link" onClick={() => handleLogout()}>Logout</button>
-                        </p>
-                    </div> */}
-			</div>{" "}
 			<div className="changetypehome">
 				<div className="changetypehome-container">
 					<h1 className="changetypehome-label">

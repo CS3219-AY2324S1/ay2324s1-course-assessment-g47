@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import "./css/Login.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as Constants from "../constants/constants.js";
 
 function Register() {
-	const postgresqlPort = 4001;
 	const [formData, setFormData] = useState({
 		username: "",
 		email: "",
@@ -37,7 +37,7 @@ function Register() {
 
 		try {
 			const response = await fetch(
-				`http://localhost:${postgresqlPort}/users/register`,
+				`http://localhost:${Constants.POSTGRESQL_PORT}/users/register`,
 				{
 					method: "POST",
 					headers: {

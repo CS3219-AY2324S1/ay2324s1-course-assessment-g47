@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./css/Login.css";
+import * as Constants from "../constants/constants.js";
 
 function VerifyOTP() {
 	const [formData, setFormData] = useState({
@@ -22,13 +23,16 @@ function VerifyOTP() {
 		e.preventDefault();
 
 		try {
-			const response = await fetch("http://localhost:4001/verifyOTP", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(formData),
-			});
+			const response = await fetch(
+				`http://localhost:${Constants.POSTGRESQL_PORT}/verifyOTP`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(formData),
+				}
+			);
 
 			if (response.status === 200) {
 				// OTP verification successful

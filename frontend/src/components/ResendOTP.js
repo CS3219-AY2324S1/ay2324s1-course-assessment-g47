@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./css/Login.css";
+import * as Constants from "../constants/constants.js";
 
 function ResendOTP() {
 	const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ function ResendOTP() {
 
 		try {
 			const response = await fetch(
-				"http://localhost:4001/resendOTPVerificationCode",
+				`http://localhost:${Constants.POSTGRESQL_PORT}/resendOTPVerificationCode`,
 				{
 					method: "POST",
 					headers: {

@@ -19,11 +19,9 @@ function authenticateToken(allowedRoles) {
 
 			// Check if the user's role is allowed for this route
 			if (!allowedRoles.includes(userRole)) {
-				return res
-					.status(403)
-					.json({
-						error: "Access denied. Insufficient permissions.",
-					});
+				return res.status(403).json({
+					error: "Access denied. Insufficient permissions.",
+				});
 			}
 
 			req.user = user;

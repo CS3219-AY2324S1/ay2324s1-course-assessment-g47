@@ -7,8 +7,9 @@ ay2324s1-course-assessment-g47 created by GitHub Classroom
 
 1. [Assignment 1](#assignment-1)    
 2. [Assignment 2](#assignment-2)   
-3. [Assignment 3](#assignment-3)   
-4. [Setting up PostgreSQL Permissions](#setting-up-postgresql-permissions)
+3. [Assignment 3](#assignment-3)
+4. [Assignment 4](#assignment-4)
+5. [Setting up PostgreSQL Permissions](#setting-up-postgresql-permissions)
 
 
 # Assignment instructions
@@ -87,6 +88,25 @@ Login Information for testing:
 - SuperUser: superuser@example.com, PW: 123456     
 - Admin: admin@example.com, PW: 123456 
 - SuperAdmin: superadmin@example.com, PW: 123456
+
+## Assignment 4:
+**Setup:**
+Follow these steps to run the project:   
+
+1. Ensure you have installed Docker Desktop
+2. Run the following commands in the main directory:
+    ```bash
+    docker-compose down
+    docker-compose up --build
+    ```
+3. Wait for the docker to fully initialise and connect to all databases before testing
+4. Login Information for testing:
+    - User: user@example.com, PW: 123456
+    - SuperUser: superuser@example.com, PW: 123456     
+    - Admin: admin@example.com, PW: 123456 
+    - SuperAdmin: superadmin@example.com, PW: 123456
+
+
 
 ## Setting up PostgreSQL Permissions
 
