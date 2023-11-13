@@ -138,7 +138,7 @@ function Room({ user }) {
 		if (selectedQuestionTitle) {
 			// Call fetchQuestionByTitle when "Change Question" button is clicked
 			fetchQuestionByTitle(selectedQuestionTitle); // Use async and await so that randomQuestion will be updated FIRST!
-			updateData(editorText, selectedLanguage, randomQuestion);
+			if (randomQuestion != null){updateData(editorText, selectedLanguage, randomQuestion);}
 		}
 	};
 
@@ -159,34 +159,6 @@ function Room({ user }) {
 		}
 	};
 
-	const fetchInitialRandomEasyQuestion = async () => {
-		if (user) {
-			try {
-				const response = await fetch(
-					`/api/questions/random-${difficultyLevel}`,
-					{
-						headers: {
-							Authorization: `Bearer ${user.tokens.accessToken}`,
-						},
-					}
-				);
-				const json = await response.json();
-				if (response.ok) {
-					setRandomQuestion(json);
-					socket.emit("newRandomQuestion", {
-						roomId: roomId,
-						randomQuestion: json,
-						user: user.user,
-					});
-				}
-			} catch (error) {
-				console.error(
-					`Error fetching random ${difficultyLevel} question:`,
-					error
-				);
-			}
-		}
-	};
 	// Update the options for the dropdown list
 	const dropdownOptions = [
 		<option key="default" value="" disabled hidden>Select a question</option>,
@@ -203,7 +175,7 @@ function Room({ user }) {
 		}
 	}, [questions]);
 
-	const fetchRandomEasyQuestion = async () => {
+	const fetchRandomQuestion = async () => {
 		if (user) {
 			try {
 				const response = await fetch(
@@ -215,7 +187,6 @@ function Room({ user }) {
 					}
 				);
 				const json = await response.json();
-				console.log("TESTTTTT: ", json);
 				if (response.ok) {
 					setRandomQuestion(json);
 					socket.emit("newRandomQuestion", {
@@ -255,7 +226,6 @@ function Room({ user }) {
 			setSelectedLanguage(language); // Set the language from the profile
 		} else {
 			setIsFromProfile(false);
-			fetchInitialRandomEasyQuestion();
 		}
 		fetchQuestionsByDifficulty();
 		socket.on("updateRandomQuestion", (newRandomQuestion) => {
@@ -408,8 +378,8 @@ function Room({ user }) {
 	const handleRefreshQuestion = async () => {
 		if (!isFromProfile) {
 			// Call fetchRandomEasyQuestion when "Change Question" button is clicked
-			const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
-			updateData(editorText, selectedLanguage, newQuestion);
+			const newQuestion = await fetchRandomQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
+			if (randomQuestion != null){updateData(editorText, selectedLanguage, newQuestion);}
 		}
 	};
 
@@ -422,7 +392,7 @@ function Room({ user }) {
 	const handleEditorChange = (newValue) => {
 		if (!isFromProfile) {
 			setEditorText(newValue);
-			updateData(newValue, selectedLanguage, randomQuestion);
+			if (randomQuestion != null){updateData(newValue, selectedLanguage, randomQuestion);}
 			socket.emit("editor-change", { text: newValue, roomId: roomId });
 		}
 	};
@@ -512,7 +482,7 @@ function Room({ user }) {
 		if (!isFromProfile) {
 			console.log(`Option selected:`, selectedOption);
 			setSelectedLanguage(selectedOption);
-			updateData(editorText, selectedOption, randomQuestion);
+			if (randomQuestion != null){updateData(editorText, selectedOption, randomQuestion);}
 			socket.emit("language-change", {
 				label: selectedOption.label,
 				value: selectedOption.value,
