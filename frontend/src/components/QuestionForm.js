@@ -178,7 +178,7 @@ const QuestionForm = () => {
 
 	const wrapperRef = useCallback(
 		(wrapper) => {
-			if (wrapper == null) return;
+			if (wrapper == null || quill) return; // Prevent setting quill again
 
 			wrapper.innerHTML = "";
 			const editor = document.createElement("div");
@@ -193,13 +193,11 @@ const QuestionForm = () => {
 
 			q.on("text-change", (delta, oldDelta, source) => {
 				if (source === "user") {
-					setQuill(q);
+					setQuill(q); // Set the state here
 				}
 			});
-
-			setQuill(q);
 		},
-		[handlePaste]
+		[quill, handlePaste]
 	);
 
 	return (
@@ -281,7 +279,14 @@ const QuestionForm = () => {
 					<label className="form-label" htmlFor="description">
 						Description:
 					</label>
-					{/* <div className={`editor-container ${emptyFields.includes("description") ? "is-invalid" : ""}`} ref={wrapperRef}></div> */}
+					<div
+						className={`editor-container ${
+							emptyFields.includes("description")
+								? "is-invalid"
+								: ""
+						}`}
+						ref={wrapperRef}
+					></div>
 				</div>
 
 				<div className="d-flex justify-content-center">

@@ -5,6 +5,7 @@ import "./css/Profile.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import profileImage from "../images/profile.png";
+import { useNavigate } from "react-router-dom";
 
 // Function used to retrieve user's name based on email given
 async function fetchUserName(email, user) {
@@ -55,6 +56,7 @@ function Parser(data, type) {
 }
 
 function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
+	const navigate = useNavigate();
 	const [historyData, setHistoryData] = useState([]);
 	const [isEditingUserDetails, setIsEditingUserDetails] = useState(false);
 	const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -612,41 +614,58 @@ function Profile({ user, handleUserChange, handleLogout, handleLogin }) {
 												(historyItem, index) => (
 													<tr
 														key={index}
-														className="history-row"
+														className={`history-row ${historyItem.question_difficulty.toLowerCase()}`}
+														onClick={() =>
+															navigate(
+																`/history/${historyItem.room_id}`,
+																{
+																	state: {
+																		source: "profile",
+																		question:
+																			{
+																				category:
+																					Parser(
+																						historyItem.question_category,
+																						"category2"
+																					),
+																				complexity:
+																					historyItem.question_difficulty,
+																				createdAt:
+																					historyItem.timestamp,
+																				description:
+																					historyItem.question_description,
+																				title: historyItem.question_name,
+																				updatedAt:
+																					historyItem.timestamp,
+																			},
+																		code: historyItem.code,
+																		language:
+																			JSON.parse(
+																				historyItem.language
+																			)
+																				.label,
+																		partner:
+																			userNames[
+																				historyItem.user1_email ===
+																				user
+																					.user
+																					.email
+																					? historyItem.user2_email
+																					: historyItem.user1_email
+																			] ||
+																			" ",
+																	},
+																}
+															)
+														}
+														style={{
+															cursor: "pointer",
+														}}
 													>
 														<td>
-															<Link
-																to={`/room/${historyItem.room_id}`}
-																state={{
-																	source: "profile",
-																	question: {
-																		category:
-																			Parser(
-																				historyItem.question_category,
-																				"category2"
-																			),
-																		complexity:
-																			historyItem.question_difficulty,
-																		createdAt:
-																			historyItem.question_created_timestamp,
-																		description:
-																			historyItem.question_description,
-																		title: historyItem.question_name,
-																		updatedAt:
-																			historyItem.question_updated_timestamp,
-																	},
-																	code: historyItem.code,
-																	language:
-																		JSON.parse(
-																			historyItem.language
-																		).label,
-																}}
-																className="left-align-link"
-															>
-																{
-																	historyItem.question_name
-																}
-															</Link>
+															{
+																historyItem.question_name
+															}
 														</td>
 														<td>
 															{

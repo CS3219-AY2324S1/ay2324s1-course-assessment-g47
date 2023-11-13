@@ -8,6 +8,7 @@ import { codeLanguages } from "./constants";
 import { FaCheck } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import DisplayRandomQuestion from "./DisplayRandomQuestion";
+import ConfirmModal from "./ConfirmModal";
 
 import Select, { components } from "react-select";
 
@@ -43,6 +44,10 @@ function Room({ user }) {
 	const [peer, setPeer] = useState(null);
 	const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
 	const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
+	const [questions, setQuestions] = useState([]); // Stores the questions
+	const [selectedQuestionTitle, setSelectedQuestionTitle] = useState(null); // Stores the selected question title
+
+	const [showConfirmModal, setShowConfirmModal] = useState(false); // State to manage the visibility of the confirmation modal
 
 	const getCurrentDateTime = async () => {
 		const currentDateTime = new Date();
@@ -112,6 +117,75 @@ function Room({ user }) {
 			);
 		}
 	};
+	//Get question by title
+	const fetchQuestionByTitle = async (title) => {
+		if (user) {
+			try {
+				const response = await fetch(`/api/questions/title/${title}`, {
+					headers: {
+						Authorization: `Bearer ${user.tokens.accessToken}`,
+					},
+				});
+				const json = await response.json();
+
+				if (response.ok) {
+					setRandomQuestion(json);
+					socket.emit("newRandomQuestion", {
+						roomId,
+						randomQuestion: json,
+						user: user.user,
+					});
+					const msg = `${user.user.username} changed to question to ${json.title}`;
+					socket.emit("chatNotifcationMessage", {
+						message: msg,
+						roomId: roomId,
+						senderInfo: user.user,
+						time: new Date().toLocaleTimeString([], {
+							hour: "2-digit",
+							minute: "2-digit",
+						}),
+					});
+				}
+			} catch (error) {
+				console.error(`Error fetching ${title} question:`, error);
+			}
+		}
+	};
+
+	const handleFormSubmit = (e) => {
+		e.preventDefault();
+
+		if (selectedQuestionTitle) {
+			// Call fetchQuestionByTitle when "Change Question" button is clicked
+			fetchQuestionByTitle(selectedQuestionTitle); // Use async and await so that randomQuestion will be updated FIRST!
+			updateData(editorText, selectedLanguage, randomQuestion);
+		}
+	};
+
+	const fetchQuestionsByDifficulty = async () => {
+		if (user) {
+			try {
+				const response = await fetch(
+					`/api/questions/all-${difficultyLevel}`,
+					{
+						headers: {
+							Authorization: `Bearer ${user.tokens.accessToken}`,
+						},
+					}
+				);
+				const json = await response.json();
+
+				if (response.ok) {
+					setQuestions(json);
+				}
+			} catch (error) {
+				console.error(
+					`Error fetching ${difficultyLevel} questions:`,
+					error
+				);
+			}
+		}
+	};
 
 	const fetchInitialRandomEasyQuestion = async () => {
 		if (user) {
@@ -125,7 +199,6 @@ function Room({ user }) {
 					}
 				);
 				const json = await response.json();
-
 				if (response.ok) {
 					setRandomQuestion(json);
 					socket.emit("newRandomQuestion", {
@@ -142,6 +215,23 @@ function Room({ user }) {
 			}
 		}
 	};
+	// Update the options for the dropdown list
+	const dropdownOptions = [
+		<option key="default" value="" disabled hidden>
+			Select a question
+		</option>,
+		...questions.map((question, index) => (
+			<option key={index} value={question.title}>
+				{question.title}
+			</option>
+		)),
+	];
+
+	useEffect(() => {
+		if (questions.length > 0) {
+			setSelectedQuestionTitle(questions[0].title);
+		}
+	}, [questions]);
 
 	const fetchRandomEasyQuestion = async () => {
 		if (user) {
@@ -197,6 +287,7 @@ function Room({ user }) {
 			setIsFromProfile(false);
 			fetchInitialRandomEasyQuestion();
 		}
+		fetchQuestionsByDifficulty();
 		socket.on("updateRandomQuestion", (newRandomQuestion) => {
 			console.log("newRandomQuestion:", newRandomQuestion);
 			setRandomQuestion(newRandomQuestion);
@@ -387,7 +478,6 @@ function Room({ user }) {
 
 			// Get message text
 			const msg = e.target.elements.msg.value;
-
 			// Emit message to server and the current time
 			socket.emit(
 				"chatMessage",
@@ -471,7 +561,10 @@ function Room({ user }) {
 		}
 	};
 
-	const handleExit = () => {
+	const handleShowConfirmModal = () => setShowConfirmModal(true); // Handler to show the modal
+	const handleCloseConfirmModal = () => setShowConfirmModal(false); // Handler to close the modal
+
+	const handleConfirmExit = () => {
 		leaveCall();
 		window.location.href = "/";
 	};
@@ -480,7 +573,42 @@ function Room({ user }) {
 		<div className="container-fluid">
 			<div className="row mt-4">
 				<div className="col-lg-3 col-md-6 order-lg-1 order-md-1 order-1">
-					<div className="question-container m-2">
+					<div className="question-container m-2 d-flex flex-column">
+						<div className="card bg-dark text-white rounded-4">
+							<div className="card-body">
+								<form
+									onSubmit={handleFormSubmit}
+									className="m-2"
+								>
+									<div className="mb-3">
+										<label
+											htmlFor="questionSelect"
+											className="form-label"
+										>
+											Select Question:
+										</label>
+										<select
+											className="form-select"
+											id="questionSelect"
+											onChange={(e) =>
+												setSelectedQuestionTitle(
+													e.target.value
+												)
+											}
+										>
+											{dropdownOptions}
+										</select>
+									</div>
+									<button
+										type="submit"
+										className="btn btn-light"
+										onClick={handleFormSubmit}
+									>
+										Change Question
+									</button>
+								</form>
+							</div>
+						</div>
 						<DisplayRandomQuestion
 							user={user}
 							randomQuestion={randomQuestion}
@@ -530,7 +658,7 @@ function Room({ user }) {
 							</div>
 							<button
 								className="btn btn-danger exit-button m-2"
-								onClick={handleExit}
+								onClick={handleShowConfirmModal}
 							>
 								Exit
 							</button>
@@ -553,13 +681,24 @@ function Room({ user }) {
 									required
 									autoComplete="off"
 								/>
+								<button
+									type="submit"
+									className="btn btn-success rounded-circle "
+								>
+									<i className="fas fa-paper-plane"></i>
+								</button>
 							</form>
-							<button className="btn btn-success rounded-circle ">
-								<i className="fas fa-paper-plane"></i>
-							</button>
 						</div>
 					</div>
 				</div>
+				<ConfirmModal
+					show={showConfirmModal}
+					handleClose={handleCloseConfirmModal}
+					handleConfirm={handleConfirmExit}
+					title="Confirm Exit"
+					body="Are you sure you want to exit the room?"
+					rightBtn="Exit"
+				/>
 			</div>
 		</div>
 	);

@@ -172,30 +172,34 @@ function QuestionQueue({ user }) {
 	};
 
 	return (
-		<div className="container-fluid" style={{ minWidth: "200px" }}>
+		<div className="container-fluid " style={{ minWidth: "200px" }}>
 			<div className="card m-1 rounded-4">
-				<div className="card-body bg-dark rounded-4">
-					<h2 className="card-title text-light">Question Queue</h2>
+				<div className="card-body bg-light rounded-4">
+					<h2 className="card-title text-dark">Find your match!</h2>
 					<form>
-						<div className="mb-3">
-							<label
-								htmlFor="difficulty-select"
-								className="form-label"
-							>
-								Select Difficulty:
-							</label>
-							<select
-								id="difficulty-select"
-								className="form-select"
-								value={selectedDifficulty}
-								onChange={handleDifficultyChange}
-								disabled={loading}
-							>
-								<option value="easy">Easy</option>
-								<option value="medium">Medium</option>
-								<option value="hard">Hard</option>
-							</select>
-						</div>
+						{!loading && !noMatchFound ? (
+							<div className="mb-3">
+								<label
+									htmlFor="difficulty-select"
+									className="form-label"
+								>
+									Select Difficulty:
+								</label>
+								<select
+									id="difficulty-select"
+									className="form-select"
+									value={selectedDifficulty}
+									onChange={handleDifficultyChange}
+									disabled={loading}
+								>
+									<option value="easy">Easy</option>
+									<option value="medium">Medium</option>
+									<option value="hard">Hard</option>
+								</select>
+							</div>
+						) : (
+							<></>
+						)}
 						<div>
 							{loading ? (
 								<div>
@@ -220,7 +224,7 @@ function QuestionQueue({ user }) {
 								!noMatchFound && (
 									<button
 										type="button"
-										className="btn btn-primary bg-success"
+										className="btn btn-success"
 										onClick={handleJoinQueue}
 									>
 										Join Queue

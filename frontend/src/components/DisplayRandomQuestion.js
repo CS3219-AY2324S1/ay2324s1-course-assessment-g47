@@ -3,18 +3,20 @@ import { format } from 'date-fns';
 import { FaSync } from 'react-icons/fa';
 import "./css/DisplayRandomQuestion.css";
 
-function DisplayRandomQuestion({ randomQuestion, handleRefreshQuestion }) {
+function DisplayRandomQuestion({ randomQuestion, handleRefreshQuestion, hideRefresh = false }) {
   return (
-    <div style={{height: '100%'}}>
+    <div style={{height: '79%'}}>
       {randomQuestion && (
         <div className="col" style={{height: '100%'}}>
             <div className="card m-1 rounded-4" style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                 <div className="card-body bg-dark rounded-4 d-flex flex-column" style={{height: '100%'}}>
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <h4 className="card-title text-light m-0">{randomQuestion.title}</h4>
-                        <button onClick={handleRefreshQuestion} className="btn btn-secondary">
-                            <FaSync />
-                        </button>
+                        {!hideRefresh && (
+                          <button onClick={handleRefreshQuestion} className="btn btn-secondary">
+                               <FaSync />
+                          </button>
+                        )}
                     </div>
                     <p className="mb-1 text-light"><strong>Complexity:</strong> {randomQuestion.complexity}</p>
                     <p className="mb-1 text-light"><strong>Category:</strong> {randomQuestion.category.join(', ')}</p>

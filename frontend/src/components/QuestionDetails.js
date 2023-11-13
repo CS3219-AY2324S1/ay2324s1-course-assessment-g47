@@ -135,16 +135,10 @@ const QuestionDetails = ({ selectedQuestion, onUpdate }) => {
 						<div className="position-absolute top-0 end-0 pt-2 pe-2">
 							{editMode ? (
 								<>
-									<button className="btn btn-success me-2" onClick={handleSave}>
-										<span className="material-icons">Save</span>
-									</button>
-									<button className="btn btn-danger" onClick={handleCancel}>
-										<span className="material-icons">Cancel</span>
-									</button>
 								</>
 							) : (
 								<button className="btn btn-primary rounded-circle" onClick={() => setEditMode(true)}>
-									<span className="material-icons"><FaPen/></span>
+									<span className="material-icons"><FaPen /></span>
 								</button>
 							)}
 						</div>
@@ -202,6 +196,12 @@ const QuestionDetails = ({ selectedQuestion, onUpdate }) => {
 									/>
 								</div>
 							</div>
+							<button className="btn btn-success me-2" onClick={handleSave}>
+								<span className="material-icons">Save</span>
+							</button>
+							<button className="btn btn-danger" onClick={handleCancel}>
+								<span className="material-icons">Cancel</span>
+							</button>
 						</>
 					) :
 						(
