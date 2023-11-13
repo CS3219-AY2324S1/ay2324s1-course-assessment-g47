@@ -11,11 +11,14 @@ import QuestionForm from "../components/QuestionForm";
 import QuestionDetails from "../components/QuestionDetails";
 import LoginPage from "../components/Login";
 import QuestionQueue from "../components/QuestionQueue";
+import DoughnutChart from "../components/DoughnutChart.js";
+import LineChart from "../components/LineChart.js";
 import { set } from "date-fns";
 
 const Home = ({ user, handleLogin }) => {
 	const [historyData, setHistoryData] = useState([]);
-	const [timestamps, setTimestamps] = useState({}); // Store user names
+	const [timestamps, setTimestamps] = useState([]); // Store user names
+	const [completedQnDiffculty, setCompletedQnDifficulty] = useState([0, 0, 0]);
 
 	const { questions, dispatch } = useQuestionsContext();
 	const [selectedQuestion, setSelectedQuestion] = useState(null); // State to store the selected question
@@ -105,12 +108,27 @@ const Home = ({ user, handleLogin }) => {
 				console.log("Fetched user's history successfully");
 
 				const timestamps = []; // Create an array to store timestamps
+				let easy = 0;
+				let med = 0;
+				let hard = 0;
 				for (const historyItem of data.data.rows) {
 					const timestamp = historyItem.timestamp;
-    				timestamps.push(timestamp);
+					timestamps.push(timestamp);
+					console.log(historyItem.question_difficulty);
+
+					if (historyItem.question_difficulty === "Easy") {
+						easy++;
+					} else if (historyItem.question_difficulty === "Medium") {
+						med++;
+					} else if (historyItem.question_difficulty === "Hard") {
+						hard++;
+					}
 				}
+				setCompletedQnDifficulty([easy, med, hard]);
+
 				setTimestamps(timestamps);
-				console.log(timestamps); 
+				console.log(timestamps);
+
 			} else {
 				// Handle other error cases
 				console.log("Server error");
@@ -119,6 +137,25 @@ const Home = ({ user, handleLogin }) => {
 			console.error("Error:", error);
 		}
 	};
+
+	function processTimestamps(timestamps) {
+		const counts = new Array(7).fill(0); // Array for each day of the week
+		const now = new Date(); // Current date
+	
+		// Determine the start and end of the current week
+		const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+		const endOfWeek = new Date(startOfWeek);
+		endOfWeek.setDate(endOfWeek.getDate() + 6);
+	
+		timestamps.forEach(ts => {
+			const date = new Date(ts);
+			if (date >= startOfWeek && date <= endOfWeek) {
+				counts[date.getDay()]++; // Increment the count for the specific day
+			}
+		});
+		console.log(counts);
+		return counts;
+	}
 
 	// Define the handleDifficultyChange function
 	const handleDifficultyChange = (selectedOptions) => {
@@ -130,8 +167,8 @@ const Home = ({ user, handleLogin }) => {
 			selectedDifficultyValues.length === 0
 				? originalQuestions
 				: originalQuestions.filter((question) =>
-						selectedDifficultyValues.includes(question.complexity)
-				  );
+					selectedDifficultyValues.includes(question.complexity)
+				);
 
 		setFilteredQuestions(filteredQuestions);
 		setSelectedDifficulty(selectedDifficultyValues);
@@ -153,10 +190,10 @@ const Home = ({ user, handleLogin }) => {
 			selectedCategoryValues.length === 0
 				? originalQuestions
 				: originalQuestions.filter((question) =>
-						question.category.some((category) =>
-							selectedCategoryValues.includes(category)
-						)
-				  );
+					question.category.some((category) =>
+						selectedCategoryValues.includes(category)
+					)
+				);
 
 		setFilteredQuestions(filteredQuestions);
 		setSelectedCategories(selectedCategoryValues);
@@ -230,18 +267,28 @@ const Home = ({ user, handleLogin }) => {
 	return user ? (
 		<>
 			<div className="header"></div>
+
 			<div className="home">
+				{completedQnDiffculty.every(count => count === 0) ? (
+					<p>Start working on questions today!</p>
+				) : (
+					<DoughnutChart data={completedQnDiffculty} />
+				)}
+				<LineChart data={processTimestamps(timestamps)}/>
+
 				{user.user.account_type !== "user" ? (
 					<div>
 						<QuestionForm />
 					</div>
 				) : null}
+
 				<QuestionQueue user={user.user} />
 				<div className="QuestionDetails">
-				<QuestionDetails 
-					selectedQuestion={selectedQuestion}
-					onUpdate={(questionId, updatedQuestion) => {
-						setSelectedQuestion(updatedQuestion);}}/>
+					<QuestionDetails
+						selectedQuestion={selectedQuestion}
+						onUpdate={(questionId, updatedQuestion) => {
+							setSelectedQuestion(updatedQuestion);
+						}} />
 				</div>
 			</div>
 
@@ -253,13 +300,12 @@ const Home = ({ user, handleLogin }) => {
 								<div className="btn-group">
 									<button
 										onClick={handleSortByPopularity}
-										className={`btn ${
-											asc
-												? "btn-success"
-												: desc
+										className={`btn ${asc
+											? "btn-success"
+											: desc
 												? "btn-danger"
 												: "btn-secondary"
-										}`}
+											}`}
 									>
 										{asc ? (
 											<i className="fas fa-sort-up"></i>
