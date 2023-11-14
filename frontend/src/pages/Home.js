@@ -346,7 +346,9 @@ const Home = ({ user, handleLogin }) => {
 								{completedQnDiffculty.every(
 									(count) => count === 0
 								) ? (
-									<p>Start working on questions today!</p>
+									<p style={{ color: "white" }}>
+										Start working on questions today!
+									</p>
 								) : (
 									<DoughnutChart
 										data={completedQnDiffculty}
