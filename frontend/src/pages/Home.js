@@ -163,8 +163,22 @@ const Home = ({ user, handleLogin }) => {
 		// Filter the questions based on the selected difficulty or show all questions if none are selected
 		const filteredQuestions =
 			selectedDifficultyValues.length === 0
-				? originalQuestions
+				? selectedCategories.length === 0
+					? originalQuestions
+					: originalQuestions.filter((question) =>
+							selectedCategories.every((category) =>
+								question.category.includes(category)
+							)
+					)
+				: selectedCategories.length === 0
+				? originalQuestions.filter((question) =>
+						selectedDifficultyValues.includes(question.complexity)
+				)
 				: originalQuestions.filter((question) =>
+						selectedCategories.every((category) =>
+							question.category.includes(category)
+						)
+				  ).filter((question) =>
 						selectedDifficultyValues.includes(question.complexity)
 				  );
 
@@ -186,10 +200,26 @@ const Home = ({ user, handleLogin }) => {
 		// Filter the questions based on the selected categories or show all questions if none are selected
 		const filteredQuestions =
 			selectedCategoryValues.length === 0
-				? originalQuestions
+				? selectedDifficulty.length === 0
+					? originalQuestions 
+					: originalQuestions.filter((question) =>
+							selectedDifficulty.every((difficulty) =>
+								question.complexity.includes(difficulty)
+							)
+					)
+				: selectedDifficulty.length === 0
+				? originalQuestions.filter((question) =>
+						selectedCategoryValues.every((category) =>
+							question.category.includes(category)
+						)
+				)
 				: originalQuestions.filter((question) =>
-						question.category.some((category) =>
-							selectedCategoryValues.includes(category)
+						selectedDifficulty.every((difficulty) =>
+							question.complexity.includes(difficulty)
+						)
+				  ).filter((question) =>
+						selectedCategoryValues.every((category) =>
+							question.category.includes(category)
 						)
 				  );
 
