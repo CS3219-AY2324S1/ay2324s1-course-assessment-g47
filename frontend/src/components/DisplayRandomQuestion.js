@@ -9,7 +9,7 @@ function DisplayRandomQuestion({
 	hideRefresh = false,
 }) {
 	return (
-		<div style={{ height: "79%" }}>
+		<div style={{ height: "70%" }}>
 			{randomQuestion ? (
 				<div className="col" style={{ height: "100%" }}>
 					<div
