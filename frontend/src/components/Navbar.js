@@ -6,6 +6,7 @@ const Navbar = ({ user, handleLogout }) => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const isRoomRoute = location.pathname.includes("/room");
+	const isHistoryRoom = location.pathname.includes("/history");
 	const [isCollapsed, setIsCollapsed] = useState(false);
 
 	const toggleCollapse = () => {
@@ -19,10 +20,13 @@ const Navbar = ({ user, handleLogout }) => {
 	return (
 		<nav className="navbar navbar-expand-lg navbar-dark bg-dark">
 			<div className="container">
-				<a className="navbar-brand" href={isRoomRoute ? "#" : "/"}>
+				<a
+					className="navbar-brand"
+					href={isRoomRoute || isHistoryRoom ? "#" : "/"}
+				>
 					PeerPrep
 				</a>
-				{user && !isRoomRoute ? (
+				{user && !isRoomRoute && !isHistoryRoom ? (
 					<>
 						<button
 							className="navbar-toggler"
