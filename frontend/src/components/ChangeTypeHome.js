@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./css/Login.css";
 import "./css/ChangeTypeHome.css";
 import LoginPage from "./Login";
 import "./css/Login.css";
-import * as Constants from "../constants/constants.js";
 
 function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
+	const navigate = useNavigate();
 	const [formData, setFormData] = useState({
 		email: "",
 		account_type: "user",
@@ -41,7 +41,7 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 		try {
 			console.log(user.user);
 			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/type/${user.user_id}`,
+				`/api/users/update/type/${user.user_id}`,
 				{
 					method: "POST",
 					headers: {
@@ -77,63 +77,115 @@ function ChangeTypeHome({ user, handleUserChange, handleLogout, handleLogin }) {
 
 	return user ? (
 		<>
-			<div className="changetypehome">
-				<div className="changetypehome-container">
-					<h1 className="changetypehome-label">
-						Change Account Type
-					</h1>
-					<div className="ChangeTypeHome">
-						<form onSubmit={handleSaveClick}>
-							<div className="form-group">
-								<label htmlFor="email">Email</label>
-								<input
-									type="email"
-									id="email"
-									onChange={handleChange}
-									required
-								/>
+			<section className="text-center">
+				{/* Background image */}
+				<div
+					className="p-5 bg-image"
+					style={{
+						backgroundImage:
+							'url("https://mdbootstrap.com/img/new/textures/full/171.jpg")',
+						height: "300px",
+					}}
+				></div>
+				{/* Background image */}
+
+				<div
+					className="card mx-4 mx-md-5 shadow-5-strong"
+					style={{
+						marginTop: "-100px",
+						background: "hsla(0, 0%, 100%, 0.8)",
+						backdropFilter: "blur(30px)",
+					}}
+				>
+					<div className="card-body py-5 px-md-5">
+						<div className="row d-flex justify-content-center">
+							<div className="col-lg-8">
+								<h2 className="fw-bold mb-5">
+									Change Account Type
+								</h2>
+								<form>
+									{/* Email input */}
+									<div className="form-outline mb-4">
+										<label
+											className="form-label"
+											htmlFor="form3Example3"
+										>
+											Email address
+										</label>
+										<input
+											type="email"
+											id="email"
+											onChange={handleChange}
+											required
+											className="form-control"
+										/>
+									</div>
+
+									{/* Password input */}
+									<div className="form-outline mb-4">
+										<label htmlFor="accountType">
+											User Type
+										</label>
+										<select
+											id="account_type"
+											onChange={handleChange}
+											value={selectedOption}
+											required
+										>
+											<option value="user" selected>
+												User
+											</option>
+											<option value="superuser">
+												SuperUser
+											</option>
+											{user.account_type ===
+											"superadmin" ? (
+												<option value="admin">
+													Admin
+												</option>
+											) : null}
+										</select>
+									</div>
+
+									{/* Show error */}
+									<div className="form-group">
+										{formData.updateSuccess && (
+											<p className="success">
+												{formData.updateSuccess}
+											</p>
+										)}
+									</div>
+									<div className="form-group">
+										{formData.updateError && (
+											<p className="error">
+												{formData.updateError}
+											</p>
+										)}
+									</div>
+
+									{/* Submit button */}
+									<button
+										type="submit"
+										className="btn btn-primary btn-block mb-4"
+										onClick={handleSaveClick}
+									>
+										Save
+									</button>
+									<button
+										type="submit"
+										className="btn btn-primary btn-block mb-4"
+										onClick={() => {
+											navigate("/profile"); // Navigate to the registration page
+										}}
+									>
+										Back
+									</button>
+								</form>
 							</div>
-							<div className="form-group">
-								<label htmlFor="accountType">User Type</label>
-								<select
-									id="account_type"
-									onChange={handleChange}
-									value={selectedOption}
-									required
-								>
-									<option value="user" selected>
-										User
-									</option>
-									<option value="superuser">SuperUser</option>
-									{user.user.account_type === "superadmin" ? (
-										<option value="admin">Admin</option>
-									) : null}
-								</select>
-							</div>
-							<div className="form-group">
-								{formData.updateSuccess && (
-									<p className="success">
-										{formData.updateSuccess}
-									</p>
-								)}
-							</div>
-							<div className="form-group">
-								{formData.updateError && (
-									<p className="error">
-										{formData.updateError}
-									</p>
-								)}
-							</div>
-							<div className="edit-password-button">
-								<button className="profile-button">Save</button>
-								<Link className="profile-button" to="/profile">
-									Back
-								</Link>
-							</div>
-						</form>
+						</div>
 					</div>
 				</div>
-			</div>
+			</section>
 		</>
 	) : (
 		<LoginPage onSuccessLogin={handleLogin} />

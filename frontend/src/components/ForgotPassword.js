@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import * as Constants from "../constants/constants.js";
 
 function ForgotPassword() {
 	const [formData, setFormData] = useState({
@@ -23,16 +22,13 @@ function ForgotPassword() {
 		const { email, password } = formData;
 
 		try {
-			const response = await fetch(
-				`http://localhost:${Constants.POSTGRESQL_PORT}/users/update/password`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ email, password }),
-				}
-			);
+			const response = await fetch(`/api/users/update/password`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ email, password }),
+			});
 
 			if (response.status === 200) {
 				// Successful update of password

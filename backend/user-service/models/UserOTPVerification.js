@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const UserOTPVerificationSchema = new Schema({
+const otpSchema = new Schema({
     userId: String,
     email: String,
     otp: String,
@@ -9,4 +9,4 @@ const UserOTPVerificationSchema = new Schema({
     expiresAt: Date,
 });
 
-module.exports = mongoose.model("UserOTPVerification", UserOTPVerificationSchema);
+module.exports = mongoose.model("otp", otpSchema);

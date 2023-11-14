@@ -92,4 +92,31 @@ async function addMultipleRowsToAccountsTable() {
 		.finally(() => {});
 }
 
+// Create the code_attempts table if it doesn't exist
+const createCodeAttemptsTableQuery = `
+  CREATE TABLE IF NOT EXISTS code_attempts (
+    attempt_id serial PRIMARY KEY,
+    user1_email VARCHAR(255) NOT NULL,
+    user2_email VARCHAR(255) NOT NULL,
+    room_id VARCHAR(255) NOT NULL,
+    timestamp VARCHAR ( 255 ) NOT NULL,
+    language VARCHAR(255) NOT NULL,
+    question_name VARCHAR(255) NOT NULL,
+    question_difficulty VARCHAR(255) NOT NULL,
+    question_category VARCHAR(255) NOT NULL,
+    question_created_timestamp TIMESTAMP NOT NULL,
+    question_updated_timestamp TIMESTAMP NOT NULL,
+    code TEXT NOT NULL,
+    question_description TEXT NOT NULL
+  );
+`;
+
+pool.query(createCodeAttemptsTableQuery)
+	.then((res) => {
+		console.log("Code attempts table created or already exists.");
+	})
+	.catch((err) => {
+		console.error("Error creating code attempts table:", err);
+	});
+
 module.exports = pool;

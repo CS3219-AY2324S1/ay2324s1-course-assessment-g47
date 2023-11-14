@@ -1,19 +1,20 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import { QuestionsContextProvider } from './context/QuestionContext'
-import { AuthContextProvider } from './context/AuthContext'
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import { QuestionsContextProvider } from "./context/QuestionContext";
+import { AuthContextProvider } from "./context/AuthContext";
+import "bootstrap/dist/css/bootstrap.css";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <AuthContextProvider>
-      <QuestionsContextProvider>
-        <App />
-      </QuestionsContextProvider>
-    </AuthContextProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+	<React.StrictMode>
+		<AuthContextProvider>
+			<QuestionsContextProvider>
+				<App />
+			</QuestionsContextProvider>
+		</AuthContextProvider>
+	</React.StrictMode>,
+	document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

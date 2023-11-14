@@ -1,32 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import './App.css';
-
-// import {BrowserRouter, Routes, Route} from 'react-router-dom'
-
-// // pages & components
-// import Home from './pages/Home'
-// import Navbar from './components/Navbar'
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <BrowserRouter>
-//       <Navbar />
-//       <div className="pages">
-//         <Routes>
-//           <Route
-//            path="/"
-//            element={<Home />}
-//           />
-//         </Routes>
-//       </div>
-//       </BrowserRouter>
-//     </div>
-//   );
-// }
-
-// export default App;
-
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Layout from "./components/Layout";
@@ -39,12 +10,15 @@ import ChangeTypeHome from "./components/ChangeTypeHome";
 import VerifyOTP from "./components/VerifyOTP";
 import ResendOTP from "./components/ResendOTP";
 import { useAuthContext } from "./hooks/useAuthContext";
+import Room from "./components/Room";
+import History from "./components/History";
 import Navbar from "./components/Navbar";
-import * as Constants from "./constants/constants.js";
+import RoomUserExit from "./components/RoomUserExit";
 
 function App() {
 	const [user, setUser] = useState(null);
 	const { dispatch } = useAuthContext();
+	// const postgresqlPort = 4001;
 
 	// Load user data from localStorage when the component mounts
 	useEffect(() => {
@@ -78,7 +52,7 @@ function App() {
 		const fetchDataFromAPI = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:${Constants.POSTGRESQL_PORT}/users/fetch/${newUser.user.user_id}`,
+					`/api/users/fetch/${newUser.user.user_id}`,
 					{
 						method: "POST",
 						headers: {
@@ -88,6 +62,7 @@ function App() {
 						body: JSON.stringify(newUser), // Send user data directly
 					}
 				);
+
 				if (response.ok) {
 					const user = await response.json();
 
@@ -149,6 +124,32 @@ function App() {
 								/>
 							}
 						/>
+					</Route>
+					<Route path="/verifyOTP" element={<VerifyOTP />}>
+						{" "}
+					</Route>
+					<Route
+						path="/resendOTPVerificationCode"
+						element={<ResendOTP />}
+					>
+						{" "}
+					</Route>
+					<Route path="/room/:roomId" element={user ? (
+						<Room user={user} />
+					) : (
+						<div>Loading...</div>
+					)}>
+						{" "}
+					</Route>
+					<Route path="/history/:historyId" element={user ? (
+						<History user={user} />
+					) : (
+						<div>Loading...</div>
+					)}>
+						{" "}
+					</Route>
+					<Route path="/roomexit" element={<RoomUserExit />}>
+						{" "}
 					</Route>
 				</Routes>
 			</BrowserRouter>

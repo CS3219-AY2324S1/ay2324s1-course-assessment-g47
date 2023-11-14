@@ -18,12 +18,21 @@ app.use((req, res, next) => {
 });
 
 //routes
-app.use("/api/questions", questionRoutes);
+// app.use("/api/questions", questionRoutes);
+app.use(
+	"/api/questions",
+	(req, res, next) => {
+		console.log("MANAGED TO CONNECT TO QUESTIONS"); // Log "test" when a request reaches this middleware
+		next(); // Continue to the next middleware or route handler
+	},
+	questionRoutes
+);
 
 // Connect to mongodb
 const connectWithRetry = () => {
 	mongoose
 		.connect(process.env.MONGO_URI, {
+			// Changed from URL to URI
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			serverSelectionTimeoutMS: 5000, // Timeout in milliseconds for server selection

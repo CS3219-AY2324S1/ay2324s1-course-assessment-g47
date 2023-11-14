@@ -1,0 +1,27 @@
+/* CSS for the container */
+.question-details {
+    position: relative; /* Make the container a positioning context for its children */
+    display: flex; /* Use flexbox layout */
+    justify-content: space-between; /* Align items to the right */
+    align-items: flex-start; /* Align items at the top vertically */
+  }
+  
+  /* CSS for the circular refresh button */
+  .refresh-button {
+    position: absolute; /* Position the button relative to the container */
+    top: 0; /* Align the button to the top */
+    right: 0; /* Align the button to the right */
+    background-color: var(--accent-color); /* Button background color */
+    color: var(--dark-accent-color); /* Button text color */
+    border: none; /* Remove button border */
+    margin: 20px;
+    padding: 10px; /* Adjust the padding to control the button size */
+    font-size: 15px; /* Adjust font size as needed */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    border-radius: 50%; /* Make the button circular */
+  }
+  
+  .refresh-button:hover {
+    background-color: #818b90; /* Change background color on hover */
+  }
+  

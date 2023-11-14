@@ -1,5 +1,24 @@
 version: '3.8'
 services:
+  # nginx
+  nginx:
+    container_name: nginx
+    restart: always
+    build:
+      context: ./backend/nginx
+      dockerfile: Dockerfile
+    depends_on:
+      - frontend
+      - user-service
+      - question-service
+      - matching-service
+      - collaboration-service
+      - history-service
+    ports:
+      - 80:80
+    networks:
+      - app-network
+
   # PostgreSQL Database
   postgres:
     container_name: postgres
@@ -79,6 +98,60 @@ services:
     depends_on:
       - mongodb
 
+  # Matching Service
+  matching-service:
+    container_name: matching-service
+    restart: always
+    build:
+      context: ./backend/matching-service
+      dockerfile: Dockerfile
+    ports:
+      - '8083:8083'
+    environment:
+      - MATCHING_SERVICE_PORT=8083
+      - AMQP_URL=amqps://zgwixtic:FVykfsbOIymPvAOiH3LOZ6xMRxetTjbj@armadillo.rmq.cloudamqp.com/zgwixtic
+      - SOCKET_IO_URL=http://collaboration-service:8084    
+    depends_on:
+      - collaboration-service
+    networks:
+      - app-network
+
+  # Collaboration Service
+  collaboration-service:
+    container_name: collaboration-service
+    restart: always
+    build:
+      context: ./backend/collaboration-service
+      dockerfile: Dockerfile
+    ports:
+      - '8084:8084'
+    environment:
+      - COLLABORATION_SERVICE_PORT=8084
+      - AMQP_URL=amqps://zgwixtic:FVykfsbOIymPvAOiH3LOZ6xMRxetTjbj@armadillo.rmq.cloudamqp.com/zgwixtic
+    networks:
+      - app-network
+
+  # History Service
+  history-service:
+    container_name: history-service
+    restart: always
+    build:
+      context: ./backend/history-service
+      dockerfile: Dockerfile
+    ports:
+      - '8085:8085'
+    environment:
+      - HISTORYPORT=8085
+      - DB_USER=postgres
+      - DB_HOST=postgres
+      - DB_PASSWORD=root
+      - DB_PORT=5432
+      - DB_DATABASE=cs3219_g47
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+
   # Frontend React App
   frontend:
     container_name: frontend
@@ -88,15 +161,11 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - USER_SERVICE_PORT=8081
-      - QUESTION_SERVICE_PORT=8082
+      - ENV=PROD
     stdin_open: true
     tty: true
     volumes:
       - ./frontend:/app
-    depends_on:
-      - user-service
-      - question-service
     networks:
       - app-network
 

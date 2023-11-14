@@ -16,7 +16,7 @@ RUN npm install
 # copy the rest of the files to /app
 COPY . .
 
-EXPOSE 3000 8080
+EXPOSE 3000
 
 # ==== RUN =======
 CMD [ "npm", "run", "start" ]
