@@ -471,5 +471,5 @@ module.exports = {
 	resendOTPVerificationCode,
 	fetchUserInfo,
 	fetchUserEmail,
-	fetchUserHistory,
+	fetchUserHistory
 };

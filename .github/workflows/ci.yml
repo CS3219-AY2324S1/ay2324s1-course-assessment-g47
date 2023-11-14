@@ -1,0 +1,32 @@
+name: CI Pipeline
+on:
+  push:
+    branches:
+      - master
+      - CI-Docker
+      - nginx-CI
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.9.0
+        with:
+          mongodb-version: '6.0'
+
+      - name: Install dependencies
+        run: npm run install-all
+
+      - name: Run Tests
+        run: npm run test-ci
+        env:
+          ACCESS_TOKEN_SECRET: ${{ secrets.AUTH_TOKEN }}

@@ -2,7 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const pool = require("./database");
-const historyPort = process.env.HISTORYPORT || 8085;
+let historyPort;
+
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'ci') {
+    historyPort = 8093;
+} else {
+    historyPort = process.env.HISTORYPORT || 8085;
+}
 
 const appForHistory = express();
 
@@ -73,3 +79,5 @@ appForHistory.post("/api/history/manage-code-attempt", async (req, res) => {
 appForHistory.listen(historyPort, () => {
 	console.log(`History service running on port ${historyPort}`);
 });
+
+module.exports = appForHistory;

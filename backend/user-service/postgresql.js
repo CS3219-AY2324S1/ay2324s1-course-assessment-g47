@@ -39,13 +39,29 @@ function errorHandler(err, req, res, next) {
 }
 
 // Initialize routes
-app.use("/api/users", userRoutes);
+//app.use("/api/users", userRoutes);
+
+app.use(
+    "/api/users",
+    (req, res, next) => {
+        next(); // Continue to the next middleware or route handler
+    },
+    userRoutes
+);
+
 
 // Start the server
-const port = process.env.POSTGRESQLPORT || 8081;
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'ci') {
+	port = 8090;
+  } else {
+	port = process.env.POSTGRESQLPORT || 8081;
+  }
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
 });
 
 // Connect to MongoDB
 connectToMongoDB();
+
+module.exports = app;
+
