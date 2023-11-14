@@ -13,6 +13,7 @@ import QuestionQueue from "../components/QuestionQueue";
 import DoughnutChart from "../components/DoughnutChart.js";
 import LineChart from "../components/LineChart.js";
 import Calendar from "../components/Calendar.js";
+import { set } from "date-fns";
 
 const Home = ({ user, handleLogin }) => {
 	const [historyData, setHistoryData] = useState([]);
@@ -27,6 +28,7 @@ const Home = ({ user, handleLogin }) => {
 	const [sort, setSort] = useState("none");
 	const [asc, setAsc] = useState(false);
 	const [desc, setDesc] = useState(false);
+	const [ogQuestions , setOgQuestions] = useState([]); // Store the original questions
 	const [originalQuestions, setOriginalQuestions] = useState([]);
 	const [filteredQuestions, setFilteredQuestions] = useState([]);
 	const [selectedDifficulty, setSelectedDifficulty] = useState([]); // State to store the selected difficulty
@@ -50,6 +52,7 @@ const Home = ({ user, handleLogin }) => {
 
 				setOriginalQuestions(json);
 				setFilteredQuestions(json);
+				setOgQuestions(json);
 				dispatch({ type: "SET_QUESTIONS", payload: json });
 			} catch (error) {
 				// Handle the error here
@@ -249,7 +252,25 @@ const Home = ({ user, handleLogin }) => {
 			setDesc(true);
 		} else if (sort === "desc") {
 			// Return to the original order (no sorting)
-			sortedQuestions.sort((a, b) => a._id - b._id);
+			// Sort by difficulty
+			sortedQuestions.sort((a, b) => {
+				if (a.complexity === "Easy") {
+					return -1;
+				} else if (a.complexity === "Medium") {
+					if (b.complexity === "Easy") {
+						return 1;
+					} else {
+						return -1;
+					}
+				} else if (a.complexity === "Hard") {
+					if (b.complexity === "Easy" || b.complexity === "Medium") {
+						return 1;
+					} else {
+						return -1;
+					}
+				}
+				return 0;
+			});
 			setSort("none");
 			setAsc(false);
 			setDesc(false);
