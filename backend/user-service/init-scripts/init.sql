@@ -16,14 +16,16 @@ CREATE TABLE IF NOT EXISTS accounts (
 
 CREATE TABLE IF NOT EXISTS code_attempts (
     attempt_id serial PRIMARY KEY,
-    user1_email VARCHAR (255) NOT NULL,
-    user2_email VARCHAR (255) NOT NULL,
-    room_id VARCHAR (255) NOT NULL,
-    timestamp TIMESTAMP NOT NULL,
-    language VARCHAR (255) NOT NULL,
-    question_name VARCHAR (255) NOT NULL,
-    question_difficulty VARCHAR (255) NOT NULL,
-    question_category VARCHAR (255) NOT NULL,
+    user1_email VARCHAR(255) NOT NULL,
+    user2_email VARCHAR(255) NOT NULL,
+    room_id VARCHAR(255) NOT NULL,
+    timestamp VARCHAR ( 255 ) NOT NULL,
+    language VARCHAR(255) NOT NULL,
+    question_name VARCHAR(255) NOT NULL,
+    question_difficulty VARCHAR(255) NOT NULL,
+    question_category VARCHAR(255) NOT NULL,
+    question_created_timestamp TIMESTAMP NOT NULL,
+    question_updated_timestamp TIMESTAMP NOT NULL,
     code TEXT NOT NULL,
     question_description TEXT NOT NULL
 );
@@ -33,5 +35,8 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- -- Insert a test record to verify initialization
 INSERT INTO accounts (username, email, password, account_type, authentication_stats)
-VALUES ('admin', 'admin@example.com', crypt('123456', gen_salt('bf', 10)::text), 'admin', true)
+VALUES ('User', 'user@example.com', crypt('123456', gen_salt('bf', 10)::text), 'user', true),
+       ('Superuser', 'superuser@example.com', crypt('123456', gen_salt('bf', 10)::text), 'superuser', true),
+       ('Admin', 'admin@example.com', crypt('123456', gen_salt('bf', 10)::text), 'admin', true),
+       ('Superadmin', 'superadmin@example.com', crypt('123456', gen_salt('bf', 10)::text), 'superadmin', true)
 ON CONFLICT (email) DO NOTHING;

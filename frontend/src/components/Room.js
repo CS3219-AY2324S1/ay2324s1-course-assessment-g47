@@ -8,6 +8,7 @@ import { codeLanguages } from "./constants";
 import { FaCheck } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import DisplayRandomQuestion from "./DisplayRandomQuestion";
+import ConfirmModal from "./ConfirmModal";
 
 import Select, { components } from "react-select";
 
@@ -43,6 +44,10 @@ function Room({ user }) {
 	const [peer, setPeer] = useState(null);
 	const [randomQuestion, setRandomQuestion] = useState(null); // Stores the question
 	const [isFromProfile, setIsFromProfile] = useState(false); // Stores the check for whether it is from Profile component
+	const [questions, setQuestions] = useState([]); // Stores the questions
+	const [selectedQuestionTitle, setSelectedQuestionTitle] = useState(null); // Stores the selected question title
+
+	const [showConfirmModal, setShowConfirmModal] = useState(false); // State to manage the visibility of the confirmation modal
 
 	const getCurrentDateTime = async () => {
 		const currentDateTime = new Date();
@@ -112,12 +117,59 @@ function Room({ user }) {
 			);
 		}
 	};
+	//Get question by title
+	const fetchQuestionByTitle = async (title) => {
+		if (user) {
+			try {
+				const response = await fetch(`/api/questions/title/${title}`, {
+					headers: {
+						Authorization: `Bearer ${user.tokens.accessToken}`,
+					},
+				});
+				const json = await response.json();
 
-	const fetchInitialRandomEasyQuestion = async () => {
+				if (response.ok) {
+					setRandomQuestion(json);
+					socket.emit("newRandomQuestion", {
+						roomId,
+						randomQuestion: json,
+						user: user.user,
+						initial: false,
+					});
+					const msg = `${user.user.username} changed to question to ${json.title}`;
+					socket.emit("chatNotifcationMessage", {
+						message: msg,
+						roomId: roomId,
+						senderInfo: user.user,
+						time: new Date().toLocaleTimeString([], {
+							hour: "2-digit",
+							minute: "2-digit",
+						}),
+					});
+				}
+			} catch (error) {
+				console.error(`Error fetching ${title} question:`, error);
+			}
+		}
+	};
+
+	const handleFormSubmit = (e) => {
+		e.preventDefault();
+
+		if (selectedQuestionTitle) {
+			// Call fetchQuestionByTitle when "Change Question" button is clicked
+			fetchQuestionByTitle(selectedQuestionTitle); // Use async and await so that randomQuestion will be updated FIRST!
+			if (randomQuestion != null) {
+				updateData(editorText, selectedLanguage, randomQuestion);
+			}
+		}
+	};
+
+	const fetchQuestionsByDifficulty = async () => {
 		if (user) {
 			try {
 				const response = await fetch(
-					`/api/questions/random-${difficultyLevel}`,
+					`/api/questions/all-${difficultyLevel}`,
 					{
 						headers: {
 							Authorization: `Bearer ${user.tokens.accessToken}`,
@@ -127,23 +179,36 @@ function Room({ user }) {
 				const json = await response.json();
 
 				if (response.ok) {
-					setRandomQuestion(json);
-					socket.emit("newRandomQuestion", {
-						roomId: roomId,
-						randomQuestion: json,
-						user: user.user,
-					});
+					setQuestions(json);
 				}
 			} catch (error) {
 				console.error(
-					`Error fetching random ${difficultyLevel} question:`,
+					`Error fetching ${difficultyLevel} questions:`,
 					error
 				);
 			}
 		}
 	};
 
-	const fetchRandomEasyQuestion = async () => {
+	// Update the options for the dropdown list
+	const dropdownOptions = [
+		<option key="default" value="" disabled hidden>
+			Select a question
+		</option>,
+		...questions.map((question, index) => (
+			<option key={index} value={question.title}>
+				{question.title}
+			</option>
+		)),
+	];
+
+	useEffect(() => {
+		if (questions.length > 0) {
+			setSelectedQuestionTitle(questions[0].title);
+		}
+	}, [questions]);
+
+	const fetchRandomQuestion = async () => {
 		if (user) {
 			try {
 				const response = await fetch(
@@ -155,13 +220,13 @@ function Room({ user }) {
 					}
 				);
 				const json = await response.json();
-				console.log("TESTTTTT: ", json);
 				if (response.ok) {
 					setRandomQuestion(json);
 					socket.emit("newRandomQuestion", {
 						roomId: roomId,
 						randomQuestion: json,
 						user: user.user,
+						initial: false,
 					});
 					//const roomName = roomId;
 					const msg = `${user.user.username} changed to question to ${json.title}`;
@@ -195,12 +260,25 @@ function Room({ user }) {
 			setSelectedLanguage(language); // Set the language from the profile
 		} else {
 			setIsFromProfile(false);
-			fetchInitialRandomEasyQuestion();
 		}
-		socket.on("updateRandomQuestion", (newRandomQuestion) => {
-			console.log("newRandomQuestion:", newRandomQuestion);
-			setRandomQuestion(newRandomQuestion);
-		});
+		fetchQuestionsByDifficulty();
+		socket.on(
+			"updateRandomQuestion",
+			(newRandomQuestion, email, initial) => {
+				console.log("newRandomQuestion:", newRandomQuestion);
+				if (initial) {
+					if (
+						email.localeCompare(user.user.email, undefined, {
+							sensitivity: "base",
+						}) < 0
+					) {
+						setRandomQuestion(newRandomQuestion);
+					}
+				} else {
+					setRandomQuestion(newRandomQuestion);
+				}
+			}
+		);
 		socket.on("set-caller-signal", (data) => {
 			setCallerSignal(data.signal);
 		});
@@ -337,8 +415,10 @@ function Room({ user }) {
 	const handleRefreshQuestion = async () => {
 		if (!isFromProfile) {
 			// Call fetchRandomEasyQuestion when "Change Question" button is clicked
-			const newQuestion = await fetchRandomEasyQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
-			updateData(editorText, selectedLanguage, newQuestion);
+			const newQuestion = await fetchRandomQuestion(); // Use async and await so that randomQuestion will be updated FIRST!
+			if (randomQuestion != null) {
+				updateData(editorText, selectedLanguage, newQuestion);
+			}
 		}
 	};
 
@@ -351,7 +431,9 @@ function Room({ user }) {
 	const handleEditorChange = (newValue) => {
 		if (!isFromProfile) {
 			setEditorText(newValue);
-			updateData(newValue, selectedLanguage, randomQuestion);
+			if (randomQuestion != null) {
+				updateData(newValue, selectedLanguage, randomQuestion);
+			}
 			socket.emit("editor-change", { text: newValue, roomId: roomId });
 		}
 	};
@@ -368,7 +450,7 @@ function Room({ user }) {
 	// wait for DOM to load before getting elements
 	useEffect(() => {
 		const chatForm = document.getElementById("chat-form");
-		const chatMessages = document.querySelector(".chat-messages");
+		const chatMessages = document.querySelector(".chat-main");
 
 		//Message submit
 		chatForm.addEventListener("submit", async (e) => {
@@ -377,7 +459,6 @@ function Room({ user }) {
 
 			// Get message text
 			const msg = e.target.elements.msg.value;
-
 			// Emit message to server and the current time
 			socket.emit(
 				"chatMessage",
@@ -442,7 +523,9 @@ function Room({ user }) {
 		if (!isFromProfile) {
 			console.log(`Option selected:`, selectedOption);
 			setSelectedLanguage(selectedOption);
-			updateData(editorText, selectedOption, randomQuestion);
+			if (randomQuestion != null) {
+				updateData(editorText, selectedOption, randomQuestion);
+			}
 			socket.emit("language-change", {
 				label: selectedOption.label,
 				value: selectedOption.value,
@@ -461,75 +544,144 @@ function Room({ user }) {
 		}
 	};
 
-	const handleExit = () => {
+	const handleShowConfirmModal = () => setShowConfirmModal(true); // Handler to show the modal
+	const handleCloseConfirmModal = () => setShowConfirmModal(false); // Handler to close the modal
+
+	const handleConfirmExit = () => {
 		leaveCall();
 		window.location.href = "/";
 	};
 
 	return (
-		<div className="container">
-			<div className="right-panel">
-				<div className="editor-container-room">
-					<div className="editor">
-						<Editor
-							height="100%"
-							width="100%"
-							theme="vs-dark"
-							language={selectedLanguage.value}
-							value={editorText}
-							onChange={handleEditorChange}
+		<div className="container-fluid">
+			<div className="row mt-4">
+				<div className="col-lg-3 col-md-6 order-lg-1 order-md-1 order-1">
+					<div className="question-container m-2 d-flex flex-column">
+						<div className="card bg-dark text-white rounded-4">
+							<div className="card-body">
+								<form
+									onSubmit={handleFormSubmit}
+									className="m-2"
+								>
+									<div className="mb-3">
+										<label
+											htmlFor="questionSelect"
+											className="form-label"
+										>
+											Select Question:
+										</label>
+										<select
+											className="form-select"
+											id="questionSelect"
+											onChange={(e) =>
+												setSelectedQuestionTitle(
+													e.target.value
+												)
+											}
+										>
+											{dropdownOptions}
+										</select>
+									</div>
+									<button
+										type="submit"
+										className="btn btn-light"
+										onClick={handleFormSubmit}
+									>
+										Change Question
+									</button>
+								</form>
+							</div>
+						</div>
+						<DisplayRandomQuestion
+							user={user}
+							randomQuestion={randomQuestion}
+							handleRefreshQuestion={handleRefreshQuestion}
 						/>
 					</div>
-					<div className="language-dropdown">
-						<label>Select Language:</label>
-						<Select
-							value={selectedLanguage}
-							onChange={handleLanguageChange}
-							options={codeLanguages}
-							isSearchable={true}
-							placeholder="Search for a language..."
-							className="select-language"
-							styles={customSelectStyles}
-							components={{
-								Option: CustomSelectOption, // Use the custom component to render options
-							}}
-						/>
+				</div>
+				<div className="col-lg-6 col-md-6 order-lg-2 order-md-2 order-2">
+					<div className="editor-container-room m-2 d-flex flex-column">
+						<div className="language-dropdown mb-2">
+							<label>Select Language:</label>
+							<Select
+								value={selectedLanguage}
+								onChange={handleLanguageChange}
+								options={codeLanguages}
+								isSearchable={true}
+								placeholder="Search for a language..."
+								className="select-language"
+								styles={customSelectStyles}
+								components={{
+									Option: CustomSelectOption, // Use the custom component to render options
+								}}
+							/>
+						</div>
+						<div className="editor flex-grow-1">
+							<Editor
+								height="100%"
+								width="100%"
+								theme="vs-dark"
+								language={selectedLanguage.value}
+								value={editorText}
+								onChange={handleEditorChange}
+								options={{
+									minimap: { enabled: false },
+								}}
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="middle-panel">
-				<div className="question-container">
-					<button className="exit-button" onClick={handleExit}>
-						Exit
-					</button>
-					<DisplayRandomQuestion
-						user={user}
-						randomQuestion={randomQuestion}
-						handleRefreshQuestion={handleRefreshQuestion}
-					/>
+				<div className="col-lg-3 col-md-12 order-lg-3 order-md-3 order-3">
+					<div className="chat-container bg-dark d-flex flex-column m-2 rounded-4">
+						<div className="chat-name d-flex align-items-center mb-2">
+							<div className="flex-grow-1 text-center">
+								<p className="room-id h5 text-light mb-0">
+									Chat with: {matchedUsername}
+								</p>
+							</div>
+							<button
+								className="btn btn-danger exit-button m-2"
+								onClick={handleShowConfirmModal}
+							>
+								Exit
+							</button>
+						</div>
+						<main
+							className="chat-main flex-grow-1 mb-2"
+							style={{ overflowY: "auto" }}
+						>
+							<div className="chat-messages"></div>
+						</main>
+						<div className="chat-form-container d-flex justify-content-between align-items-center m-2">
+							<form
+								id="chat-form"
+								className="chat-form flex-grow-1 mb-1 mt-1"
+							>
+								<input
+									id="msg"
+									type="text"
+									placeholder="Enter Message"
+									required
+									autoComplete="off"
+								/>
+								<button
+									type="submit"
+									className="btn btn-success rounded-circle "
+								>
+									<i className="fas fa-paper-plane"></i>
+								</button>
+							</form>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div className="left-panel">
-				<div>
-					<p className="room-id">In a chat with: {matchedUsername}</p>
-				</div>
-				<main class="chat-main">
-					<div class="chat-messages"></div>
-				</main>
-				<div class="chat-form-container">
-					<form id="chat-form" class="chat-form">
-						<input
-							id="msg"
-							type="text"
-							placeholder="Enter Message"
-							required
-							autocomplete="off"
-						/>
-						<button class="btn">
-							<i class="fas fa-paper-plane"></i>
-						</button>
-					</form>
-				</div>
+				<ConfirmModal
+					show={showConfirmModal}
+					handleClose={handleCloseConfirmModal}
+					handleConfirm={handleConfirmExit}
+					title="Confirm Exit"
+					body="Are you sure you want to exit the room?"
+					rightBtn="Exit"
+				/>
 			</div>
 		</div>
 	);

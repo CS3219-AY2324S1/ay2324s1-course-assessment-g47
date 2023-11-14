@@ -11,6 +11,10 @@
   --text-color: #b0bec5;
 }
 
+.text-accent-color {
+  color: var(--accent-color);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -116,12 +120,9 @@ form {
 
 /* Style for Add new Question Form */
 .create {
-  height: 750px;
-  background-color: var(--secondary-color);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 
 .question-header {
   text-align: center;
@@ -136,8 +137,10 @@ form {
 .editor-container {
   padding: 0 !important;
   border: None !important;
-  background-color: transparent !important;
+  background-color: white !important;
   height: auto;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 /* CSS for the Quill editor toolbar */
@@ -274,10 +277,13 @@ form {
   overflow-y: auto;
   border: 1px solid #ccc;
   max-width: 200px;
-
 }
 
 /* Style for table */
+.table {
+  background-color: transparent; /* or any other color you want */
+}
+
 .table-container {
   margin: 10px 60px;
   width: 90%;
@@ -291,10 +297,10 @@ form {
 }
 
 /* Style for the table rows */
-.table-row {
+/* .table-row {
   background-color: var(--[--primary-color]-color);
   color: var(--accent-color);
-}
+} */
 
 .clickable-cell {
   cursor: pointer; /* Change the cursor to a pointer on hover to indicate it's clickable */

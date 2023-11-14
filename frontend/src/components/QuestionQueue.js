@@ -4,14 +4,17 @@ import "./css/QuestionQueue.css";
 import io from "socket.io-client";
 
 function QuestionQueue({ user }) {
-  const [selectedDifficulty, setSelectedDifficulty] = useState('easy'); // Default difficulty
-  const [loading, setLoading] = useState(false); // Loading state
-  const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
-  const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
-  const [noMatchFound, setNoMatchFound] = useState(false); // Checks if user has gotten a match within a certain time
+	const [selectedDifficulty, setSelectedDifficulty] = useState("easy"); // Default difficulty
+	const [loading, setLoading] = useState(false); // Loading state
+	const [queueStartTime, setQueueStartTime] = useState(null); // Queue start time
+	const [elapsedTime, setElapsedTime] = useState(0); // Elapsed time in seconds
+	const [noMatchFound, setNoMatchFound] = useState(false); // Checks if user has gotten a match within a certain time
 
 	const navigate = useNavigate();
 	const [socketID, setSocketID] = useState(null);
+
+	// Handle timer queue
+	let timerInterval;
 
 	useEffect(() => {
 		const socket = io({
@@ -45,39 +48,41 @@ function QuestionQueue({ user }) {
 		// Attach the event listener for successful matches
 		socket.on("matched-successfully", handleMatchedSuccessfully);
 
-		// Handle timer queue
-		let timerInterval;
-
-    if (queueStartTime && loading) {
-      // Start a timer to update elapsed time while in the queue
-      timerInterval = setInterval(() => {
-        const currentTime = new Date().getTime();
-        const elapsed = Math.floor((currentTime - queueStartTime) / 1000);
-        setElapsedTime(elapsed);
-        if (selectedDifficulty === 'easy') {
-          console.log("Time in Queue: ", elapsed);
-          if (elapsed >= 30) {
-            setNoMatchFound(true);
-            handleExitQueue();
-          }
-        } else if (selectedDifficulty === 'medium') {
-          console.log("Time in Queue: ", elapsed);
-          if (elapsed >= 45) {
-            setNoMatchFound(true);
-            handleExitQueue();
-          }
-        } else {
-          console.log("Time in Queue: ", elapsed);
-          if (elapsed >= 60) {
-            setNoMatchFound(true);
-            handleExitQueue();
-          }
-        }
-      }, 1000);
-    } else {
-      // Clear the timer interval when not in the queue
-      clearInterval(timerInterval);
-    }
+		if (queueStartTime && loading) {
+			// Start a timer to update elapsed time while in the queue
+			timerInterval = setInterval(() => {
+				const currentTime = new Date().getTime();
+				const elapsed = Math.floor(
+					(currentTime - queueStartTime) / 1000
+				);
+				setElapsedTime(elapsed);
+				if (selectedDifficulty === "easy") {
+					console.log("Time in Queue: ", elapsed);
+					if (elapsed >= 30) {
+						setNoMatchFound(true);
+						handleExitQueue();
+						clearInterval(timerInterval);
+					}
+				} else if (selectedDifficulty === "medium") {
+					console.log("Time in Queue: ", elapsed);
+					if (elapsed >= 45) {
+						setNoMatchFound(true);
+						handleExitQueue();
+						clearInterval(timerInterval);
+					}
+				} else {
+					console.log("Time in Queue: ", elapsed);
+					if (elapsed >= 60) {
+						setNoMatchFound(true);
+						handleExitQueue();
+						clearInterval(timerInterval);
+					}
+				}
+			}, 1000);
+		} else {
+			// Clear the timer interval when not in the queue
+			clearInterval(timerInterval);
+		}
 
 		return () => {
 			// Clean up the event listener when the component unmounts
@@ -137,6 +142,7 @@ function QuestionQueue({ user }) {
 		setLoading(false); // Stop loading
 		setQueueStartTime(null); // Reset queue start time
 		setElapsedTime(0); // Reset elapsed time
+		clearInterval(timerInterval);
 
 		try {
 			const response = await fetch(`/api/matching/exitqueue`, {
@@ -165,50 +171,87 @@ function QuestionQueue({ user }) {
 		}
 	};
 
-
-
-  return (
-    <div className="question-queue">
-      <h2>Question Queue</h2>
-      <div>
-        <label>Select Difficulty:</label>
-        <select
-          value={selectedDifficulty}
-          onChange={handleDifficultyChange}
-          disabled={loading}
-          className="difficulty-select"
-        >
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-        {loading ? (
-          <p className="difficulty-prompt">Please exit the queue to change the difficulty.</p>
-        ) : null}
-      </div>
-      <div>
-        {loading ? (
-          <div>
-            <div className="timer">
-              <p className="timer-text">{formatElapsedTime(elapsedTime)}</p>
-              <p className="waiting-text">Waiting in queue for {selectedDifficulty} difficulty...</p>
-            </div>
-            <button onClick={handleExitQueue}>Exit Queue</button>
-          </div>
-        ) : (
-          !noMatchFound && <button onClick={handleJoinQueue}>Join Queue</button>
-        )}
-        {noMatchFound && (
-          <div>
-            <div className="no-match-popup">
-              <p>No match found, please requeue or select another difficulty.</p>
-            </div>
-            <button onClick={() => setNoMatchFound(false)}>Close</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+	return (
+		<div className="container-fluid " style={{ minWidth: "200px" }}>
+			<div className="card m-1 rounded-4">
+				<div className="card-body bg-light rounded-4">
+					<h2 className="card-title text-dark">Find your match!</h2>
+					<form>
+						{!loading && !noMatchFound ? (
+							<div className="mb-3">
+								<label
+									htmlFor="difficulty-select"
+									className="form-label"
+								>
+									Select Difficulty:
+								</label>
+								<select
+									id="difficulty-select"
+									className="form-select"
+									value={selectedDifficulty}
+									onChange={handleDifficultyChange}
+									disabled={loading}
+								>
+									<option value="easy">Easy</option>
+									<option value="medium">Medium</option>
+									<option value="hard">Hard</option>
+								</select>
+							</div>
+						) : (
+							<></>
+						)}
+						<div>
+							{loading ? (
+								<div>
+									<div className="timer mb-3">
+										<p className="timer-text fs-2">
+											{formatElapsedTime(elapsedTime)}
+										</p>
+										<p className="waiting-text">
+											Waiting in queue for{" "}
+											{selectedDifficulty} difficulty...
+										</p>
+									</div>
+									<button
+										type="button"
+										className="btn btn-danger"
+										onClick={handleExitQueue}
+									>
+										Exit Queue
+									</button>
+								</div>
+							) : (
+								!noMatchFound && (
+									<button
+										type="button"
+										className="btn btn-success"
+										onClick={handleJoinQueue}
+									>
+										Join Queue
+									</button>
+								)
+							)}
+							{noMatchFound && (
+								<div>
+									<div className="no-match-popup">
+										<p>
+											No match found, please requeue or
+											select another difficulty.
+										</p>
+									</div>
+									<button
+										onClick={() => setNoMatchFound(false)}
+									>
+										Close
+									</button>
+								</div>
+							)}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	);
 }
 
 export default QuestionQueue;

@@ -1,3 +1,15 @@
+.easy {
+  background-color: #d4edda; /* pastel green */
+}
+
+.medium {
+  background-color: #fff3cd; /* yellow */
+}
+
+.hard {
+  background-color: #f8d7da; /* red */
+}
+
 .profile-history-wrapper {
   display: flex;
   justify-content: space-between;
@@ -90,27 +102,23 @@
 }
 
 /* Style for table headers */
-.history-table th {
+/* .history-table th {
   background-color: var(--secondary-color);
-  /* Set the background color */
   color: var(--accent-color);
-  /* Set the text color */
   font-weight: bold;
-}
+} */
 
 /* Style for even rows */
-.history-table tr:nth-child(even) {
+/* .history-table tr:nth-child(even) {
   background-color: var(--white-color);
-  /* Set your desired background color */
   color: var(--accent-color);
-}
+} */
 
 /* Style for odd rows */
-.history-table tr:nth-child(odd) {
+/* .history-table tr:nth-child(odd) {
   background-color: var(--primary-color);
-  /* Set your desired background color */
   color: var(--accent-color);
-}
+} */
 
 /* Hover effect for table rows */
 .history-table tr:hover {
