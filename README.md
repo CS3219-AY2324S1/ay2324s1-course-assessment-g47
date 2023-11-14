@@ -9,7 +9,7 @@ ay2324s1-course-assessment-g47 created by GitHub Classroom
 2. [Assignment 2](#assignment-2)   
 3. [Assignment 3](#assignment-3)
 4. [Assignment 4](#assignment-4)
-5. [Assignment 5](#assignment-5)
+5. [Assignment 5 and Project](#assignment-5-and-project)
 6. [Setting up PostgreSQL Permissions](#setting-up-postgresql-permissions)
 
 
@@ -106,7 +106,7 @@ Follow these steps to run the project:
     - Admin: admin@example.com, PW: 123456 
     - SuperAdmin: superadmin@example.com, PW: 123456
 
-## Assignment 5:
+## Assignment 5 and Project:
 **Setup:**
 Follow these steps to run the project:   
 
