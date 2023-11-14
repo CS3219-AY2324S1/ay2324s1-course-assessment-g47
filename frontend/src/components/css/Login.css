@@ -1,0 +1,121 @@
+
+/* Styling for links */
+a {
+    text-decoration: none; /* Remove the underline */
+    color: var(--accent-color); /* Set the link color */
+    transition: color 0.3s; /* Add a smooth color transition on hover */
+    display: flex; /* Use flexbox to center-align content */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
+}
+  
+  /* Change link color on hover */
+a:hover {
+    color: var(--dark-accent-color); /* Change color on hover */
+}
+
+label {
+    color: var(--accent-color);
+    font-size: 18px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: var(--input-color);
+    outline: none;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: var(--dark-accent-color);
+    color: var(--input-color);
+    border: none;
+    border-radius: 10px;
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--accent-color); /* Set the hover background color */
+    color: var(--primary-color);
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  min-height: 50vh;
+  margin: 8% auto;
+  padding: 20px 40px;
+  border-radius: 20px;
+  background-color: var(--secondary-color);
+}
+
+.form-group {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.form-group input {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.login-label {
+    font-size: 40px;
+    font-weight: bold;
+    color: var(--accent-color);
+    padding-bottom: 30px;
+}
+
+
+/* Styling for success message */
+.success {
+    color: var(--correct-color);
+    display: flex; /* Use flexbox to center-align content */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */ 
+    text-align: center;   
+}
+
+/* Styling for error message */
+.error {
+    color: var(--incorrect-color);
+    display: flex; /* Use flexbox to center-align content */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
+    text-align: center;
+}
+
+
+.divider:after,
+.divider:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+.h-custom {
+    height: calc(100% - 73px);
+}
+@media (max-width: 450px) {
+    .h-custom {
+        height: 100%;
+    }
+}
+
+
+

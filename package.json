@@ -1,0 +1,35 @@
+{
+    "name": "repo",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "cd backend && npm test",
+        "test-ci": "cd backend && npm run test-ci",
+        "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
+        "frontend": "cd frontend && npm start",
+        "backend": "cd backend && concurrently \"nodemon collaboration-service/socket-io.js\" \"nodemon question-service/server.js\" \"nodemon user-service/postgresql.js\" \"nodemon history-service/history.js\" \"nodemon matching-service/match-service.js\"",
+        "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install && cd collaboration-service && npm install && cd ../history-service && npm install && cd ../matching-service && npm install && cd ../question-service && npm install && cd ../user-service && npm install"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^8.2.1"
+    },
+    "dependencies": {
+        "axios": "^1.5.1",
+        "bcrypt": "^5.1.1",
+        "bootstrap": "^5.3.2",
+        "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
+        "date-fns": "^2.30.0",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.2",
+        "mongodb": "^6.0.0",
+        "mongoose": "^7.5.2",
+        "nodemailer": "^6.9.5",
+        "pg": "^8.11.3"
+    }
+}

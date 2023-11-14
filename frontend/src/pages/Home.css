@@ -1,0 +1,76 @@
+@media (min-width: 992px) { /* Bootstrap's breakpoint for 'lg' size */
+  .fixed-height-lg {
+    max-height: 300px;
+    overflow: auto;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #333;
+  padding: 10px 20px;
+}
+
+.left,
+.right {
+  flex: 1;
+  text-align: center;
+}
+  
+.center {
+  flex: 2;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.table tbody , 
+.table tbody td {
+    background-color: transparent !important;
+}
+
+.table-container {
+  margin-bottom: 50px;
+}
+
+/* Filters Section Container */
+.filter-container {
+  display: flex;
+  justify-content: flex-start; /* Align elements to the left */
+  align-items: center;
+  padding: 10px;
+}
+
+/* Filter Options (Each filter element) */
+.filter-option {
+  margin-right: 10px; /* Add some space between filter elements */
+  display: flex;
+  align-items: center;
+}
+
+/* Button (Sort by Popularity) */
+.button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Label (Select Categories and Select Difficulty) */
+label {
+  margin-right: 10px;
+}
+
+/* Select Dropdown */
+.Select {
+  width: 200px;
+}
+
+
+
+  
+  

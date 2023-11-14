@@ -1,0 +1,8 @@
+/node_modules
+.env
+
+# Ignore the MongoDB data directory
+mongo-data/
+
+# Ignore the PostgreSQL data directory
+postgres_data/

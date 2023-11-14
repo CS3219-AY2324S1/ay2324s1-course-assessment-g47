@@ -1,0 +1,17 @@
+/* .app-footer {
+    position: fixed; 
+    bottom: 0; 
+    width: 100%; 
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} */
+
+.footer {
+    position: fixed; /* Set the navbar to fixed position */
+    bottom: 0; /* Place it at the bottom of the viewport */
+    width: 100%; /* Make it span the full width of the screen */
+}

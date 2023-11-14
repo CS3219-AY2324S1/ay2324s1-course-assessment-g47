@@ -1,0 +1,222 @@
+.easy {
+  background-color: #d4edda; /* pastel green */
+}
+
+.medium {
+  background-color: #fff3cd; /* yellow */
+}
+
+.hard {
+  background-color: #f8d7da; /* red */
+}
+
+.profile-history-wrapper {
+  display: flex;
+  justify-content: space-between;
+  /* Ensures containers are side by side */
+}
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 30%;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 20px 40px;
+  border-radius: 20px;
+  background-color: var(--secondary-color);
+  white-space: normal;
+  /* Allow text to wrap */
+  position: relative;
+}
+
+.profile-head {
+  margin-top: 10px;
+}
+
+.profile-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--accent-color);
+  font-size: 20px;
+}
+
+.profile-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.history-container {
+  flex: 1;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  display: flex;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 20px 40px;
+  border-radius: 20px;
+  width: 90%;
+  background-color: var(--secondary-color);
+}
+
+.no-history {
+  text-align: left;
+}
+
+.no-history-text {
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--accent-color);
+  margin-bottom: 20px;
+}
+
+.left-align-link {
+  text-align: left;
+  display: inline-block;
+}
+
+/* Style for the table */
+.history-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  border: 1px solid #e5e5e5;
+  /* LeetCode's border color */
+  border-radius: 4px;
+  /* Rounded corners for the entire table */
+}
+
+/* Style for table headers and cells */
+.history-table th,
+.history-table td {
+  border: 1px solid #e5e5e5;
+  /* LeetCode's border color */
+  padding: 12px 20px;
+  text-align: left;
+}
+
+/* Style for table headers */
+/* .history-table th {
+  background-color: var(--secondary-color);
+  color: var(--accent-color);
+  font-weight: bold;
+} */
+
+/* Style for even rows */
+/* .history-table tr:nth-child(even) {
+  background-color: var(--white-color);
+  color: var(--accent-color);
+} */
+
+/* Style for odd rows */
+/* .history-table tr:nth-child(odd) {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+} */
+
+/* Hover effect for table rows */
+.history-table tr:hover {
+  background-color: var(--row-hover-color);
+  /* Set your desired row hover background color */
+}
+
+/* Define the table width and text alignment */
+.history-table {
+  width: 100%;
+  text-align: left;
+}
+
+/* Style for the span (displayed username and email) */
+.profile-display {
+  font-size: 20px;
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-bottom: 5px;
+  white-space: normal;
+  word-wrap: break-word;
+  /* Break long words into multiple lines */
+}
+
+.profile-heading {
+  text-align: center;
+}
+
+.username-wrapper,
+.email-wrapper {
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.edit-profile-button,
+.edit-user-button,
+.edit-password-button {
+  display: flex;
+  justify-content: space-between;
+  /* Adjust this property for spacing between buttons */
+  margin-top: 20px;
+  margin-right: 10px;
+  padding: 10px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.edit-profile-button button:not(:last-child),
+.edit-user-button button:not(:last-child),
+.edit-password-button button:not(:last-child) {
+  margin-right: 10px;
+  /* Adjust this margin for your desired spacing */
+
+  @media (max-width: 768px) {
+    margin-bottom: 10px;
+  }
+}
+
+.profile-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: var(--dark-accent-color);
+  color: var(--input-color);
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.profile-button:hover {
+  background-color: var(--accent-color);
+  /* Set the hover background color */
+  color: var(--primary-color);
+}
+
+
+.button-link-change-account {
+  position: absolute;
+  top: 0;
+  /* Position it at the top of the container */
+  right: 0;
+  /* Position it at the right of the container */
+  margin: 10px;
+  /* Add margin for spacing */
+  padding: 10px;
+  font-size: 16px;
+  background-color: var(--dark-accent-color);
+  color: var(--input-color);
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.button-link-change-account:hover {
+  background-color: var(--accent-color);
+  /* Set the hover background color */
+  color: var(--primary-color);
+}

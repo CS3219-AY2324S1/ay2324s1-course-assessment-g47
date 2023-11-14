@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "concurrently \"cd question-service && npm test\" \"cd user-service && npm test\" \"cd history-service && npm test\"",
+    "test-ci": "concurrently \"cd question-service && npm run test-ci\" \"cd user-service && npm run test-ci\" \"cd history-service && npm run test-ci\"",
+    "start": "concurrently \"node server.js\" \"node postgresql.js\" \"node history.js\" \"node matching-service.js\"",
+    "dev": "concurrently \"nodemon socket-io.js\" \"nodemon server.js\" \"nodemon postgresql.js\" \"nodemon history.js\" \"nodemon matching-service.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "chai": "^4.3.10",
+    "chai-http": "^4.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "nodemailer": "^6.9.5",
+    "nodemon": "^3.0.1",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.2.0"
+  }
+}

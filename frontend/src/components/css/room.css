@@ -1,0 +1,199 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-top: 10px;
+}
+
+.question-container {
+  height: 87vh;
+  min-width: 200px;
+  border-radius: 20px;
+}
+
+/* Code editor */
+.editor-container-room {
+  height: 87vh;
+  padding: 10px;
+  border: #1e1e1e 1px solid;
+  border-radius: 20px;
+  background-color: #1e1e1e;
+}
+
+/* .editor {
+  height: 90%;
+} */
+
+/* Chat */
+
+.chat-container {
+  height: 87vh;
+  min-width: 200px;
+
+}
+
+.chat-main{
+  height: 100%;
+  margin: 0%;
+}
+
+.chat-messages {
+  /* height: 100%;
+  overflow-y: scroll; */
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.chat-main::-webkit-scrollbar {
+  width: 12px;
+}
+
+.chat-main::-webkit-scrollbar-track {
+  background: #444;
+  border-radius: 6px;
+}
+
+.chat-main::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 6px;
+}
+
+.chat-main::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+/* .chat-messages p {
+  margin-bottom: 10px;
+} */
+
+
+.message {
+  /* background-color: #e2e2e2; */
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 8px;
+  border-radius: 15px;
+  display: inline-block;
+  clear: both; /* Add this to ensure messages appear on separate lines */
+  max-width: 70%; /* Adjust the maximum width of the message box */
+  position: relative;
+  min-width: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); 
+  
+}
+
+.message-content p{
+  margin-bottom: 2px;
+}
+
+.user-message {
+  background-color: #2e8b57;
+  background-image: linear-gradient(to bottom right, #2e8b57, #3c9f67); /* A gradient for a more 3D look */
+  color: #fff;
+  align-self: flex-end;
+  text-align: left;
+  float: right; 
+}
+
+.user-message .username {
+  color: #ff7f50;
+}
+
+.received-message {
+  background-color: #5f5f5f;
+  color: #f5f5f5;
+  align-self: flex-start;
+  text-align: left;
+  float: left; 
+}
+
+.received-message .username {
+  color: #20b2aa;
+}
+
+.notification-message {
+  color: grey;
+  font-size: 12px;
+  max-width: 90%;
+  margin: 4px auto; /* Set top and bottom margin to 4px and left and right margin to auto */
+  text-align: center;
+  min-width: auto;
+  display: block; /* Ensure it takes up the full width of the container */
+}
+
+.notification-message .message-text {
+  color: grey;
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  display: block; /* Ensure it takes up the full width of the container */
+}
+
+.username {
+  font-weight: bold;
+}
+
+.message-text {
+  font-size: 16px;
+  word-wrap: break-word;
+  white-space: pre-line;
+}
+
+.meta {
+  font-size: 0.8em;
+  color: #aaa;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-end; 
+  /* position: absolute;
+  padding-right: 10px;
+  bottom: 0;
+  right: 0;
+  margin: 0; */
+}
+
+.chat-form {
+  display: flex; 
+  align-items: center; 
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
+}
+
+.chat-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.chat-form button {
+  width: auto;
+  height: auto;
+  border-radius: 20px;
+  background-color: var(--dark-accent-color);
+  cursor: pointer;
+  color: var(--text-color);
+  margin-left: 10px;
+}
+
+.chat-form button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 20px;
+  text-align: center;
+  z-index: 1000;
+}

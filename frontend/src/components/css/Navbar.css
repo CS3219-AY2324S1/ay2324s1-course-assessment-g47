@@ -1,0 +1,28 @@
+header {
+    background-color: var(--navbar-color); /* Set the background color */
+    padding: 10px; /* Add padding for spacing */
+}
+
+h1 {
+    margin: 0; /* Remove default margin */
+    font-size: 24px; /* Adjust font size */
+    color: var(--accent-color); /* Set the text color */
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .navbar-buttons {
+    display: flex;
+    gap: 20px; /* Adjust the spacing between buttons */
+  }
+
+  .button-rounded {
+    border-radius: 10px; /* Adjust the value as needed for the desired level of rounding */
+  }
+  .button-rounded:hover {
+    border-radius: 10px; /* Adjust the value as needed for the desired level of rounding */
+  }
